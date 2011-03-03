@@ -10,8 +10,8 @@
 /*--------------------------------------------------------------------------*/
 
 /*
-	$Id: iniparser.h,v 1.24 2007-11-23 21:38:19 ndevilla Exp $
-	$Revision: 1.24 $
+	$Id: iniparser.h,v 1.26 2011-03-02 20:15:13 ndevilla Exp $
+	$Revision: 1.26 $
 */
 
 #ifndef _INIPARSER_H_
@@ -33,13 +33,6 @@
 /* #include <unistd.h> */
 
 #include "dictionary.h"
-
-/*---------------------------------------------------------------------------
-   								Macros
- ---------------------------------------------------------------------------*/
-/** For backwards compatibility only */
-#define iniparser_getstr(d, k)  iniparser_getstring(d, k, NULL)
-#define iniparser_setstr        iniparser_setstring
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -125,7 +118,7 @@ void iniparser_dump(dictionary * d, FILE * f);
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, const char * key, char * def);
+char * iniparser_getstring(dictionary * d, char * key, char * def);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -154,7 +147,7 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def);
   Credits: Thanks to A. Becker for suggesting strtol()
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getint(dictionary * d, const char * key, int notfound);
+int iniparser_getint(dictionary * d, char * key, int notfound);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -203,7 +196,7 @@ double iniparser_getdouble(dictionary * d, char * key, double notfound);
   necessarily have to be 0 or 1.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getboolean(dictionary * d, const char * key, int notfound);
+int iniparser_getboolean(dictionary * d, char * key, int notfound);
 
 
 /*-------------------------------------------------------------------------*/
@@ -219,7 +212,7 @@ int iniparser_getboolean(dictionary * d, const char * key, int notfound);
   It is Ok to set val to NULL.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_setstring(dictionary * ini, char * entry, char * val);
+int iniparser_set(dictionary * ini, char * entry, char * val);
 
 
 /*-------------------------------------------------------------------------*/
@@ -262,7 +255,7 @@ int iniparser_find_entry(dictionary * ini, char * entry) ;
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(const char * ininame);
+dictionary * iniparser_load(char * ininame);
 
 /*-------------------------------------------------------------------------*/
 /**

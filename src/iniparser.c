@@ -9,9 +9,9 @@
 */
 /*--------------------------------------------------------------------------*/
 /*
-    $Id: iniparser.c,v 2.18 2008-01-03 18:35:39 ndevilla Exp $
-    $Revision: 2.18 $
-    $Date: 2008-01-03 18:35:39 $
+    $Id: iniparser.c,v 2.19 2011-03-02 20:15:13 ndevilla Exp $
+    $Revision: 2.19 $
+    $Date: 2011-03-02 20:15:13 $
 */
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
@@ -48,7 +48,7 @@ typedef enum _line_status_ {
   allocated, it will be modified at each function call (not re-entrant).
  */
 /*--------------------------------------------------------------------------*/
-static char * strlwc(const char * s)
+static char * strlwc(char * s)
 {
     static char l[ASCIILINESZ+1];
     int i ;
@@ -265,7 +265,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, const char * key, char * def)
+char * iniparser_getstring(dictionary * d, char * key, char * def)
 {
     char * lc_key ;
     char * sval ;
@@ -305,7 +305,7 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def)
   Credits: Thanks to A. Becker for suggesting strtol()
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getint(dictionary * d, const char * key, int notfound)
+int iniparser_getint(dictionary * d, char * key, int notfound)
 {
     char    *   str ;
 
@@ -368,7 +368,7 @@ double iniparser_getdouble(dictionary * d, char * key, double notfound)
   necessarily have to be 0 or 1.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getboolean(dictionary * d, const char * key, int notfound)
+int iniparser_getboolean(dictionary * d, char * key, int notfound)
 {
     char    *   c ;
     int         ret ;
@@ -526,7 +526,7 @@ static line_status iniparser_line(
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(const char * ininame)
+dictionary * iniparser_load(char * ininame)
 {
     FILE * in ;
 
@@ -563,6 +563,8 @@ dictionary * iniparser_load(const char * ininame)
     while (fgets(line+last, ASCIILINESZ-last, in)!=NULL) {
         lineno++ ;
         len = (int)strlen(line)-1;
+        if (len==0)
+            continue;
         /* Safety check against buffer overflows */
         if (line[len]!='\n') {
             fprintf(stderr,
