@@ -469,7 +469,7 @@ static line_status iniparser_line(
     if (len<1) {
         /* Empty line */
         sta = LINE_EMPTY ;
-    } else if (line[0]=='#') {
+    } else if (line[0]=='#' || line[0]==';') {
         /* Comment line */
         sta = LINE_COMMENT ; 
     } else if (line[0]=='[' && line[len-1]==']') {
