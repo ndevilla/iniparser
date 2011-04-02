@@ -266,12 +266,11 @@ int dictionary_set(dictionary * d, char * key, char * val)
 		d->size *= 2 ;
 	}
 
-    /* Insert key in the first empty slot */
-    for (i=0 ; i<d->size ; i++) {
-        if (d->key[i]==NULL) {
-            /* Add key here */
-            break ;
-        }
+    /* Insert key in the first empty slot. Start at d->n and wrap at
+       d->size. Because d->n < d->size this will necessarily
+       terminate. */
+    for (i=d->n ; d->key[i] ; ) {
+        if(++i == d->size) i = 0;
     }
 	/* Copy key */
 	d->key[i]  = xstrdup(key);
