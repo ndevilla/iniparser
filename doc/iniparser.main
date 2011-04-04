@@ -1,10 +1,10 @@
 
 /**
 
-	@mainpage	iniparser documentation
+    @mainpage   iniparser documentation
 
 
-	@section welcome	Introduction
+    @section welcome    Introduction
 
     iniParser is a simple C library offering ini file parsing services.
     The library is pretty small (less than 1500 lines of C) and robust, and
@@ -12,7 +12,7 @@
     in ANSI C and should compile on most platforms without difficulty.
 
 
-	@section inidef		What is an ini file?
+    @section inidef     What is an ini file?
 
     An ini file is an ASCII file describing simple parameters
     (character strings, integers, floating-point values or booleans)
@@ -23,7 +23,7 @@
 
     @verbatim
     [Section Name]
-	@endverbatim
+    @endverbatim
 
     i.e. the section name enclosed in square brackets, alone on a
     line. Sections names are allowed to contain any character but
@@ -34,7 +34,7 @@
 
     @verbatim
     Key = value ; comment
-	@endverbatim
+    @endverbatim
 
     The key is any string (possibly containing blanks). The value is
     any character on the right side of the equal sign. Values can be
@@ -46,7 +46,7 @@
     @verbatim
     Hello = "this is a long string value" ; comment
     Hello = this is a long string value ; comment
-	@endverbatim
+    @endverbatim
 
     The semicolon and comment at the end of the line are optional. If
     there is a comment, it starts from the first character after the
@@ -71,29 +71,29 @@
     - Comments given on value lines after the semicolon (if present)
 
 
-	@section install	Compiling/installing the library
+    @section install    Compiling/installing the library
 
-	Edit the Makefile to indicate the C compiler you want to use, the
-	options to provide to compile ANSI C, and possibly the options to pass
-	to the ar program on your machine to build a library (.a) from a set
-	of object (.o) files.
+    Edit the Makefile to indicate the C compiler you want to use, the
+    options to provide to compile ANSI C, and possibly the options to pass
+    to the ar program on your machine to build a library (.a) from a set
+    of object (.o) files.
 
-	Defaults are set for the gcc compiler and the standard ar library
-	builder.
+    Defaults are set for the gcc compiler and the standard ar library
+    builder.
 
-	Type 'make', that should do it.
+    Type 'make', that should do it.
 
-	To use the library in your programs, add the following line on top
-	of your module:
+    To use the library in your programs, add the following line on top
+    of your module:
 
-	@code
-	#include "iniparser.h"
-	@endcode
+    @code
+    #include "iniparser.h"
+    @endcode
 
-	And link your program with the iniparser library by adding
-	@c -liniparser.a to the compile line.
+    And link your program with the iniparser library by adding
+    @c -liniparser.a to the compile line.
 
-	See the file test/initest.c for an example.
+    See the file test/initest.c for an example.
 
     iniparser is an ANSI C library. If you want to compile it
     with a C++ compiler you will likely run into compatibility
@@ -105,16 +105,15 @@
     C code in a C++ environment. You have been warned.
 
 
-	@section reference	Library reference
+    @section reference  Library reference
 
-	The library is completely documented in its header file. On-line
-	documentation has been generated and can be consulted here:
+    The library is completely documented in its header file. On-line
+    documentation has been generated and can be consulted here:
 
-	- iniparser.h
+    - iniparser.h
 
-	
 
-	@section usage 		Using the parser
+    @section usage      Using the parser
 
     Comments are discarded by the parser. Then sections are
     identified, and in each section a new entry is created for every
@@ -123,13 +122,13 @@
     @verbatim
     [Section]
     Keyword = value ; comment
-	@endverbatim
+    @endverbatim
 
     is converted to the following key pair:
 
     @verbatim
     ("section:keyword", "value")
-	@endverbatim
+    @endverbatim
 
     This means that if you want to retrieve the value that was stored
     in the section called @c Pizza, in the keyword @c Cheese,
@@ -179,7 +178,7 @@
     @endverbatim
 
 
-	@section implementation		A word about the implementation
+    @section implementation     A word about the implementation
 
     The dictionary structure is a pretty simple dictionary
     implementation which might find some uses in other applications.
@@ -200,9 +199,9 @@
     available on the net to replace this one.
 
 
-	@section authors	Authors
+    @section authors    Authors
 
-	Nicolas Devillard (ndevilla AT free DOT fr).
+    Nicolas Devillard (ndevilla AT free DOT fr).
 
 
 */

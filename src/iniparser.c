@@ -38,9 +38,9 @@ typedef enum _line_status_ {
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Convert a string to lowercase.
-  @param	s	String to convert.
-  @return	ptr to statically allocated string.
+  @brief    Convert a string to lowercase.
+  @param    s   String to convert.
+  @return   ptr to statically allocated string.
 
   This function returns a pointer to a statically allocated string
   containing a lowercased version of the input string. Do not free
@@ -66,9 +66,9 @@ static char * strlwc(char * s)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Remove blanks at the beginning and the end of a string.
-  @param	s	String to parse.
-  @return	ptr to statically allocated string.
+  @brief    Remove blanks at the beginning and the end of a string.
+  @param    s   String to parse.
+  @return   ptr to statically allocated string.
 
   This function returns a pointer to a statically allocated string,
   which is identical to the input string, except that all blank
@@ -81,21 +81,21 @@ static char * strlwc(char * s)
 static char * strstrip(char * s)
 {
     static char l[ASCIILINESZ+1];
-	char * last ;
-	
+    char * last ;
+    
     if (s==NULL) return NULL ;
     
-	while (isspace((int)*s) && *s) s++;
-	memset(l, 0, ASCIILINESZ+1);
-	strcpy(l, s);
-	last = l + strlen(l);
-	while (last > l) {
-		if (!isspace((int)*(last-1)))
-			break ;
-		last -- ;
-	}
-	*last = (char)0;
-	return (char*)l ;
+    while (isspace((int)*s) && *s) s++;
+    memset(l, 0, ASCIILINESZ+1);
+    strcpy(l, s);
+    last = l + strlen(l);
+    while (last > l) {
+        if (!isspace((int)*(last-1)))
+            break ;
+        last -- ;
+    }
+    *last = (char)0;
+    return (char*)l ;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -444,7 +444,7 @@ void iniparser_unset(dictionary * ini, char * entry)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Load a single line from an INI file
+  @brief    Load a single line from an INI file
   @param    input_line  Input line, may be concatenated multi-line input
   @param    section     Output space to store section
   @param    key         Output space to store key

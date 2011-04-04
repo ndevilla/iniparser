@@ -14,17 +14,17 @@
 /*--------------------------------------------------------------------------*/
 
 /*
-	$Id: dictionary.h,v 1.12 2007-11-23 21:37:00 ndevilla Exp $
-	$Author: ndevilla $
-	$Date: 2007-11-23 21:37:00 $
-	$Revision: 1.12 $
+    $Id: dictionary.h,v 1.12 2007-11-23 21:37:00 ndevilla Exp $
+    $Author: ndevilla $
+    $Date: 2007-11-23 21:37:00 $
+    $Revision: 1.12 $
 */
 
 #ifndef _DICTIONARY_H_
 #define _DICTIONARY_H_
 
 /*---------------------------------------------------------------------------
-   								Includes
+                                Includes
  ---------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -33,13 +33,13 @@
 #include <unistd.h>
 
 /*---------------------------------------------------------------------------
-   								New types
+                                New types
  ---------------------------------------------------------------------------*/
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Dictionary object
+  @brief    Dictionary object
 
   This object contains a list of string/string associations. Each
   association is identified by a unique string key. Looking up values
@@ -48,16 +48,16 @@
  */
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
-	int				n ;		/** Number of entries in dictionary */
-	int				size ;	/** Storage size */
-	char 		**	val ;	/** List of string values */
-	char 		**  key ;	/** List of string keys */
-	unsigned	 *	hash ;	/** List of hash values for keys */
+    int             n ;     /** Number of entries in dictionary */
+    int             size ;  /** Storage size */
+    char        **  val ;   /** List of string values */
+    char        **  key ;   /** List of string keys */
+    unsigned     *  hash ;  /** List of hash values for keys */
 } dictionary ;
 
 
 /*---------------------------------------------------------------------------
-  							Function prototypes
+                            Function prototypes
  ---------------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------------*/
