@@ -343,7 +343,7 @@ int dictionary_set(dictionary * d, char * key, char * val)
 	{
 		return -1;
 	}
-	
+
 	/* Compute hash for this key */
 	hash = dictionary_hash(key) ;
 	/* Find if value is already in dictionary */
@@ -389,13 +389,14 @@ int dictionary_set(dictionary * d, char * key, char * val)
 		d->size = d->size << 1;
 	}
 
-    /* Insert key in the first empty slot */
-    for(i=0; i < d->size; ++i)
-    {
-        if(d->key[i]==NULL)
+    /*
+     * Insert key in the first empty slot. Start at d->n and wrap at d->size.
+     * Because d->n < d->size this will necessarily terminate.
+     */
+    for (i=d->n ; d->key[i] ; ) {
+        if(++i == d->size)
         {
-            /* Add key here */
-            break ;
+            i = 0;
         }
     }
 	/* Copy key */
