@@ -10,27 +10,23 @@
 /*--------------------------------------------------------------------------*/
 
 /*
-    $Id: iniparser.h,v 1.26 2011-03-02 20:15:13 ndevilla Exp $
-    $Revision: 1.26 $
+	$Id: iniparser.h,v 1.26 2011-03-02 20:15:13 ndevilla Exp $
+	$Author: tc6 $
+	$Date: 2004-04-22 10:50:35-05 $
+	$Revision: 1.26 $
 */
 
 #ifndef _INIPARSER_H_
 #define _INIPARSER_H_
 
 /*---------------------------------------------------------------------------
-                                Includes
+   								Includes
  ---------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/*
- * The following #include is necessary on many Unixes but not Linux.
- * It is not needed for Windows platforms.
- * Uncomment it if needed.
- */
-/* #include <unistd.h> */
+#include <unistd.h>
 
 #include "dictionary.h"
 
@@ -102,6 +98,27 @@ void iniparser_dump_ini(dictionary * d, FILE * f);
  */
 /*--------------------------------------------------------------------------*/
 void iniparser_dump(dictionary * d, FILE * f);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, return NULL if not found
+  @param    d   Dictionary to search
+  @param    key Key string to look for
+  @return   pointer to statically allocated character string, or NULL.
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  NULL is returned.
+  The returned char pointer is pointing to a string allocated in
+  the dictionary, do not free or modify it.
+
+  This function is only provided for backwards compatibility with
+  previous versions of iniparser. It is recommended to use
+  iniparser_getstring() instead.
+ */
+/*--------------------------------------------------------------------------*/
+char * iniparser_getstr(dictionary * d, char * key);
+
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -214,6 +231,21 @@ int iniparser_getboolean(dictionary * d, char * key, int notfound);
 /*--------------------------------------------------------------------------*/
 int iniparser_set(dictionary * ini, char * entry, char * val);
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Set an entry in a dictionary.
+  @param    ini     Dictionary to modify.
+  @param    entry   Entry to modify (entry name)
+  @param    val     New value to associate to the entry.
+  @return   int 0 if Ok, -1 otherwise.
+
+  If the given entry can be found in the dictionary, it is modified to
+  contain the provided value. If it cannot be found, -1 is returned.
+  It is Ok to set val to NULL.
+ */
+/*--------------------------------------------------------------------------*/
+
+int iniparser_setstr(dictionary * ini, char * entry, char * val);
 
 /*-------------------------------------------------------------------------*/
 /**

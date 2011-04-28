@@ -14,17 +14,17 @@
 /*--------------------------------------------------------------------------*/
 
 /*
-    $Id: dictionary.h,v 1.12 2007-11-23 21:37:00 ndevilla Exp $
-    $Author: ndevilla $
-    $Date: 2007-11-23 21:37:00 $
-    $Revision: 1.12 $
+	$Id: dictionary.h,v 1.12 2007-11-23 21:37:00 ndevilla Exp $
+	$Author: ndevilla $
+	$Date: 2007-11-23 21:37:00 $
+	$Revision: 1.12 $
 */
 
 #ifndef _DICTIONARY_H_
 #define _DICTIONARY_H_
 
 /*---------------------------------------------------------------------------
-                                Includes
+   								Includes
  ---------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -33,13 +33,13 @@
 #include <unistd.h>
 
 /*---------------------------------------------------------------------------
-                                New types
+   								New types
  ---------------------------------------------------------------------------*/
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Dictionary object
+  @brief	Dictionary object
 
   This object contains a list of string/string associations. Each
   association is identified by a unique string key. Looking up values
@@ -48,16 +48,16 @@
  */
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
-    int             n ;     /** Number of entries in dictionary */
-    int             size ;  /** Storage size */
-    char        **  val ;   /** List of string values */
-    char        **  key ;   /** List of string keys */
-    unsigned     *  hash ;  /** List of hash values for keys */
+	int				n ;		/** Number of entries in dictionary */
+	int				size ;	/** Storage size */
+	char 		**	val ;	/** List of string values */
+	char 		**  key ;	/** List of string keys */
+	unsigned	 *	hash ;	/** List of hash values for keys */
 } dictionary ;
 
 
 /*---------------------------------------------------------------------------
-                            Function prototypes
+  							Function prototypes
  ---------------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------------*/
@@ -117,6 +117,50 @@ char * dictionary_get(dictionary * d, char * key, char * def);
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Get a value from a dictionary, as a char.
+  @param    d       dictionary object to search.
+  @param    key     Key to look for in the dictionary.
+  @param    def     Default value for the key if not found.
+  @return   char    
+
+  This function locates a key in a dictionary using dictionary_get,
+  and returns the first char of the found string.
+ */
+/*--------------------------------------------------------------------------*/
+char dictionary_getchar(dictionary * d, char * key, char def) ;
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get a value from a dictionary, as an int.
+  @param    d       dictionary object to search.
+  @param    key     Key to look for in the dictionary.
+  @param    def     Default value for the key if not found.
+  @return   int
+
+  This function locates a key in a dictionary using dictionary_get,
+  and applies atoi on it to return an int. If the value cannot be found
+  in the dictionary, the default is returned.
+ */
+/*--------------------------------------------------------------------------*/
+int dictionary_getint(dictionary * d, char * key, int def);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief        Get a value from a dictionary, as a double.
+  @param    d       dictionary object to search.
+  @param    key     Key to look for in the dictionary.
+  @param    def     Default value for the key if not found.
+  @return   double
+
+  This function locates a key in a dictionary using dictionary_get,
+  and applies atof on it to return a double. If the value cannot be found
+  in the dictionary, the default is returned.
+ */
+/*--------------------------------------------------------------------------*/
+double dictionary_getdouble(dictionary * d, char * key, double def);
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Set a value in a dictionary.
   @param    d       dictionary object to modify.
   @param    key     Key to modify or add.
@@ -156,6 +200,34 @@ int dictionary_set(dictionary * vd, char * key, char * val);
 /*--------------------------------------------------------------------------*/
 void dictionary_unset(dictionary * d, char * key);
 
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Set a key in a dictionary, providing an int.
+  @param    d       Dictionary to update.
+  @param    key     Key to modify or add
+  @param    val     Integer value to store (will be stored as a string).
+  @return   void
+
+  This helper function calls dictionary_set() with the provided integer
+  converted to a string using %d.
+ */
+/*--------------------------------------------------------------------------*/
+void dictionary_setint(dictionary * d, char * key, int val);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Set a key in a dictionary, providing a double.
+  @param    d       Dictionary to update.
+  @param    key     Key to modify or add
+  @param    val     Double value to store (will be stored as a string).
+  @return   void
+
+  This helper function calls dictionary_set() with the provided double
+  converted to a string using %g.
+ */
+/*--------------------------------------------------------------------------*/
+void dictionary_setdouble(dictionary * d, char * key, double val);
 
 /*-------------------------------------------------------------------------*/
 /**
