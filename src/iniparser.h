@@ -255,7 +255,7 @@ int iniparser_find_entry(dictionary * ini, char * entry) ;
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(char * ininame);
+dictionary * iniparser_load(const char * ininame);
 
 /*-------------------------------------------------------------------------*/
 /**
