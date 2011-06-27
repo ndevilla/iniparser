@@ -48,7 +48,7 @@ typedef enum _line_status_ {
   allocated, it will be modified at each function call (not re-entrant).
  */
 /*--------------------------------------------------------------------------*/
-static char * strlwc(char * s)
+static char * strlwc(const char * s)
 {
     static char l[ASCIILINESZ+1];
     int i ;
@@ -265,7 +265,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, char * key, char * def)
+char * iniparser_getstring(dictionary * d, const char * key, char * def)
 {
     char * lc_key ;
     char * sval ;
