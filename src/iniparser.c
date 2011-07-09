@@ -252,6 +252,44 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Save a dictionary section to a loadable ini file
+  @param    d   Dictionary to dump
+  @param    s   Section name of dictionary to dump
+  @param    f   Opened file pointer to dump to
+  @return   void
+
+  This function dumps a given section of a given dictionary into a loadable ini
+  file.  It is Ok to specify @c stderr or @c stdout as output files.
+ */
+/*--------------------------------------------------------------------------*/
+void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
+{
+    int     j ;
+    char    keym[ASCIILINESZ+1];
+    int     seclen ;
+
+    if (d==NULL || f==NULL) return ;
+    if (! iniparser_find_entry(d, s)) return ;
+
+    seclen  = (int)strlen(s);
+    fprintf(f, "\n[%s]\n", s);
+    sprintf(keym, "%s:", s);
+    for (j=0 ; j<d->size ; j++) {
+        if (d->key[j]==NULL)
+            continue ;
+        if (!strncmp(d->key[j], keym, seclen+1)) {
+            fprintf(f,
+                    "%-30s = %s\n",
+                    d->key[j]+seclen+1,
+                    d->val[j] ? d->val[j] : "");
+        }
+    }
+    fprintf(f, "\n");
+    return ;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get the string associated to a key
   @param    d       Dictionary to search
   @param    key     Key string to look for
