@@ -69,7 +69,7 @@ static char * xstrdup(char * s)
     char * t ;
     if (!s)
         return NULL ;
-    t = malloc(strlen(s)+1) ;
+    t = (char*)malloc(strlen(s)+1) ;
     if (t) {
         strcpy(t,s);
     }
