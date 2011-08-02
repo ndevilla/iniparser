@@ -90,6 +90,21 @@ void iniparser_dump_ini(dictionary * d, FILE * f);
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Save a dictionary section to a loadable ini file
+  @param    d   Dictionary to dump
+  @param    s   Section name of dictionary to dump
+  @param    f   Opened file pointer to dump to
+  @return   void
+
+  This function dumps a given section of a given dictionary into a loadable ini
+  file.  It is Ok to specify @c stderr or @c stdout as output files.
+ */
+/*--------------------------------------------------------------------------*/
+
+void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f);
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Dump a dictionary to an opened file pointer.
   @param    d   Dictionary to dump.
   @param    f   Opened file pointer to dump to.
