@@ -38,6 +38,9 @@
 /*---------------------------------------------------------------------------
                             Private functions
  ---------------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Doubles the allocated size associated to a pointer */
 /* 'size' is the current allocated size. */
@@ -400,5 +403,10 @@ int main(int argc, char *argv[])
     dictionary_del(d);
     return 0 ;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 /* vim: set ts=4 et sw=4 tw=75 */

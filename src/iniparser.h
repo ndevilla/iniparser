@@ -34,6 +34,10 @@
 
 #include "dictionary.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get number of sections in a dictionary
@@ -310,5 +314,9 @@ dictionary * iniparser_load(char * ininame);
  */
 /*--------------------------------------------------------------------------*/
 void iniparser_freedict(dictionary * d);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
