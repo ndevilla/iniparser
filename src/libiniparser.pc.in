@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libiniparser
+Description: a free stand-alone ini file parsing library
+URL: http://ndevilla.free.fr/iniparser/ 
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -liniparser
+Libs.private:
+Cflags: -I${includedir}
