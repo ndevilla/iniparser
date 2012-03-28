@@ -159,7 +159,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s);
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, char * key, char * def);
+char * iniparser_getstring(dictionary * d, const char * key, char * def);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -188,7 +188,7 @@ char * iniparser_getstring(dictionary * d, char * key, char * def);
   Credits: Thanks to A. Becker for suggesting strtol()
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getint(dictionary * d, char * key, int notfound);
+int iniparser_getint(dictionary * d, const char * key, int notfound);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -203,7 +203,7 @@ int iniparser_getint(dictionary * d, char * key, int notfound);
   the notfound value is returned.
  */
 /*--------------------------------------------------------------------------*/
-double iniparser_getdouble(dictionary * d, char * key, double notfound);
+double iniparser_getdouble(dictionary * d, const char * key, double notfound);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -237,7 +237,7 @@ double iniparser_getdouble(dictionary * d, char * key, double notfound);
   necessarily have to be 0 or 1.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getboolean(dictionary * d, char * key, int notfound);
+int iniparser_getboolean(dictionary * d, const char * key, int notfound);
 
 
 /*-------------------------------------------------------------------------*/
@@ -253,7 +253,7 @@ int iniparser_getboolean(dictionary * d, char * key, int notfound);
   It is Ok to set val to NULL.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_set(dictionary * ini, char * entry, char * val);
+int iniparser_set(dictionary * ini, const char * entry, const char * val);
 
 
 /*-------------------------------------------------------------------------*/
@@ -266,7 +266,7 @@ int iniparser_set(dictionary * ini, char * entry, char * val);
   If the given entry can be found, it is deleted from the dictionary.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_unset(dictionary * ini, char * entry);
+void iniparser_unset(dictionary * ini, const char * entry);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -280,7 +280,7 @@ void iniparser_unset(dictionary * ini, char * entry);
   of querying for the presence of sections in a dictionary.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_find_entry(dictionary * ini, char * entry) ;
+int iniparser_find_entry(dictionary * ini, const char * entry) ;
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -296,7 +296,7 @@ int iniparser_find_entry(dictionary * ini, char * entry) ;
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(char * ininame);
+dictionary * iniparser_load(const char * ininame);
 
 /*-------------------------------------------------------------------------*/
 /**

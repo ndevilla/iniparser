@@ -41,7 +41,7 @@
 
 /* Doubles the allocated size associated to a pointer */
 /* 'size' is the current allocated size. */
-static void * mem_double(void * ptr, int size)
+static void * mem_double(const void * ptr, int size)
 {
     void * newptr ;
  
@@ -64,7 +64,7 @@ static void * mem_double(void * ptr, int size)
   for systems that do not have it.
  */
 /*--------------------------------------------------------------------------*/
-static char * xstrdup(char * s)
+static char * xstrdup(const char * s)
 {
     char * t ;
     if (!s)
@@ -91,7 +91,7 @@ static char * xstrdup(char * s)
   by comparing the key itself in last resort.
  */
 /*--------------------------------------------------------------------------*/
-unsigned dictionary_hash(char * key)
+unsigned dictionary_hash(const char * key)
 {
     int         len ;
     unsigned    hash ;
@@ -178,7 +178,7 @@ void dictionary_del(dictionary * d)
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, char * key, char * def)
+char * dictionary_get(dictionary * d, const char * key, char * def)
 {
     unsigned    hash ;
     int         i ;
@@ -224,7 +224,7 @@ char * dictionary_get(dictionary * d, char * key, char * def)
   This function returns non-zero in case of failure.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_set(dictionary * d, char * key, char * val)
+int dictionary_set(dictionary * d, const char * key, const char * val)
 {
     int         i ;
     unsigned    hash ;
@@ -291,7 +291,7 @@ int dictionary_set(dictionary * d, char * key, char * val)
   key cannot be found.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_unset(dictionary * d, char * key)
+void dictionary_unset(dictionary * d, const char * key)
 {
     unsigned    hash ;
     int         i ;

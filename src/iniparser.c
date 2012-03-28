@@ -48,7 +48,7 @@ typedef enum _line_status_ {
   allocated, it will be modified at each function call (not re-entrant).
  */
 /*--------------------------------------------------------------------------*/
-static char * strlwc(char * s)
+static char * strlwc(const char * s)
 {
     static char l[ASCIILINESZ+1];
     int i ;
@@ -78,7 +78,7 @@ static char * strlwc(char * s)
   (not re-entrant).
  */
 /*--------------------------------------------------------------------------*/
-static char * strstrip(char * s)
+static char * strstrip(const char * s)
 {
     static char l[ASCIILINESZ+1];
     char * last ;
@@ -372,7 +372,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, char * key, char * def)
+char * iniparser_getstring(dictionary * d, const char * key, char * def)
 {
     char * lc_key ;
     char * sval ;
@@ -412,7 +412,7 @@ char * iniparser_getstring(dictionary * d, char * key, char * def)
   Credits: Thanks to A. Becker for suggesting strtol()
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getint(dictionary * d, char * key, int notfound)
+int iniparser_getint(dictionary * d, const char * key, int notfound)
 {
     char    *   str ;
 
@@ -434,7 +434,7 @@ int iniparser_getint(dictionary * d, char * key, int notfound)
   the notfound value is returned.
  */
 /*--------------------------------------------------------------------------*/
-double iniparser_getdouble(dictionary * d, char * key, double notfound)
+double iniparser_getdouble(dictionary * d, const char * key, double notfound)
 {
     char    *   str ;
 
@@ -475,7 +475,7 @@ double iniparser_getdouble(dictionary * d, char * key, double notfound)
   necessarily have to be 0 or 1.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getboolean(dictionary * d, char * key, int notfound)
+int iniparser_getboolean(dictionary * d, const char * key, int notfound)
 {
     char    *   c ;
     int         ret ;
@@ -506,7 +506,7 @@ int iniparser_getboolean(dictionary * d, char * key, int notfound)
 /*--------------------------------------------------------------------------*/
 int iniparser_find_entry(
     dictionary  *   ini,
-    char        *   entry
+    const char  *   entry
 )
 {
     int found=0 ;
@@ -529,7 +529,7 @@ int iniparser_find_entry(
   It is Ok to set val to NULL.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_set(dictionary * ini, char * entry, char * val)
+int iniparser_set(dictionary * ini, const char * entry, const char * val)
 {
     return dictionary_set(ini, strlwc(entry), val) ;
 }
@@ -544,7 +544,7 @@ int iniparser_set(dictionary * ini, char * entry, char * val)
   If the given entry can be found, it is deleted from the dictionary.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_unset(dictionary * ini, char * entry)
+void iniparser_unset(dictionary * ini, const char * entry)
 {
     dictionary_unset(ini, strlwc(entry));
 }
@@ -560,7 +560,7 @@ void iniparser_unset(dictionary * ini, char * entry)
  */
 /*--------------------------------------------------------------------------*/
 static line_status iniparser_line(
-    char * input_line,
+    const char * input_line,
     char * section,
     char * key,
     char * value)
@@ -633,7 +633,7 @@ static line_status iniparser_line(
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(char * ininame)
+dictionary * iniparser_load(const char * ininame)
 {
     FILE * in ;
 
