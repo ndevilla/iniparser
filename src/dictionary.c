@@ -41,7 +41,7 @@
 
 /* Doubles the allocated size associated to a pointer */
 /* 'size' is the current allocated size. */
-static void * mem_double(const void * ptr, int size)
+static void * mem_double(void * ptr, int size)
 {
     void * newptr ;
  
