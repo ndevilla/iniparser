@@ -48,7 +48,7 @@ typedef enum _line_status_ {
   allocated, it will be modified at each function call (not re-entrant).
  */
 /*--------------------------------------------------------------------------*/
-static char * strlwc(char * s)
+static const char * strlwc(const char * s)
 {
     static char l[ASCIILINESZ+1];
     int i ;
@@ -78,7 +78,7 @@ static char * strlwc(char * s)
   (not re-entrant).
  */
 /*--------------------------------------------------------------------------*/
-static char * strstrip(char * s)
+static const char * strstrip(const char * s)
 {
     static char l[ASCIILINESZ+1];
     char * last ;
@@ -147,7 +147,7 @@ int iniparser_getnsec(dictionary * d)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getsecname(dictionary * d, int n)
+const char * iniparser_getsecname(dictionary * d, int n)
 {
     int i ;
     int foundsec ;
@@ -214,7 +214,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
 {
     int     i ;
     int     nsec ;
-    char *  secname ;
+    const char *  secname ;
 
     if (d==NULL || f==NULL) return ;
 
@@ -248,7 +248,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
   file.  It is Ok to specify @c stderr or @c stdout as output files.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
+void iniparser_dumpsection_ini(dictionary * d, const char * s, FILE * f)
 {
     int     j ;
     char    keym[ASCIILINESZ+1];
@@ -282,7 +282,7 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
   @return   Number of keys in section
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getsecnkeys(dictionary * d, char * s)
+int iniparser_getsecnkeys(dictionary * d, const char * s)
 {
     int     seclen, nkeys ;
     char    keym[ASCIILINESZ+1];
@@ -321,10 +321,10 @@ int iniparser_getsecnkeys(dictionary * d, char * s)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char ** iniparser_getseckeys(dictionary * d, char * s)
+const char ** iniparser_getseckeys(dictionary * d, const char * s)
 {
 
-    char **keys;
+    const char **keys;
 
     int i, j ;
     char    keym[ASCIILINESZ+1];
@@ -337,7 +337,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
 
     nkeys = iniparser_getsecnkeys(d, s);
 
-    keys = (char**) malloc(nkeys*sizeof(char*));
+    keys = (const char**) malloc(nkeys*sizeof(const char*));
 
     seclen  = (int)strlen(s);
     sprintf(keym, "%s:", s);
@@ -372,10 +372,10 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, char * key, char * def)
+const char * iniparser_getstring(dictionary * d, const char * key, const char * def)
 {
-    char * lc_key ;
-    char * sval ;
+    const char * lc_key ;
+    const char * sval ;
 
     if (d==NULL || key==NULL)
         return def ;
@@ -412,9 +412,9 @@ char * iniparser_getstring(dictionary * d, char * key, char * def)
   Credits: Thanks to A. Becker for suggesting strtol()
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getint(dictionary * d, char * key, int notfound)
+int iniparser_getint(dictionary * d, const char * key, int notfound)
 {
-    char    *   str ;
+    const char    *   str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
@@ -434,9 +434,9 @@ int iniparser_getint(dictionary * d, char * key, int notfound)
   the notfound value is returned.
  */
 /*--------------------------------------------------------------------------*/
-double iniparser_getdouble(dictionary * d, char * key, double notfound)
+double iniparser_getdouble(dictionary * d, const char * key, double notfound)
 {
-    char    *   str ;
+    const char    *   str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
@@ -475,9 +475,9 @@ double iniparser_getdouble(dictionary * d, char * key, double notfound)
   necessarily have to be 0 or 1.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getboolean(dictionary * d, char * key, int notfound)
+int iniparser_getboolean(dictionary * d, const char * key, int notfound)
 {
-    char    *   c ;
+    const char    *   c ;
     int         ret ;
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
@@ -506,7 +506,7 @@ int iniparser_getboolean(dictionary * d, char * key, int notfound)
 /*--------------------------------------------------------------------------*/
 int iniparser_find_entry(
     dictionary  *   ini,
-    char        *   entry
+    const char  *   entry
 )
 {
     int found=0 ;
@@ -529,7 +529,7 @@ int iniparser_find_entry(
   It is Ok to set val to NULL.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_set(dictionary * ini, char * entry, char * val)
+int iniparser_set(dictionary * ini, const char * entry, const char * val)
 {
     return dictionary_set(ini, strlwc(entry), val) ;
 }
@@ -544,7 +544,7 @@ int iniparser_set(dictionary * ini, char * entry, char * val)
   If the given entry can be found, it is deleted from the dictionary.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_unset(dictionary * ini, char * entry)
+void iniparser_unset(dictionary * ini, const char * entry)
 {
     dictionary_unset(ini, strlwc(entry));
 }
@@ -560,7 +560,7 @@ void iniparser_unset(dictionary * ini, char * entry)
  */
 /*--------------------------------------------------------------------------*/
 static line_status iniparser_line(
-    char * input_line,
+    const char * input_line,
     char * section,
     char * key,
     char * value)
@@ -633,7 +633,7 @@ static line_status iniparser_line(
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(char * ininame)
+dictionary * iniparser_load(const char * ininame)
 {
     FILE * in ;
 
