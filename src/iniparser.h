@@ -3,16 +3,9 @@
 /**
    @file    iniparser.h
    @author  N. Devillard
-   @date    Sep 2007
-   @version 3.0
    @brief   Parser for ini files.
 */
 /*--------------------------------------------------------------------------*/
-
-/*
-    $Id: iniparser.h,v 1.26 2011-03-02 20:15:13 ndevilla Exp $
-    $Revision: 1.26 $
-*/
 
 #ifndef _INIPARSER_H_
 #define _INIPARSER_H_

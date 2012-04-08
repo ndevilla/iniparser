@@ -2,8 +2,6 @@
 /**
    @file    dictionary.c
    @author  N. Devillard
-   @date    Sep 2007
-   @version $Revision: 1.27 $
    @brief   Implements a dictionary for string variables.
 
    This module implements a simple dictionary object, i.e. a list
@@ -12,10 +10,6 @@
 */
 /*--------------------------------------------------------------------------*/
 
-/*
-    $Id: dictionary.c,v 1.27 2007-11-23 21:39:18 ndevilla Exp $
-    $Revision: 1.27 $
-*/
 /*---------------------------------------------------------------------------
                                 Includes
  ---------------------------------------------------------------------------*/
