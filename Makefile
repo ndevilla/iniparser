@@ -27,9 +27,16 @@ RM      ?= rm -f
 SUFFIXES = .o .c .h .a .so .sl
 
 COMPILE.c	?= $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+
+ifndef V
+QUIET_AR	= @echo "AR	$@";
+QUIET_CC	= @echo "CC	$@";
+QUIET_LINK	= @echo "LINK	$@";
+QUIET_RANLIB	= @echo "RANLIB	$@";
+endif
+
 .c.o:
-	@(echo "compiling $< ...")
-	@($(COMPILE.c) -o $@ $<)
+	$(QUIET_CC)$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 
 SRCS = src/iniparser.c \
@@ -41,11 +48,11 @@ OBJS = $(SRCS:.c=.o)
 default:	libiniparser.a libiniparser.so
 
 libiniparser.a:	$(OBJS)
-	@($(AR) $(ARFLAGS) libiniparser.a $(OBJS))
-	@($(RANLIB) libiniparser.a)
+	$(QUIET_AR)$(AR) $(ARFLAGS) $@ $<
+	$(QUIET_RANLIB)$(RANLIB) $@
 
 libiniparser.so:	$(OBJS)
-	@$(SHLD) $(LDSHFLAGS) -o $@.0 $(OBJS) $(LDFLAGS) \
+	$(QUIET_LINK)$(SHLD) $(LDSHFLAGS) -o $@.0 $(OBJS) $(LDFLAGS) \
 		-Wl,-soname=`basename $@`.0
 
 clean:
