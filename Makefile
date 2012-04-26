@@ -26,7 +26,7 @@ RM      ?= rm -f
 
 SUFFIXES = .o .c .h .a .so .sl
 
-COMPILE.c=$(CC) $(CFLAGS) -c
+COMPILE.c	?= $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 .c.o:
 	@(echo "compiling $< ...")
 	@($(COMPILE.c) -o $@ $<)
