@@ -52,7 +52,7 @@ libiniparser.a:	$(OBJS)
 	$(QUIET_RANLIB)$(RANLIB) $@
 
 libiniparser.so:	$(OBJS)
-	$(QUIET_LINK)$(SHLD) $(LDSHFLAGS) -o $@.0 $(OBJS) $(LDFLAGS) \
+	$(QUIET_LINK)$(SHLD) $(LDSHFLAGS) $(LDFLAGS) -o $@.0 $(OBJS) \
 		-Wl,-soname=`basename $@`.0
 
 clean:
