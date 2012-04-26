@@ -23,6 +23,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*---------------------------------------------------------------------------
                                 New types
  ---------------------------------------------------------------------------*/
@@ -161,5 +165,9 @@ void dictionary_unset(dictionary * d, const char * key);
  */
 /*--------------------------------------------------------------------------*/
 void dictionary_dump(dictionary * d, FILE * out);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
