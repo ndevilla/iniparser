@@ -2,6 +2,8 @@
 # iniparser Makefile
 #
 
+prefix ?= /usr/local
+
 # Compiler settings
 CC      = gcc
 CFLAGS  = -O2 -fPIC -Wall -ansi -pedantic
@@ -11,8 +13,8 @@ AR	    = ar
 ARFLAGS = rcv
 
 SHLD = ${CC} ${CFLAGS}
-LDSHFLAGS = -shared -Wl,-Bsymbolic  -Wl,-rpath -Wl,/usr/lib -Wl,-rpath,/usr/lib
-LDFLAGS = -Wl,-rpath -Wl,/usr/lib -Wl,-rpath,/usr/lib
+LDSHFLAGS = -shared
+LDFLAGS =
 
 # Set RANLIB to ranlib on systems that require it (Sun OS < 4, Mac OSX)
 # RANLIB  = ranlib
@@ -60,3 +62,16 @@ docs:
 	
 check:
 	@(cd test ; $(MAKE))
+
+install: libiniparser.so
+	mkdir -p $(DESTDIR)$(prefix)/lib
+	mkdir -p $(DESTDIR)$(prefix)/include
+	cp libiniparser.so.0 $(DESTDIR)$(prefix)/lib
+	ln -s $(DESTDIR)$(prefix)/lib/libiniparser.so.0 $(DESTDIR)$(prefix)/lib/libiniparser.so
+	cp libiniparser.a $(DESTDIR)$(prefix)/lib
+	cp src/*.h $(DESTDIR)$(prefix)/include
+	mkdir -p $(DESTDIR)/usr/lib/pkgconfig/
+	cp iniparser.pc $(DESTDIR)/usr/lib/pkgconfig/
+	echo echo $(prefix) | sed s/\\//\\\\\\//g
+	sed -i s/@prefix@/$(shell echo $(prefix) | sed s/\\//\\\\\\\\\\//g)/g $(DESTDIR)/usr/lib/pkgconfig/iniparser.pc
+
