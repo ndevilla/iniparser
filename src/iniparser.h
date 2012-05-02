@@ -64,7 +64,7 @@ int iniparser_getnsec(dictionary * d);
  */
 /*--------------------------------------------------------------------------*/
 
-char * iniparser_getsecname(dictionary * d, int n);
+const char * iniparser_getsecname(dictionary * d, int n);
 
 
 /*-------------------------------------------------------------------------*/
@@ -135,7 +135,7 @@ int iniparser_getsecnkeys(dictionary * d, const char * s);
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char ** iniparser_getseckeys(dictionary * d, const char * s);
+const char ** iniparser_getseckeys(dictionary * d, const char * s);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -152,7 +152,7 @@ char ** iniparser_getseckeys(dictionary * d, const char * s);
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, const char * key, char * def);
+const char * iniparser_getstring(dictionary * d, const char * key, const char * def);
 
 /*-------------------------------------------------------------------------*/
 /**

@@ -88,7 +88,7 @@ static const char * strstrip(const char * s)
         last -- ;
     }
     *last = (char)0;
-    return (char*)l ;
+    return l ;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -140,7 +140,7 @@ int iniparser_getnsec(dictionary * d)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getsecname(dictionary * d, int n)
+const char * iniparser_getsecname(dictionary * d, int n)
 {
     int i ;
     int foundsec ;
@@ -314,10 +314,10 @@ int iniparser_getsecnkeys(dictionary * d, const char * s)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char ** iniparser_getseckeys(dictionary * d, const char * s)
+const char ** iniparser_getseckeys(dictionary * d, const char * s)
 {
 
-    char **keys;
+    const char **keys;
 
     int i, j ;
     char    keym[ASCIILINESZ+1];
@@ -330,7 +330,7 @@ char ** iniparser_getseckeys(dictionary * d, const char * s)
 
     nkeys = iniparser_getsecnkeys(d, s);
 
-    keys = (char**) malloc(nkeys*sizeof(char*));
+    keys = (const char**) malloc(nkeys*sizeof(const char*));
 
     seclen  = (int)strlen(s);
     sprintf(keym, "%s:", s);
@@ -365,10 +365,10 @@ char ** iniparser_getseckeys(dictionary * d, const char * s)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, const char * key, char * def)
+const char * iniparser_getstring(dictionary * d, const char * key, const char * def)
 {
     const char * lc_key ;
-    char * sval ;
+    const char * sval ;
 
     if (d==NULL || key==NULL)
         return def ;
