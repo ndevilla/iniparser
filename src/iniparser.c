@@ -666,7 +666,7 @@ dictionary * iniparser_load(const char * ininame)
         if (len==0)
             continue;
         /* Safety check against buffer overflows */
-        if (line[len]!='\n') {
+        if (line[len]!='\n' && !feof(in)) {
             fprintf(stderr,
                     "iniparser: input line too long in %s (%d)\n",
                     ininame,
