@@ -35,7 +35,7 @@
 
 /* Doubles the allocated size associated to a pointer */
 /* 'size' is the current allocated size. */
-static void * mem_double(void * ptr, int size)
+static void * mem_double(void * ptr, size_t size)
 {
     void * newptr ;
  
@@ -87,9 +87,9 @@ static char * xstrdup(const char * s)
 /*--------------------------------------------------------------------------*/
 unsigned dictionary_hash(const char * key)
 {
-    int         len ;
+    size_t      len ;
     unsigned    hash ;
-    int         i ;
+    size_t      i ;
 
     len = strlen(key);
     for (hash=0, i=0 ; i<len ; i++) {
@@ -114,7 +114,7 @@ unsigned dictionary_hash(const char * key)
   dictionary, give size=0.
  */
 /*--------------------------------------------------------------------------*/
-dictionary * dictionary_new(int size)
+dictionary * dictionary_new(size_t size)
 {
     dictionary  *   d ;
 
@@ -142,7 +142,7 @@ dictionary * dictionary_new(int size)
 /*--------------------------------------------------------------------------*/
 void dictionary_del(dictionary * d)
 {
-    int     i ;
+    size_t  i ;
 
     if (d==NULL) return ;
     for (i=0 ; i<d->size ; i++) {
@@ -175,7 +175,7 @@ void dictionary_del(dictionary * d)
 const char * dictionary_get(dictionary * d, const char * key, const char * def)
 {
     unsigned    hash ;
-    int         i ;
+    size_t      i ;
 
     hash = dictionary_hash(key);
     for (i=0 ; i<d->size ; i++) {
@@ -220,7 +220,7 @@ const char * dictionary_get(dictionary * d, const char * key, const char * def)
 /*--------------------------------------------------------------------------*/
 int dictionary_set(dictionary * d, const char * key, const char * val)
 {
-    int         i ;
+    size_t      i ;
     unsigned    hash ;
 
     if (d==NULL || key==NULL) return -1 ;
@@ -288,7 +288,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
 void dictionary_unset(dictionary * d, const char * key)
 {
     unsigned    hash ;
-    int         i ;
+    size_t      i ;
 
     if (key == NULL) {
         return;
@@ -336,7 +336,7 @@ void dictionary_unset(dictionary * d, const char * key)
 /*--------------------------------------------------------------------------*/
 void dictionary_dump(dictionary * d, FILE * out)
 {
-    int     i ;
+    size_t  i ;
 
     if (d==NULL || out==NULL) return ;
     if (d->n<1) {
