@@ -124,13 +124,14 @@ dictionary * dictionary_new(size_t size)
     /* If no size was specified, allocate space for DICTMINSZ */
     if (size<DICTMINSZ) size=DICTMINSZ ;
 
-    if (!(d = (dictionary *)calloc(1, sizeof(dictionary)))) {
-        return NULL;
+    d = calloc(1, sizeof *d) ;
+
+    if (d) {
+        d->size = size ;
+        d->val  = calloc(size, sizeof *d->val);
+        d->key  = calloc(size, sizeof *d->key);
+        d->hash = calloc(size, sizeof *d->hash);
     }
-    d->size = size ;
-    d->val  = (char **)calloc(size, sizeof(char*));
-    d->key  = (char **)calloc(size, sizeof(char*));
-    d->hash = (unsigned int *)calloc(size, sizeof(unsigned));
     return d ;
 }
 
@@ -252,9 +253,9 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     if (d->n==d->size) {
 
         /* Reached maximum size: reallocate dictionary */
-        d->val  = (char **)mem_double(d->val,  d->size * sizeof(char*)) ;
-        d->key  = (char **)mem_double(d->key,  d->size * sizeof(char*)) ;
-        d->hash = (unsigned int *)mem_double(d->hash, d->size * sizeof(unsigned)) ;
+        d->val  = mem_double(d->val,  d->size * sizeof *d->val) ;
+        d->key  = mem_double(d->key,  d->size * sizeof *d->key) ;
+        d->hash = mem_double(d->hash, d->size * sizeof *d->hash) ;
         if ((d->val==NULL) || (d->key==NULL) || (d->hash==NULL)) {
             /* Cannot grow dictionary */
             return -1 ;
