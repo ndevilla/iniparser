@@ -61,11 +61,14 @@ static void * mem_double(void * ptr, size_t size)
 static char * xstrdup(const char * s)
 {
     char * t ;
+    size_t len ;
     if (!s)
         return NULL ;
-    t = (char*)malloc(strlen(s)+1) ;
+
+    len = strlen(s) + 1 ;
+    t = malloc(len) ;
     if (t) {
-        strcpy(t,s);
+        memcpy(t, s, len) ;
     }
     return t ;
 }
