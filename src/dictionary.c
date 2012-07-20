@@ -116,7 +116,7 @@ unsigned dictionary_hash(const char * key)
 /**
   @brief    Create a new dictionary object.
   @param    size    Optional initial size of the dictionary.
-  @return    1 newly allocated dictionary objet.
+  @return   1 newly allocated dictionary objet.
 
   This function allocates a new dictionary object of given size and returns
   it. If you do not know in advance (roughly) the number of entries in the
@@ -128,20 +128,21 @@ dictionary * dictionary_new(size_t size)
     dictionary * d;
 
     /* If no size was specified, allocate space for DICTMINSZ */
-    if (size<DICTMINSZ)
+    if(size<DICTMINSZ)
     {
-        size=DICTMINSZ;
+        size = DICTMINSZ;
     }
 
-    d = calloc(1, sizeof *d) ;
+    d = calloc(1, sizeof(*d));
 
-    if (d) {
-        d->size = size ;
-        d->val  = calloc(size, sizeof *d->val);
-        d->key  = calloc(size, sizeof *d->key);
-        d->hash = calloc(size, sizeof *d->hash);
+    if(NULL != d)
+    {
+        d->size = size;
+        d->val  = calloc(size, sizeof( *(d->val)));
+        d->key  = calloc(size, sizeof( *(d->key)));
+        d->hash = calloc(size, sizeof( *(d->hash)));
     }
-    return d ;
+    return d;
 }
 
 /*-------------------------------------------------------------------------*/
