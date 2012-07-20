@@ -155,22 +155,16 @@ dictionary * dictionary_new(size_t size)
 /*--------------------------------------------------------------------------*/
 void dictionary_del(dictionary * d)
 {
-    size_t  i ;
-
-    if(d==NULL)
+    size_t i = 0;
+    if(NULL == d)
     {
         return;
     }
-    for (i=0; i < d->size; ++i)
+
+    for(; i < d->size; ++i)
     {
-        if (d->key[i]!=NULL)
-        {
-            free(d->key[i]);
-        }
-        if (d->val[i]!=NULL)
-        {
-            free(d->val[i]);
-        }
+        free(d->key[i]);
+        free(d->val[i]);
     }
     free(d->val);
     free(d->key);
