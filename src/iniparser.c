@@ -48,7 +48,7 @@ static char * strlwc(const char * s)
 
     if(s==NULL)
     {
-    	return NULL ;
+        return NULL ;
     }
     memset(l, 0, ASCIILINESZ+1);
 
@@ -63,9 +63,9 @@ static char * strlwc(const char * s)
 
 /* Private: add an entry to the dictionary */
 static void iniparser_add_entry(dictionary * d,
-				char * sec,
-				char * key,
-				char * val)
+                                char * sec,
+                                char * key,
+                                char * val)
 {
     char longkey[(2*ASCIILINESZ)+1];
 
@@ -102,14 +102,14 @@ static char * strstrip(const char * s)
 {
     static char l[ASCIILINESZ+1];
     char * last ;
-	
+    
     if (s==NULL)
     {
-    	return NULL ;
+        return NULL ;
     }
     
     while (isspace((int)*s) && *s) s++;
-	
+    
     memset(l, 0, ASCIILINESZ+1);
     strcpy(l, s);
     last = l + strlen(l);
@@ -117,7 +117,7 @@ static char * strstrip(const char * s)
     {
         if(!isspace((int)*(last-1)))
         {
-        	break;
+            break;
         }
         --last;
     }
@@ -152,7 +152,7 @@ int iniparser_getnsec(dictionary * d)
 
     if (d==NULL)
     {
-    	return -1;
+        return -1;
     }
 
     for (i=0; i < d->size; ++i)
@@ -192,7 +192,7 @@ char * iniparser_getsecname(dictionary * d, int n)
 
     if(d==NULL || n<0)
     {
-    	return NULL;
+        return NULL;
     }
 
     for(i=0; i < d->size; ++i)
@@ -237,7 +237,7 @@ void iniparser_dump(dictionary * d, FILE * f)
 
     if (d==NULL || f==NULL)
     {
-    	return;
+        return;
     }
     for(i=0; i < d->size; ++i)
     {
@@ -277,7 +277,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
 
     if (d==NULL || f==NULL)
     {
-    	return;
+        return;
     }
 
     nsec = iniparser_getnsec(d);
@@ -346,7 +346,7 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Get the string associated to a key, return NULL if not found
+  @brief    Get the string associated to a key, return NULL if not found
   @param    d   Dictionary to search
   @param    key Key string to look for
   @return   pointer to statically allocated character string, or NULL.
@@ -475,7 +475,7 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def)
     }
     else
     {
-    	return dictionary_get(d, strlwc(key), def);
+        return dictionary_get(d, strlwc(key), def);
     }
 
 }
@@ -514,10 +514,10 @@ int iniparser_getint(dictionary * d, const char * key, int notfound)
     char * str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY)
     {
-    	return notfound;
+        return notfound;
     }
     {
-    	return (int)strtol(str, NULL, 0);
+        return (int)strtol(str, NULL, 0);
     }
 }
 
@@ -540,11 +540,11 @@ double iniparser_getdouble(dictionary * d, const char * key, double notfound)
     char * str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY)
     {
-    	return notfound;
+        return notfound;
     }
     else
     {
-    	return atof(str);
+        return atof(str);
     }
 }
 
@@ -587,19 +587,19 @@ int iniparser_getboolean(dictionary * d, const char * key, int notfound)
     char * c = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (c==INI_INVALID_KEY)
     {
-    	return notfound;
+        return notfound;
     }
     else if (c[0]=='y' || c[0]=='Y' || c[0]=='1' || c[0]=='t' || c[0]=='T')
     {
-    	return 1 ;
+        return 1 ;
     }
     else if (c[0]=='n' || c[0]=='N' || c[0]=='0' || c[0]=='f' || c[0]=='F')
     {
-    	return 0 ;
+        return 0 ;
     }
     else
     {
-    	return notfound ;
+        return notfound ;
     }
 }
 
@@ -852,23 +852,23 @@ dictionary * iniparser_load(const char * ininame)
         {
             case LINE_EMPTY:
             case LINE_COMMENT:
-            	break;
+                break;
             case LINE_SECTION:
-            	errs = dictionary_set(dict, section, NULL);
-            	break ;
+                errs = dictionary_set(dict, section, NULL);
+                break ;
             case LINE_VALUE:
-            	sprintf(tmp, "%s:%s", section, key);
-            	errs = dictionary_set(dict, tmp, val) ;
-            	break ;
+                sprintf(tmp, "%s:%s", section, key);
+                errs = dictionary_set(dict, tmp, val) ;
+                break ;
             case LINE_ERROR:
-            	fprintf(stderr, "iniparser: syntax error in %s (%d):\n",
-            			ininame,
-            			lineno);
-            	fprintf(stderr, "-> %s\n", line);
-            	++errs;
-            	break;
+                fprintf(stderr, "iniparser: syntax error in %s (%d):\n",
+                        ininame,
+                        lineno);
+                fprintf(stderr, "-> %s\n", line);
+                ++errs;
+                break;
             default:
-            	break;
+                break;
         }
         memset(line, 0, ASCIILINESZ);
         last = 0;

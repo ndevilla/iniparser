@@ -75,7 +75,7 @@ static char * xstrdup(const char * s)
 }
 
 /*---------------------------------------------------------------------------
-  							Function codes
+                              Function codes
  ---------------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------------*/
@@ -92,29 +92,29 @@ static char * xstrdup(const char * s)
 /*--------------------------------------------------------------------------*/
 unsigned dictionary_hash(const char * key)
 {
-	unsigned int i;
-	unsigned int len;
-	unsigned int hash;
+    unsigned int i;
+    unsigned int len;
+    unsigned int hash;
 
-	len = strlen(key);
-	for (hash=0, i=0; i < len; ++i)
-	{
-		hash += (unsigned int)key[i];
-		hash += (hash<<10);
-		hash ^= (hash>>6);
-	}
-	hash += (hash <<3);
-	hash ^= (hash >>11);
-	hash += (hash <<15);
-	return hash;
+    len = strlen(key);
+    for (hash=0, i=0; i < len; ++i)
+    {
+        hash += (unsigned int)key[i];
+        hash += (hash<<10);
+        hash ^= (hash>>6);
+    }
+    hash += (hash <<3);
+    hash ^= (hash >>11);
+    hash += (hash <<15);
+    return hash;
 }
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Create a new dictionary object.
-  @param	size	Optional initial size of the dictionary.
-  @return	1 newly allocated dictionary objet.
+  @brief    Create a new dictionary object.
+  @param    size    Optional initial size of the dictionary.
+  @return    1 newly allocated dictionary objet.
 
   This function allocates a new dictionary object of given size and returns
   it. If you do not know in advance (roughly) the number of entries in the
@@ -124,24 +124,24 @@ unsigned dictionary_hash(const char * key)
 
 dictionary * dictionary_new(int size)
 {
-	dictionary * d;
+    dictionary * d;
 
-	/* If no size was specified, allocate space for DICTMINSZ */
-	if (size<DICTMINSZ)
-	{
-		size=DICTMINSZ;
-	}
+    /* If no size was specified, allocate space for DICTMINSZ */
+    if (size<DICTMINSZ)
+    {
+        size=DICTMINSZ;
+    }
 
-	d = (dictionary *)calloc(1, sizeof(dictionary));
-	if(!d)
-	{
-		return NULL;
-	}
-	d->size = size;
-	d->val  = (char **)calloc(size, sizeof(char*));
-	d->key  = (char **)calloc(size, sizeof(char*));
-	d->hash = (unsigned int *)calloc(size, sizeof(unsigned int));
-	return d;
+    d = (dictionary *)calloc(1, sizeof(dictionary));
+    if(!d)
+    {
+        return NULL;
+    }
+    d->size = size;
+    d->val  = (char **)calloc(size, sizeof(char*));
+    d->key  = (char **)calloc(size, sizeof(char*));
+    d->hash = (unsigned int *)calloc(size, sizeof(unsigned int));
+    return d;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -155,37 +155,37 @@ dictionary * dictionary_new(int size)
 /*--------------------------------------------------------------------------*/
 void dictionary_del(dictionary * d)
 {
-	unsigned int i;
+    unsigned int i;
 
-	if(d==NULL)
-	{
-		return;
-	}
-	for (i=0; i < d->size; ++i)
-	{
-		if (d->key[i]!=NULL)
-		{
-			free(d->key[i]);
-		}
-		if (d->val[i]!=NULL)
-		{
-			free(d->val[i]);
-		}
-	}
-	free(d->val);
-	free(d->key);
-	free(d->hash);
-	free(d);
-	return;
+    if(d==NULL)
+    {
+        return;
+    }
+    for (i=0; i < d->size; ++i)
+    {
+        if (d->key[i]!=NULL)
+        {
+            free(d->key[i]);
+        }
+        if (d->val[i]!=NULL)
+        {
+            free(d->val[i]);
+        }
+    }
+    free(d->val);
+    free(d->key);
+    free(d->hash);
+    free(d);
+    return;
 }
 
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Get a value from a dictionary.
-  @param	d		dictionary object to search.
-  @param	key		Key to look for in the dictionary.
+  @brief    Get a value from a dictionary.
+  @param    d        dictionary object to search.
+  @param    key        Key to look for in the dictionary.
   @param    def     Default value to return if key not found.
   @return   1 pointer to internally allocated character string.
 
@@ -197,36 +197,36 @@ void dictionary_del(dictionary * d)
 /*--------------------------------------------------------------------------*/
 char * dictionary_get(dictionary * d, const char * key, char * def)
 {
-	unsigned int i;
-	unsigned int hash;
+    unsigned int i;
+    unsigned int hash;
 
-	hash = dictionary_hash(key);
-	for (i=0; i < d->size; ++i)
-	{
+    hash = dictionary_hash(key);
+    for (i=0; i < d->size; ++i)
+    {
         if (d->key[i] == NULL)
         {
             continue;
         }
         /* Compare hash */
-		if (hash == d->hash[i])
-		{
+        if (hash == d->hash[i])
+        {
             /* Compare string, to avoid hash collisions */
             if (!strcmp(key, d->key[i]))
             {
-				return d->val[i];
-			}
-		}
-	}
-	return def;
+                return d->val[i];
+            }
+        }
+    }
+    return def;
 }
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Get a value from a dictionary, as a char.
-  @param	d		dictionary object to search.
-  @param	key		Key to look for in the dictionary.
-  @param	def		Default value for the key if not found.
-  @return 	char	
+  @brief    Get a value from a dictionary, as a char.
+  @param    d        dictionary object to search.
+  @param    key        Key to look for in the dictionary.
+  @param    def        Default value for the key if not found.
+  @return     char    
 
   This function locates a key in a dictionary using dictionary_get,
   and returns the first char of the found string.
@@ -234,26 +234,26 @@ char * dictionary_get(dictionary * d, const char * key, char * def)
 /*--------------------------------------------------------------------------*/
 char dictionary_getchar(dictionary * d, char * key, char def)
 {
-	char * v;
-	v=dictionary_get(d,key,DICT_INVALID_KEY);
-	if (v==DICT_INVALID_KEY)
-	{
-		return def ;
-	}
-	else
-	{
-		return v[0] ;
-	}
+    char * v;
+    v=dictionary_get(d,key,DICT_INVALID_KEY);
+    if (v==DICT_INVALID_KEY)
+    {
+        return def ;
+    }
+    else
+    {
+        return v[0] ;
+    }
 }
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Get a value from a dictionary, as an int.
-  @param	d		dictionary object to search.
-  @param	key		Key to look for in the dictionary.
-  @param	def		Default value for the key if not found.
-  @return	int
+  @brief    Get a value from a dictionary, as an int.
+  @param    d        dictionary object to search.
+  @param    key        Key to look for in the dictionary.
+  @param    def        Default value for the key if not found.
+  @return    int
 
   This function locates a key in a dictionary using dictionary_get,
   and applies atoi on it to return an int. If the value cannot be found
@@ -262,25 +262,25 @@ char dictionary_getchar(dictionary * d, char * key, char def)
 /*--------------------------------------------------------------------------*/
 int dictionary_getint(dictionary * d, char * key, int def)
 {
-	char * v ;
-	v=dictionary_get(d,key,DICT_INVALID_KEY);
-	if (v==DICT_INVALID_KEY)
-	{
-		return def;
-	}
-	else
-	{
-		return atoi(v);
-	}
+    char * v ;
+    v=dictionary_get(d,key,DICT_INVALID_KEY);
+    if (v==DICT_INVALID_KEY)
+    {
+        return def;
+    }
+    else
+    {
+        return atoi(v);
+    }
 }
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief		Get a value from a dictionary, as a double.
-  @param	d		dictionary object to search.
-  @param	key		Key to look for in the dictionary.
-  @param	def		Default value for the key if not found.
-  @return	double
+  @brief        Get a value from a dictionary, as a double.
+  @param    d        dictionary object to search.
+  @param    key        Key to look for in the dictionary.
+  @param    def        Default value for the key if not found.
+  @return    double
 
   This function locates a key in a dictionary using dictionary_get,
   and applies atof on it to return a double. If the value cannot be found
@@ -289,16 +289,16 @@ int dictionary_getint(dictionary * d, char * key, int def)
 /*--------------------------------------------------------------------------*/
 double dictionary_getdouble(dictionary * d, char * key, double def)
 {
-	char * v ;
-	v=dictionary_get(d,key,DICT_INVALID_KEY);
-	if (v==DICT_INVALID_KEY)
-	{
-		return def;
-	}
-	else
-	{
-		return atof(v);
-	}
+    char * v ;
+    v=dictionary_get(d,key,DICT_INVALID_KEY);
+    if (v==DICT_INVALID_KEY)
+    {
+        return def;
+    }
+    else
+    {
+        return atof(v);
+    }
 }
 
 
@@ -330,58 +330,58 @@ double dictionary_getdouble(dictionary * d, char * key, double def)
 /*--------------------------------------------------------------------------*/
 int dictionary_set(dictionary * d, const char * key, const char * val)
 {
-	unsigned int i;
-	unsigned int hash;
+    unsigned int i;
+    unsigned int hash;
 
-	if (d==NULL || key==NULL)
-	{
-		return -1;
-	}
+    if (d==NULL || key==NULL)
+    {
+        return -1;
+    }
 
-	/* Compute hash for this key */
-	hash = dictionary_hash(key) ;
-	/* Find if value is already in dictionary */
-	if(d->n>0)
-	{
-		for(i=0; i < d->size; ++i)
-		{
+    /* Compute hash for this key */
+    hash = dictionary_hash(key) ;
+    /* Find if value is already in dictionary */
+    if(d->n>0)
+    {
+        for(i=0; i < d->size; ++i)
+        {
             if(d->key[i]==NULL)
             {
                 continue;
             }
-			if(hash==d->hash[i])
-			{ /* Same hash value */
-				if(!strcmp(key, d->key[i]))
-				{	 /* Same key */
-					/* Found a value: modify and return */
-					if(d->val[i]!=NULL)
-					{
-						free(d->val[i]);
-					}
+            if(hash==d->hash[i])
+            { /* Same hash value */
+                if(!strcmp(key, d->key[i]))
+                {     /* Same key */
+                    /* Found a value: modify and return */
+                    if(d->val[i]!=NULL)
+                    {
+                        free(d->val[i]);
+                    }
                     d->val[i] = val ? xstrdup(val) : NULL;
                     /* Value has been modified: return */
-					return 0;
-				}
-			}
-		}
-	}
-	/* Add a new value */
-	/* See if dictionary needs to grow */
-	if(d->n == d->size)
-	{
+                    return 0;
+                }
+            }
+        }
+    }
+    /* Add a new value */
+    /* See if dictionary needs to grow */
+    if(d->n == d->size)
+    {
 
-		/* Reached maximum size: reallocate dictionary */
-		d->val  = (char **)mem_double(d->val,  d->size * sizeof(char*)) ;
-		d->key  = (char **)mem_double(d->key,  d->size * sizeof(char*)) ;
-		d->hash = (unsigned int *)mem_double(d->hash, d->size * sizeof(unsigned int));
+        /* Reached maximum size: reallocate dictionary */
+        d->val  = (char **)mem_double(d->val,  d->size * sizeof(char*)) ;
+        d->key  = (char **)mem_double(d->key,  d->size * sizeof(char*)) ;
+        d->hash = (unsigned int *)mem_double(d->hash, d->size * sizeof(unsigned int));
         if((d->val==NULL) || (d->key==NULL) || (d->hash==NULL))
         {
             /* Cannot grow dictionary */
             return -1 ;
         }
-		/* Double size */
-		d->size = d->size << 1;
-	}
+        /* Double size */
+        d->size = d->size << 1;
+    }
 
     /*
      * Insert key in the first empty slot. Start at d->n and wrap at d->size.
@@ -393,19 +393,19 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
             i = 0;
         }
     }
-	/* Copy key */
-	d->key[i]  = xstrdup(key);
+    /* Copy key */
+    d->key[i]  = xstrdup(key);
     d->val[i]  = val ? xstrdup(val) : NULL ;
-	d->hash[i] = hash;
-	++(d->n);
-	return 0 ;
+    d->hash[i] = hash;
+    ++(d->n);
+    return 0 ;
 }
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Delete a key in a dictionary
-  @param	d		dictionary object to modify.
-  @param	key		Key to remove.
+  @brief    Delete a key in a dictionary
+  @param    d        dictionary object to modify.
+  @param    key        Key to remove.
   @return   void
 
   This function deletes a key in a dictionary. Nothing is done if the
@@ -414,32 +414,32 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
 /*--------------------------------------------------------------------------*/
 void dictionary_unset(dictionary * d, const char * key)
 {
-	unsigned int i;
-	unsigned int hash;
+    unsigned int i;
+    unsigned int hash;
 
-	if (key == NULL)
-	{
-		return;
-	}
+    if (key == NULL)
+    {
+        return;
+    }
 
-	hash = dictionary_hash(key);
-	for(i=0; i < d->size; ++i)
-	{
+    hash = dictionary_hash(key);
+    for(i=0; i < d->size; ++i)
+    {
         if(d->key[i]==NULL)
         {
             continue;
         }
         /* Compare hash */
-		if(hash == d->hash[i])
-		{
+        if(hash == d->hash[i])
+        {
             /* Compare string, to avoid hash collisions */
             if(!strcmp(key, d->key[i]))
             {
                 /* Found key */
                 break ;
-			}
-		}
-	}
+            }
+        }
+    }
     if (i >= d->size)
     {
         /* Key not found */
@@ -461,11 +461,11 @@ void dictionary_unset(dictionary * d, const char * key)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Set a key in a dictionary, providing an int.
-  @param	d		Dictionary to update.
-  @param	key		Key to modify or add
-  @param	val		Integer value to store (will be stored as a string).
-  @return	void
+  @brief    Set a key in a dictionary, providing an int.
+  @param    d        Dictionary to update.
+  @param    key        Key to modify or add
+  @param    val        Integer value to store (will be stored as a string).
+  @return    void
 
   This helper function calls dictionary_set() with the provided integer
   converted to a string using %d.
@@ -475,19 +475,19 @@ void dictionary_unset(dictionary * d, const char * key)
 
 void dictionary_setint(dictionary * d, char * key, int val)
 {
-	char	sval[MAXVALSZ];
-	sprintf(sval, "%d", val);
-	dictionary_set(d, key, sval);
+    char    sval[MAXVALSZ];
+    sprintf(sval, "%d", val);
+    dictionary_set(d, key, sval);
 }
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Set a key in a dictionary, providing a double.
-  @param	d		Dictionary to update.
-  @param	key		Key to modify or add
-  @param	val		Double value to store (will be stored as a string).
-  @return	void
+  @brief    Set a key in a dictionary, providing a double.
+  @param    d        Dictionary to update.
+  @param    key        Key to modify or add
+  @param    val        Double value to store (will be stored as a string).
+  @return    void
 
   This helper function calls dictionary_set() with the provided double
   converted to a string using %g.
@@ -497,19 +497,19 @@ void dictionary_setint(dictionary * d, char * key, int val)
 
 void dictionary_setdouble(dictionary * d, char * key, double val)
 {
-	char	sval[MAXVALSZ];
-	sprintf(sval, "%g", val);
-	dictionary_set(d, key, sval);
+    char    sval[MAXVALSZ];
+    sprintf(sval, "%g", val);
+    dictionary_set(d, key, sval);
 }
 
 
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief	Dump a dictionary to an opened file pointer.
-  @param	d	Dictionary to dump
-  @param	f	Opened file pointer.
-  @return	void
+  @brief    Dump a dictionary to an opened file pointer.
+  @param    d    Dictionary to dump
+  @param    f    Opened file pointer.
+  @return    void
 
   Dumps a dictionary onto an opened file pointer. Key pairs are printed out
   as @c [Key]=[Value], one per line. It is Ok to provide stdout or stderr as
@@ -519,27 +519,27 @@ void dictionary_setdouble(dictionary * d, char * key, double val)
 
 void dictionary_dump(dictionary * d, FILE * out)
 {
-	unsigned int i;
+    unsigned int i;
 
-	if (d==NULL || out==NULL)
-	{
-		return;
-	}
-	if (d->n < 1)
-	{
-		fprintf(out, "empty dictionary\n");
-		return;
-	}
-	for (i=0; i < d->size; ++i)
-	{
+    if (d==NULL || out==NULL)
+    {
+        return;
+    }
+    if (d->n < 1)
+    {
+        fprintf(out, "empty dictionary\n");
+        return;
+    }
+    for (i=0; i < d->size; ++i)
+    {
         if (d->key[i])
         {
             fprintf(out, "%20s\t[%s]\n",
                     d->key[i],
                     d->val[i] ? d->val[i] : "UNDEF");
         }
-	}
-	return;
+    }
+    return;
 }
 
 
