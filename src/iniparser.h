@@ -40,7 +40,7 @@
  */
 /*--------------------------------------------------------------------------*/
 
-int iniparser_getnsec(dictionary * d);
+ssize_t iniparser_getnsec(const dictionary * const d);
 
 
 /*-------------------------------------------------------------------------*/
@@ -58,7 +58,7 @@ int iniparser_getnsec(dictionary * d);
  */
 /*--------------------------------------------------------------------------*/
 
-const char * iniparser_getsecname(dictionary * d, int n);
+const char * iniparser_getsecname(const dictionary * const d, size_t n);
 
 
 /*-------------------------------------------------------------------------*/
@@ -73,7 +73,7 @@ const char * iniparser_getsecname(dictionary * d, int n);
  */
 /*--------------------------------------------------------------------------*/
 
-void iniparser_dump_ini(dictionary * d, FILE * f);
+void iniparser_dump_ini(const dictionary * const d, FILE * const f);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -88,7 +88,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f);
  */
 /*--------------------------------------------------------------------------*/
 
-void iniparser_dumpsection_ini(dictionary * d, const char * s, FILE * f);
+void iniparser_dumpsection_ini(const dictionary * const d, const char * s, FILE * f);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -103,7 +103,7 @@ void iniparser_dumpsection_ini(dictionary * d, const char * s, FILE * f);
   purposes mostly.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_dump(dictionary * d, FILE * f);
+void iniparser_dump(const dictionary * const d, FILE * const f);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -113,7 +113,7 @@ void iniparser_dump(dictionary * d, FILE * f);
   @return   Number of keys in section
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getsecnkeys(dictionary * d, const char * s);
+int iniparser_getsecnkeys(const dictionary * const d, const char * s);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -129,7 +129,7 @@ int iniparser_getsecnkeys(dictionary * d, const char * s);
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-const char ** iniparser_getseckeys(dictionary * d, const char * s);
+const char ** iniparser_getseckeys(const dictionary * const d, const char * s);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -146,7 +146,7 @@ const char ** iniparser_getseckeys(dictionary * d, const char * s);
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-const char * iniparser_getstring(dictionary * d, const char * key, const char * def);
+const char * iniparser_getstring(const dictionary * const d, const char * key, const char * def);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -282,7 +282,7 @@ void iniparser_unset(dictionary * ini, const char * entry);
   of querying for the presence of sections in a dictionary.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_find_entry(dictionary * ini, const char * entry) ;
+int iniparser_find_entry(const dictionary * const ini, const char * entry) ;
 
 /*-------------------------------------------------------------------------*/
 /**

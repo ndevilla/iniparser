@@ -87,7 +87,7 @@ dictionary * dictionary_new(size_t size);
   Deallocate a dictionary object and all memory associated to it.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_del(dictionary * vd);
+void dictionary_del(dictionary * d);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -103,7 +103,7 @@ void dictionary_del(dictionary * vd);
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-const char * dictionary_get(dictionary * d, const char * key, const char * def);
+const char * dictionary_get(const dictionary * const d, const char * key, const char * def);
 
 
 /*-------------------------------------------------------------------------*/
@@ -118,7 +118,7 @@ const char * dictionary_get(dictionary * d, const char * key, const char * def);
   and returns the first char of the found string.
  */
 /*--------------------------------------------------------------------------*/
-char dictionary_getchar(dictionary * d, char * key, char def) ;
+char dictionary_getchar(const dictionary * const d, const char * key, char def) ;
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -133,7 +133,7 @@ char dictionary_getchar(dictionary * d, char * key, char def) ;
   in the dictionary, the default is returned.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_getint(dictionary * d, char * key, int def);
+int dictionary_getint(const dictionary * const d, const char * key, int def);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -148,7 +148,7 @@ int dictionary_getint(dictionary * d, char * key, int def);
   in the dictionary, the default is returned.
  */
 /*--------------------------------------------------------------------------*/
-double dictionary_getdouble(dictionary * d, char * key, double def);
+double dictionary_getdouble(const dictionary * const d, const char * key, double def);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -176,7 +176,7 @@ double dictionary_getdouble(dictionary * d, char * key, double def);
   This function returns non-zero in case of failure.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_set(dictionary * vd, const char * key, const char * val);
+int dictionary_set(dictionary * d, const char * key, const char * val);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -204,7 +204,7 @@ void dictionary_unset(dictionary * d, const char * key);
   converted to a string using %d.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_setint(dictionary * d, char * key, int val);
+void dictionary_setint(dictionary * d, const char * key, int val);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -218,7 +218,7 @@ void dictionary_setint(dictionary * d, char * key, int val);
   converted to a string using %g.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_setdouble(dictionary * d, char * key, double val);
+void dictionary_setdouble(dictionary * d, const char * key, double val);
 
 /*-------------------------------------------------------------------------*/
 /**

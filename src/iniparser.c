@@ -63,14 +63,14 @@ static const char * strlwc(const char * s)
 
 /* Private: add an entry to the dictionary */
 static void iniparser_add_entry(dictionary * d,
-                                char * sec,
-                                char * key,
-                                char * val)
+                                const char * const sec,
+                                const char * const key,
+                                const char * const val)
 {
     char longkey[(2*ASCIILINESZ)+1];
 
     /* Make a key as section:keyword */
-    if(key!=NULL)
+    if(NULL != key)
     {
         sprintf(longkey, "%s:%s", sec, key);
     }
@@ -144,23 +144,24 @@ static const char * strstrip(const char * s)
  */
 /*--------------------------------------------------------------------------*/
 
-int iniparser_getnsec(dictionary * d)
+ssize_t iniparser_getnsec(const dictionary * const d)
 {
-    unsigned int i;
-    int nsec = 0;
+    size_t i = 0;
+    ssize_t nsec = 0;
 
     if (d==NULL)
     {
         return -1;
     }
 
-    for (i=0; i < d->size; ++i)
+    for ( ; i < d->size; ++i)
     {
-        if (d->key[i] == NULL)
+        if(NULL == d->key[i])
         {
             continue;
         }
-        if (strchr(d->key[i], ':') == NULL)
+
+        if(NULL == strchr(d->key[i], ':'))
         {
             ++nsec;
         }
@@ -183,23 +184,23 @@ int iniparser_getnsec(dictionary * d)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-const char * iniparser_getsecname(dictionary * d, int n)
+const char * iniparser_getsecname(const dictionary * const d, size_t n)
 {
-    unsigned int i;
-    int foundsec = 0;
+    size_t i = 0;
+    size_t foundsec = 0;
 
-    if(d==NULL || n<0)
+    if((NULL == d) || (n < 0))
     {
         return NULL;
     }
 
-    for(i=0; i < d->size; ++i)
+    for( ; i < d->size; ++i)
     {
-        if(d->key[i]==NULL)
+        if(NULL == d->key[i])
         {
             continue ;
         }
-        if(strchr(d->key[i], ':')==NULL)
+        if(NULL == strchr(d->key[i], ':'))
         {
             ++foundsec;
             if(foundsec>n)
@@ -208,7 +209,7 @@ const char * iniparser_getsecname(dictionary * d, int n)
             }
         }
     }
-    if (foundsec<=n)
+    if(foundsec <= n)
     {
         return NULL;
     }
@@ -229,21 +230,21 @@ const char * iniparser_getsecname(dictionary * d, int n)
   purposes mostly.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_dump(dictionary * d, FILE * f)
+void iniparser_dump(const dictionary * const d, FILE * const f)
 {
-    unsigned int i;
+    size_t i = 0;
 
-    if (d==NULL || f==NULL)
+    if((NULL == d) || (NULL == f))
     {
         return;
     }
-    for(i=0; i < d->size; ++i)
+    for( ; i < d->size; ++i)
     {
-        if (d->key[i]==NULL)
+        if(NULL == d->key[i])
         {
             continue;
         }
-        if (d->val[i]!=NULL)
+        if (NULL != d->val[i])
         {
             fprintf(f, "[%s]=[%s]\n", d->key[i], d->val[i]);
         }
@@ -267,38 +268,38 @@ void iniparser_dump(dictionary * d, FILE * f)
  */
 /*--------------------------------------------------------------------------*/
 
-void iniparser_dump_ini(dictionary * d, FILE * f)
+void iniparser_dump_ini(const dictionary * const d, FILE * const f)
 {
-    int     i ;
-    int     nsec ;
-    const char *  secname ;
+    size_t        i       = 0;
+    ssize_t       nsec    = 0;
+    const char *  secname = NULL;
 
-    if (d==NULL || f==NULL)
+    if((NULL == d) || (NULL == f))
     {
         return;
     }
 
     nsec = iniparser_getnsec(d);
-    if (nsec<1)
+    if(nsec<1)
     {
         /* No section in file: dump all keys as they are */
-        for (i=0 ; i<d->size ; ++i)
+        for( ; i<d->size; ++i)
         {
-            if (d->key[i]==NULL)
+            if(NULL == d->key[i])
             {
-                continue ;
+                continue;
             }
             fprintf(f, "%s = %s\n", d->key[i], d->val[i]);
         }
-        return ;
+        return;
     }
-    for (i=0 ; i<nsec ; ++i)
+    for ( ; i<nsec; ++i)
     {
         secname = iniparser_getsecname(d, i) ;
         iniparser_dumpsection_ini(d, secname, f) ;
     }
     fprintf(f, "\n");
-    return ;
+    return;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -313,22 +314,35 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
   file.  It is Ok to specify @c stderr or @c stdout as output files.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_dumpsection_ini(dictionary * d, const char * s, FILE * f)
+void iniparser_dumpsection_ini(const dictionary * const d, const char * s, FILE * const f)
 {
-    int     j ;
+    size_t  j=0;
     char    keym[ASCIILINESZ+1];
-    int     seclen ;
+    size_t  seclen;
 
-    if (d==NULL || f==NULL) return ;
-    if (! iniparser_find_entry(d, s)) return ;
+    if((NULL == d) || (NULL == f))
+    {
+        return;
+    }
 
-    seclen  = (int)strlen(s);
+    if (! iniparser_find_entry(d, s))
+    {
+        return;
+    }
+
+    seclen  = strlen(s);
     fprintf(f, "\n[%s]\n", s);
     sprintf(keym, "%s:", s);
-    for (j=0 ; j<d->size ; j++) {
-        if (d->key[j]==NULL)
-            continue ;
-        if (!strncmp(d->key[j], keym, seclen+1)) {
+
+    for( ; j<d->size; ++j)
+    {
+        if (NULL == d->key[j])
+        {
+            continue;
+        }
+
+        if (!strncmp(d->key[j], keym, seclen+1))
+        {
             fprintf(f,
                     "%-30s = %s\n",
                     d->key[j]+seclen+1,
@@ -360,7 +374,7 @@ void iniparser_dumpsection_ini(dictionary * d, const char * s, FILE * f)
   iniparser_getstring() instead.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstr(dictionary * d, char * key)
+const char * iniparser_getstr(const dictionary * const d, const char * key)
 {
     return iniparser_getstring(d, key, NULL);
 }
@@ -374,29 +388,38 @@ char * iniparser_getstr(dictionary * d, char * key)
   @return   Number of keys in section
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getsecnkeys(dictionary * d, const char * s)
+int iniparser_getsecnkeys(const dictionary * const d, const char * s)
 {
-    int     seclen, nkeys ;
+    size_t  seclen;
+    int     nkeys = 0;
     char    keym[ASCIILINESZ+1];
-    int j ;
+    int j = 0;
 
-    nkeys = 0;
-
-    if (d==NULL) return nkeys;
-    if (! iniparser_find_entry(d, s)) return nkeys;
-
-    seclen  = (int)strlen(s);
-    sprintf(keym, "%s:", s);
-
-    for (j=0 ; j<d->size ; j++) {
-        if (d->key[j]==NULL)
-            continue ;
-        if (!strncmp(d->key[j], keym, seclen+1)) 
-            nkeys++;
+    if(d==NULL)
+    {
+        return nkeys;
     }
 
-    return nkeys;
+    if(! iniparser_find_entry(d, s))
+    {
+        return nkeys;
+    }
 
+    seclen  = strlen(s);
+    sprintf(keym, "%s:", s);
+
+    for ( ; j<d->size ; ++j)
+    {
+        if(NULL == d->key[j])
+        {
+            continue;
+        }
+        if(!strncmp(d->key[j], keym, seclen+1))
+        {
+            ++nkeys;
+        }
+    }
+    return nkeys;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -413,40 +436,47 @@ int iniparser_getsecnkeys(dictionary * d, const char * s)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-const char ** iniparser_getseckeys(dictionary * d, const char * s)
+const char ** iniparser_getseckeys(const dictionary * const d, const char * s)
 {
+    const char **keys = NULL;
 
-    const char **keys;
-
-    int i, j ;
+    size_t  i = 0;
+    size_t  j = 0;
     char    keym[ASCIILINESZ+1];
-    int     seclen, nkeys ;
+    size_t  seclen = 0;
+    int     nkeys  = 0;
 
-    keys = NULL;
+    if(NULL == d)
+    {
+        return keys;
+    }
 
-    if (d==NULL) return keys;
-    if (! iniparser_find_entry(d, s)) return keys;
+    if(! iniparser_find_entry(d, s))
+    {
+        return keys;
+    }
 
     nkeys = iniparser_getsecnkeys(d, s);
 
     keys = (const char**) malloc(nkeys*sizeof(const char*));
 
-    seclen  = (int)strlen(s);
+    seclen  = strlen(s);
     sprintf(keym, "%s:", s);
-    
-    i = 0;
 
-    for (j=0 ; j<d->size ; j++) {
-        if (d->key[j]==NULL)
-            continue ;
-        if (!strncmp(d->key[j], keym, seclen+1)) {
+    for( ; j<d->size ; ++j)
+    {
+        if(NULL == d->key[j])
+        {
+            continue;
+        }
+
+        if( ! strncmp(d->key[j], keym, seclen+1))
+        {
             keys[i] = d->key[j];
-            i++;
+            ++i;
         }
     }
-
     return keys;
-
 }
 
 /*-------------------------------------------------------------------------*/
@@ -464,7 +494,7 @@ const char ** iniparser_getseckeys(dictionary * d, const char * s)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-const char * iniparser_getstring(dictionary * d, const char * key, const char * def)
+const char * iniparser_getstring(const dictionary * const d, const char * key, const char * def)
 {
     if (d==NULL || key==NULL)
     {
@@ -509,7 +539,7 @@ const char * iniparser_getstring(dictionary * d, const char * key, const char * 
 int iniparser_getint(dictionary * d, const char * key, int notfound)
 {
     const char * const str = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (str==INI_INVALID_KEY)
+    if(INI_INVALID_KEY == str)
     {
         return notfound;
     }
@@ -619,9 +649,8 @@ int iniparser_getboolean(dictionary * d, const char * key, int notfound)
   of querying for the presence of sections in a dictionary.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_find_entry(
-    dictionary  *   ini,
-    const char  *   entry
+int iniparser_find_entry(const dictionary  * const  ini,
+                         const char  *  const entry
 )
 {
     return (iniparser_getstring(ini, entry, INI_INVALID_KEY)!=INI_INVALID_KEY);
@@ -689,18 +718,17 @@ void iniparser_unset(dictionary * ini, const char * entry)
   @return   line_status value
  */
 /*--------------------------------------------------------------------------*/
-static line_status iniparser_line(
-    const char * input_line,
-    char * section,
-    char * key,
-    char * value)
+static line_status iniparser_line(const char * input_line,
+                                  char * section,
+                                  char * key,
+                                  char * value)
 {   
     line_status sta;
     char        line[ASCIILINESZ+1];
-    int         len;
+    size_t      len;
 
     strcpy(line, strstrip(input_line));
-    len = (int)strlen(line);
+    len = strlen(line);
 
     sta = LINE_UNPROCESSED ;
     if (len<1)

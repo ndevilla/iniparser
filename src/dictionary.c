@@ -179,8 +179,8 @@ void dictionary_del(dictionary * d)
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get a value from a dictionary.
-  @param    d        dictionary object to search.
-  @param    key        Key to look for in the dictionary.
+  @param    d       Dictionary object to search.
+  @param    key     Key to look for in the dictionary.
   @param    def     Default value to return if key not found.
   @return   1 pointer to internally allocated character string.
 
@@ -190,7 +190,7 @@ void dictionary_del(dictionary * d)
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-const char * dictionary_get(dictionary * d, const char * key, const char * def)
+const char * dictionary_get(const dictionary * const d, const char * key, const char * def)
 {
     unsigned    hash ;
     size_t      i ;
@@ -198,7 +198,7 @@ const char * dictionary_get(dictionary * d, const char * key, const char * def)
     hash = dictionary_hash(key);
     for (i=0; i < d->size; ++i)
     {
-        if (d->key[i] == NULL)
+        if (NULL == d->key[i])
         {
             continue;
         }
@@ -227,17 +227,17 @@ const char * dictionary_get(dictionary * d, const char * key, const char * def)
   and returns the first char of the found string.
  */
 /*--------------------------------------------------------------------------*/
-char dictionary_getchar(dictionary * d, char * key, char def)
+char dictionary_getchar(const dictionary * const d, const char * key, char def)
 {
-    char * v;
-    v=dictionary_get(d,key,DICT_INVALID_KEY);
-    if (v==DICT_INVALID_KEY)
+    const char * const v = dictionary_get(d,key,DICT_INVALID_KEY);
+
+    if(DICT_INVALID_KEY == v)
     {
-        return def ;
+        return def;
     }
     else
     {
-        return v[0] ;
+        return v[0];
     }
 }
 
@@ -255,11 +255,10 @@ char dictionary_getchar(dictionary * d, char * key, char def)
   in the dictionary, the default is returned.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_getint(dictionary * d, char * key, int def)
+int dictionary_getint(const dictionary * const d, const char * key, int def)
 {
-    char * v ;
-    v=dictionary_get(d,key,DICT_INVALID_KEY);
-    if (v==DICT_INVALID_KEY)
+    const char * const v = dictionary_get(d,key,DICT_INVALID_KEY);
+    if(DICT_INVALID_KEY == v)
     {
         return def;
     }
@@ -282,11 +281,10 @@ int dictionary_getint(dictionary * d, char * key, int def)
   in the dictionary, the default is returned.
  */
 /*--------------------------------------------------------------------------*/
-double dictionary_getdouble(dictionary * d, char * key, double def)
+double dictionary_getdouble(dictionary const * const d, const char * key, double def)
 {
-    char * v ;
-    v=dictionary_get(d,key,DICT_INVALID_KEY);
-    if (v==DICT_INVALID_KEY)
+    const char * const v=dictionary_get(d,key,DICT_INVALID_KEY);
+    if(DICT_INVALID_KEY == v)
     {
         return def;
     }
@@ -467,7 +465,7 @@ void dictionary_unset(dictionary * d, const char * key)
 /*--------------------------------------------------------------------------*/
 
 
-void dictionary_setint(dictionary * d, char * key, int val)
+void dictionary_setint(dictionary * d, const char * key, int val)
 {
     char    sval[MAXVALSZ];
     sprintf(sval, "%d", val);
@@ -489,7 +487,7 @@ void dictionary_setint(dictionary * d, char * key, int val)
 /*--------------------------------------------------------------------------*/
 
 
-void dictionary_setdouble(dictionary * d, char * key, double val)
+void dictionary_setdouble(dictionary * d, const char * key, double val)
 {
     char    sval[MAXVALSZ];
     sprintf(sval, "%g", val);
