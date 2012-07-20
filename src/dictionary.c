@@ -2,8 +2,6 @@
 /**
    @file    dictionary.c
    @author  N. Devillard
-   @date    Sep 2007
-   @version $Revision: 1.27 $
    @brief   Implements a dictionary for string variables.
 
    This module implements a simple dictionary object, i.e. a list
@@ -12,10 +10,6 @@
 */
 /*--------------------------------------------------------------------------*/
 
-/*
-    $Id: dictionary.c,v 1.27 2007-11-23 21:39:18 ndevilla Exp $
-    $Revision: 1.27 $
-*/
 /*---------------------------------------------------------------------------
                                 Includes
  ---------------------------------------------------------------------------*/
@@ -65,14 +59,14 @@ static void * mem_double(void * ptr, int size)
   for systems that do not have it.
  */
 /*--------------------------------------------------------------------------*/
-static char * xstrdup(char * s)
+static char * xstrdup(const char * s)
 {
     char * t;
     if(!s)
     {
-        return NULL ;
+        return NULL;
     }
-    t = malloc(strlen(s)+1) ;
+    t = (char*)malloc(strlen(s)+1);
     if(t)
     {
         strcpy(t,s);
@@ -96,7 +90,7 @@ static char * xstrdup(char * s)
   by comparing the key itself in last resort.
  */
 /*--------------------------------------------------------------------------*/
-unsigned dictionary_hash(char * key)
+unsigned dictionary_hash(const char * key)
 {
 	unsigned int i;
 	unsigned int len;
@@ -201,7 +195,7 @@ void dictionary_del(dictionary * d)
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, char * key, char * def)
+char * dictionary_get(dictionary * d, const char * key, char * def)
 {
 	unsigned int i;
 	unsigned int hash;
@@ -334,7 +328,7 @@ double dictionary_getdouble(dictionary * d, char * key, double def)
   This function returns non-zero in case of failure.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_set(dictionary * d, char * key, char * val)
+int dictionary_set(dictionary * d, const char * key, const char * val)
 {
 	unsigned int i;
 	unsigned int hash;
@@ -418,7 +412,7 @@ int dictionary_set(dictionary * d, char * key, char * val)
   key cannot be found.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_unset(dictionary * d, char * key)
+void dictionary_unset(dictionary * d, const char * key)
 {
 	unsigned int i;
 	unsigned int hash;
