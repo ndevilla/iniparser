@@ -76,7 +76,7 @@ unsigned dictionary_hash(const char * key);
   dictionary, give size=0.
  */
 /*--------------------------------------------------------------------------*/
-dictionary * dictionary_new(int size);
+dictionary * dictionary_new(size_t size);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -103,7 +103,7 @@ void dictionary_del(dictionary * vd);
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, const char * key, char * def);
+const char * dictionary_get(dictionary * d, const char * key, const char * def);
 
 
 /*-------------------------------------------------------------------------*/

@@ -35,7 +35,7 @@
 
 /* Doubles the allocated size associated to a pointer */
 /* 'size' is the current allocated size. */
-static void * mem_double(void * ptr, int size)
+static void * mem_double(void * ptr, size_t size)
 {
     void * newptr;
  
@@ -62,14 +62,16 @@ static void * mem_double(void * ptr, int size)
 static char * xstrdup(const char * s)
 {
     char * t;
+    size_t len;
     if(!s)
     {
         return NULL;
     }
-    t = (char*)malloc(strlen(s)+1);
+    len = strlen(s) + 1;
+    t = (char*)malloc(len);
     if(t)
     {
-        strcpy(t,s);
+        memcpy(t, s, len);
     }
     return t ;
 }
@@ -92,9 +94,9 @@ static char * xstrdup(const char * s)
 /*--------------------------------------------------------------------------*/
 unsigned dictionary_hash(const char * key)
 {
-    unsigned int i;
-    unsigned int len;
-    unsigned int hash;
+    size_t      len ;
+    unsigned    hash ;
+    size_t      i ;
 
     len = strlen(key);
     for (hash=0, i=0; i < len; ++i)
@@ -121,8 +123,7 @@ unsigned dictionary_hash(const char * key)
   dictionary, give size=0.
  */
 /*--------------------------------------------------------------------------*/
-
-dictionary * dictionary_new(int size)
+dictionary * dictionary_new(size_t size)
 {
     dictionary * d;
 
@@ -132,16 +133,15 @@ dictionary * dictionary_new(int size)
         size=DICTMINSZ;
     }
 
-    d = (dictionary *)calloc(1, sizeof(dictionary));
-    if(!d)
-    {
-        return NULL;
+    d = calloc(1, sizeof *d) ;
+
+    if (d) {
+        d->size = size ;
+        d->val  = calloc(size, sizeof *d->val);
+        d->key  = calloc(size, sizeof *d->key);
+        d->hash = calloc(size, sizeof *d->hash);
     }
-    d->size = size;
-    d->val  = (char **)calloc(size, sizeof(char*));
-    d->key  = (char **)calloc(size, sizeof(char*));
-    d->hash = (unsigned int *)calloc(size, sizeof(unsigned int));
-    return d;
+    return d ;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -155,7 +155,7 @@ dictionary * dictionary_new(int size)
 /*--------------------------------------------------------------------------*/
 void dictionary_del(dictionary * d)
 {
-    unsigned int i;
+    size_t  i ;
 
     if(d==NULL)
     {
@@ -195,10 +195,10 @@ void dictionary_del(dictionary * d)
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, const char * key, char * def)
+const char * dictionary_get(dictionary * d, const char * key, const char * def)
 {
-    unsigned int i;
-    unsigned int hash;
+    unsigned    hash ;
+    size_t      i ;
 
     hash = dictionary_hash(key);
     for (i=0; i < d->size; ++i)
@@ -330,8 +330,8 @@ double dictionary_getdouble(dictionary * d, char * key, double def)
 /*--------------------------------------------------------------------------*/
 int dictionary_set(dictionary * d, const char * key, const char * val)
 {
-    unsigned int i;
-    unsigned int hash;
+    size_t      i ;
+    unsigned    hash ;
 
     if (d==NULL || key==NULL)
     {
@@ -371,11 +371,10 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     {
 
         /* Reached maximum size: reallocate dictionary */
-        d->val  = (char **)mem_double(d->val,  d->size * sizeof(char*)) ;
-        d->key  = (char **)mem_double(d->key,  d->size * sizeof(char*)) ;
-        d->hash = (unsigned int *)mem_double(d->hash, d->size * sizeof(unsigned int));
-        if((d->val==NULL) || (d->key==NULL) || (d->hash==NULL))
-        {
+        d->val  = mem_double(d->val,  d->size * sizeof *d->val) ;
+        d->key  = mem_double(d->key,  d->size * sizeof *d->key) ;
+        d->hash = mem_double(d->hash, d->size * sizeof *d->hash) ;
+        if ((d->val==NULL) || (d->key==NULL) || (d->hash==NULL)) {
             /* Cannot grow dictionary */
             return -1 ;
         }
@@ -414,8 +413,8 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
 /*--------------------------------------------------------------------------*/
 void dictionary_unset(dictionary * d, const char * key)
 {
-    unsigned int i;
-    unsigned int hash;
+    unsigned    hash ;
+    size_t      i ;
 
     if (key == NULL)
     {
@@ -519,7 +518,7 @@ void dictionary_setdouble(dictionary * d, char * key, double val)
 
 void dictionary_dump(dictionary * d, FILE * out)
 {
-    unsigned int i;
+    size_t  i ;
 
     if (d==NULL || out==NULL)
     {
