@@ -156,6 +156,23 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def);
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Get the string associated to a key, split to an array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value at [0] to return in case of error
+  @return   pointer to statically allocated character strings
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  the notfound value is returned in an array at index [0].
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+char ** iniparser_getstring_array(dictionary * d, const char * key, char * notfound);
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get the string associated to a key, convert to an int
   @param    d Dictionary to search
   @param    key Key string to look for
@@ -182,6 +199,25 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def);
  */
 /*--------------------------------------------------------------------------*/
 int iniparser_getint(dictionary * d, const char * key, int notfound);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to an int array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value at [0] to return in case of error
+  @return   pointer to statically allocated integer array
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  the notfound value is returned in an array at index [0].
+
+  Handling of numbers is completly the same as in iniparser_getint.
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+int* iniparser_getint_array(dictionary * d, const char * key, int notfound);
 
 /*-------------------------------------------------------------------------*/
 /**

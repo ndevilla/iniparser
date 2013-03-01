@@ -8,6 +8,7 @@
 /*--------------------------------------------------------------------------*/
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
+#include <string.h>
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -89,6 +90,37 @@ static char * strstrip(const char * s)
     }
     *last = (char)0;
     return (char*)l ;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Split a string into an array at any character that are part of delimiters
+  @param    s   String to parse.
+  @param    delimiters   Delimiter characters
+  @return   ptr to statically allocated string array.
+
+  This function returns a pointer to a statically allocated string array, which
+  is the input string split into parts at the delimiter characters.
+ */
+/*--------------------------------------------------------------------------*/
+static char ** strsplit(char * s, const char * delimiters)
+{
+    char ** str_array;
+    char * ptr;
+    unsigned long n;
+
+    str_array = NULL;
+    ptr = NULL;
+    n = 0;
+    ptr = strtok(s, delimiters);
+    while (ptr!=NULL) {
+    	n++;
+    	str_array = realloc(str_array, n*sizeof(char*));
+    	str_array[n-1] = ptr;
+    	ptr = strtok(NULL, delimiters);
+    }
+
+    return str_array;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -380,6 +412,40 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def)
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Get the string associated to a key, split to an array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value at [0] to return in case of error
+  @return   pointer to statically allocated character strings
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  the notfound value is returned in an array at index [0].
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+char ** iniparser_getstring_array(dictionary * d, const char * key, char* notfound)
+{
+	char    *   str ;
+	char    **  str_array;
+
+	str_array = NULL;
+	str = iniparser_getstring(d, key, INI_INVALID_KEY);
+	if (str==INI_INVALID_KEY) {
+		str_array = malloc(sizeof(char*));
+		str_array[0] = notfound;
+		return str_array;
+	}
+	else {
+		str_array = strsplit(str, ";");
+	}
+
+	return str_array;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get the string associated to a key, convert to an int
   @param    d Dictionary to search
   @param    key Key string to look for
@@ -412,6 +478,47 @@ int iniparser_getint(dictionary * d, const char * key, int notfound)
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
     return (int)strtol(str, NULL, 0);
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to an int array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value at [0] to return in case of error
+  @return   pointer to statically allocated integer array
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  the notfound value is returned in an array at index [0].
+
+  Handling of numbers is completly the same as in iniparser_getint.
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+int* iniparser_getint_array(dictionary * d, const char * key, int notfound)
+{
+    char    **  str_array;
+    int     *   int_array;
+    int         j;
+
+    int_array = NULL;
+    str_array = iniparser_getstring_array(d, key, INI_INVALID_KEY);
+    if (str_array[0]==INI_INVALID_KEY) {
+    	int_array = (int*) malloc(sizeof(int));
+    	int_array[0] = notfound;
+    	return int_array;
+    }
+    else {
+		int_array = malloc(sizeof(str_array)*sizeof(int));
+		for (j=0; j<sizeof(str_array); j++)
+		{
+			int_array[j] = (int)strtol(str_array[j], NULL, 0);
+		}
+    }
+
+    return int_array;
 }
 
 /*-------------------------------------------------------------------------*/
