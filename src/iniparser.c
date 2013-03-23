@@ -127,6 +127,60 @@ static char ** strsplit(char * s, const char * delimiters, int * size)
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Convert a string into boolean
+  @param    s String to parse
+  @param    invalid Value to return in case of error
+  @return   integer
+
+  This function parses a string and decides by looking at the first non white-space character
+  if the value is true or false
+
+  A true boolean is found if one of the following is matched:
+
+  - A string starting with 'y'
+  - A string starting with 'Y'
+  - A string starting with 't'
+  - A string starting with 'T'
+  - A string starting with '1'
+
+  A false boolean is found if one of the following is matched:
+
+  - A string starting with 'n'
+  - A string starting with 'N'
+  - A string starting with 'f'
+  - A string starting with 'F'
+  - A string starting with '0'
+
+  The invalid value returned if no boolean is identified, does not
+  necessarily have to be 0 or 1.
+ */
+/*--------------------------------------------------------------------------*/
+static int strtob(char * s, int invalid)
+{
+	int ret;
+	int i=0;
+
+	while (s[i]) {
+		if (isspace(s[i])!=0) {
+			i++;
+		} else {
+			break;
+		}
+	}
+
+	if (s[i]=='y' || s[i]=='Y' || s[i]=='1' || s[i]=='t' || s[i]=='T') {
+		ret = 1 ;
+	} else if (s[i]=='n' || s[i]=='N' || s[i]=='0' || s[i]=='f' || s[i]=='F') {
+		ret = 0 ;
+	} else {
+		ret = invalid;
+	}
+
+	return ret;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get number of sections in a dictionary
   @param    d   Dictionary to examine
   @return   int Number of sections found in dictionary
@@ -422,7 +476,7 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def)
 
   This function queries a dictionary for a key. A key as read from an
   ini file is given as "section:key". If the key cannot be found,
-  the notfound value is returned in an array at index [0].
+  an empty array (size = 0) is returned.
 
   This function returns NULL in case of error.
  */
@@ -491,7 +545,7 @@ int iniparser_getint(dictionary * d, const char * key, int notfound)
 
   This function queries a dictionary for a key. A key as read from an
   ini file is given as "section:key". If the key cannot be found,
-  the notfound value is returned in an array at index [0].
+  an empty array (size = 0) is returned.
 
   Handling of numbers is completly the same as in iniparser_getint.
 
@@ -549,7 +603,7 @@ double iniparser_getdouble(dictionary * d, const char * key, double notfound)
 
   This function queries a dictionary for a key. A key as read from an
   ini file is given as "section:key". If the key cannot be found,
-  the notfound value is returned in an array at index [0].
+  an empty array (size = 0) is returned.
 
   Handling of numbers is completly the same as in iniparser_getdouble.
 
@@ -614,14 +668,61 @@ int iniparser_getboolean(dictionary * d, const char * key, int notfound)
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (c==INI_INVALID_KEY) return notfound ;
-    if (c[0]=='y' || c[0]=='Y' || c[0]=='1' || c[0]=='t' || c[0]=='T') {
-        ret = 1 ;
-    } else if (c[0]=='n' || c[0]=='N' || c[0]=='0' || c[0]=='f' || c[0]=='F') {
-        ret = 0 ;
-    } else {
-        ret = notfound ;
-    }
+    ret = strtob(c, notfound);
     return ret;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to a boolean array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value to return in case of error
+  @param    size   Ptr to an int variable were the size of the array will be stored
+  @return   pointer to statically allocated integer array
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  an empty array (size = 0) is returned.
+
+  A true boolean is found if one of the following is matched:
+
+  - A string starting with 'y'
+  - A string starting with 'Y'
+  - A string starting with 't'
+  - A string starting with 'T'
+  - A string starting with '1'
+
+  A false boolean is found if one of the following is matched:
+
+  - A string starting with 'n'
+  - A string starting with 'N'
+  - A string starting with 'f'
+  - A string starting with 'F'
+  - A string starting with '0'
+
+  The notfound value returned if no boolean is identified, does not
+  necessarily have to be 0 or 1.
+ */
+/*--------------------------------------------------------------------------*/
+int * iniparser_getboolean_array(dictionary * d, const char * key, int notfound, int * size)
+{
+    char    **  str_array;
+    int     *   int_array;
+    int         j;
+
+    int_array = NULL;
+    str_array = iniparser_getstring_array(d, key, size);
+
+    if (*size != 0) {
+		int_array = malloc(*size * sizeof(int));
+		for (j=0; j<*size; j++)
+		{
+			int_array[j] = strtob(str_array[j], notfound);
+		}
+	}
+
+    return int_array;
 }
 
 /*-------------------------------------------------------------------------*/
