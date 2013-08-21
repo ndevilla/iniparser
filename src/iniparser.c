@@ -140,7 +140,7 @@ int iniparser_getnsec(dictionary * d)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getsecname(dictionary * d, int n)
+const char * iniparser_getsecname(dictionary * d, int n)
 {
     int i ;
     int foundsec ;
@@ -205,9 +205,9 @@ void iniparser_dump(dictionary * d, FILE * f)
 /*--------------------------------------------------------------------------*/
 void iniparser_dump_ini(dictionary * d, FILE * f)
 {
-    int     i ;
-    int     nsec ;
-    char *  secname ;
+    int             i ;
+    int             nsec ;
+    const char *    secname ;
 
     if (d==NULL || f==NULL) return ;
 
@@ -241,7 +241,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
   file.  It is Ok to specify @c stderr or @c stdout as output files.
  */
 /*--------------------------------------------------------------------------*/
-void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
+void iniparser_dumpsection_ini(dictionary * d, const char * s, FILE * f)
 {
     int     j ;
     char    keym[ASCIILINESZ+1];
@@ -275,7 +275,7 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
   @return   Number of keys in section
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getsecnkeys(dictionary * d, char * s)
+int iniparser_getsecnkeys(dictionary * d, const char * s)
 {
     int     seclen, nkeys ;
     char    keym[ASCIILINESZ+1];
@@ -314,7 +314,7 @@ int iniparser_getsecnkeys(dictionary * d, char * s)
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char ** iniparser_getseckeys(dictionary * d, char * s)
+char ** iniparser_getseckeys(dictionary * d, const char * s)
 {
 
     char **keys;
@@ -365,10 +365,10 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, const char * key, char * def)
+const char * iniparser_getstring(dictionary * d, const char * key, const char * def)
 {
-    char * lc_key ;
-    char * sval ;
+    char *          lc_key ;
+    const char *    sval ;
 
     if (d==NULL || key==NULL)
         return def ;
@@ -407,7 +407,7 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def)
 /*--------------------------------------------------------------------------*/
 int iniparser_getint(dictionary * d, const char * key, int notfound)
 {
-    char    *   str ;
+    const char *    str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
@@ -429,7 +429,7 @@ int iniparser_getint(dictionary * d, const char * key, int notfound)
 /*--------------------------------------------------------------------------*/
 double iniparser_getdouble(dictionary * d, const char * key, double notfound)
 {
-    char    *   str ;
+    const char *    str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
@@ -470,8 +470,8 @@ double iniparser_getdouble(dictionary * d, const char * key, double notfound)
 /*--------------------------------------------------------------------------*/
 int iniparser_getboolean(dictionary * d, const char * key, int notfound)
 {
-    char    *   c ;
-    int         ret ;
+    const char *    c ;
+    int             ret ;
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (c==INI_INVALID_KEY) return notfound ;
