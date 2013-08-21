@@ -87,7 +87,7 @@ static char * xstrdup(const char * s)
 /*--------------------------------------------------------------------------*/
 unsigned dictionary_hash(const char * key)
 {
-    int         len ;
+    ssize_t     len ;
     unsigned    hash ;
     int         i ;
 
