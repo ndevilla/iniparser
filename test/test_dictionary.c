@@ -50,7 +50,7 @@ void Test_dictionary_grow(CuTest *tc)
     for (i = 1 ; i < 10 ; ++i) {
         CuAssertIntEquals(tc, 0, dictionary_grow(dic));
         CuAssertIntEquals(tc, 0, dic->n);
-        CuAssertIntEquals(tc, (1 << i) * DICTMINSZ, dic->size); 
+        CuAssertIntEquals(tc, (1 << i) * DICTMINSZ, dic->size);
     }
 }
 
