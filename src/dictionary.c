@@ -91,7 +91,7 @@ unsigned dictionary_hash(const char * key)
     unsigned    hash ;
     int         i ;
 
-    len = strlen(key);
+    len = (int)strlen(key);
     for (hash=0, i=0 ; i<len ; i++) {
         hash += (unsigned)key[i] ;
         hash += (hash<<10);
@@ -249,9 +249,9 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     if (d->n==d->size) {
 
         /* Reached maximum size: reallocate dictionary */
-        d->val  = (char **)mem_double(d->val,  d->size * sizeof(char*)) ;
-        d->key  = (char **)mem_double(d->key,  d->size * sizeof(char*)) ;
-        d->hash = (unsigned int *)mem_double(d->hash, d->size * sizeof(unsigned)) ;
+        d->val  = (char **)mem_double(d->val,  d->size * (int)sizeof(char*)) ;
+        d->key  = (char **)mem_double(d->key,  d->size * (int)sizeof(char*)) ;
+        d->hash = (unsigned int *)mem_double(d->hash, d->size * (int)sizeof(unsigned)) ;
         if ((d->val==NULL) || (d->key==NULL) || (d->hash==NULL)) {
             /* Cannot grow dictionary */
             return -1 ;
