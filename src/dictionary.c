@@ -38,7 +38,7 @@
 static void * mem_double(void * ptr, size_t size)
 {
     void * newptr ;
- 
+
     newptr = calloc(2*size, 1);
     if (newptr==NULL) {
         return NULL ;
@@ -176,7 +176,7 @@ void dictionary_del(dictionary * d)
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, const char * key, char * def)
+const char * dictionary_get(dictionary * d, const char * key, const char * def)
 {
     unsigned    hash ;
     size_t      i ;
@@ -228,7 +228,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     unsigned    hash ;
 
     if (d==NULL || key==NULL) return -1 ;
-    
+
     /* Compute hash for this key */
     hash = dictionary_hash(key) ;
     /* Find if value is already in dictionary */
@@ -371,7 +371,7 @@ int main(int argc, char *argv[])
     /* Allocate dictionary */
     printf("allocating...\n");
     d = dictionary_new(0);
-    
+
     /* Set values in dictionary */
     printf("setting %d values...\n", NVALS);
     for (i=0 ; i<NVALS ; i++) {
