@@ -147,9 +147,13 @@
     accessed through the following accessor functions:
 
     - iniparser_getstring()
+    - iniparser_getstring_array()
     - iniparser_getint()
+    - iniparser_getint_array()
     - iniparser_getdouble()
+    - iniparser_getdouble_array()
     - iniparser_getboolean()
+    - iniparser_getboolean_array()
 
     Finally, discard this structure using iniparser_freedict().
 
@@ -163,7 +167,7 @@
     with "y", "Y", "t", "T" or "1" are considered true values (return 1),
     strings starting with "n", "N", "f", "F", "0" are considered false
     (return 0). This allows some flexibility in handling of boolean
-    answers.
+    answers. iniparser_getboolean_array() uses the same way of conversion.
 
     If you want to add extra information into the structure that was not
     present in the ini file, you can use iniparser_set() to insert a

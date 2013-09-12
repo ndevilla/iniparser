@@ -1,4 +1,3 @@
-
 /*-------------------------------------------------------------------------*/
 /**
    @file    iniparser.c
@@ -8,6 +7,7 @@
 /*--------------------------------------------------------------------------*/
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
+#include <string.h>
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -89,6 +89,93 @@ static char * strstrip(const char * s)
     }
     *last = (char)0;
     return (char*)l ;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Split a string into an array at any character that are part of delimiters
+  @param    s   String to parse.
+  @param    delimiters   Delimiter characters
+  @param    size   Ptr to an int variable were the size of the array will be stored
+  @return   ptr to statically allocated string array.
+
+  This function returns a pointer to a statically allocated string array, which
+  is the input string split into parts at the delimiter characters.
+ */
+/*--------------------------------------------------------------------------*/
+static char ** strsplit(char * s, const char * delimiters, int * size)
+{
+    char ** str_array;
+    char * ptr;
+    unsigned long n;
+
+    str_array = NULL;
+    ptr = NULL;
+    n = 0;
+    ptr = strtok(s, delimiters);
+    while (ptr!=NULL) {
+    	n++;
+    	str_array = realloc(str_array, n*sizeof(char*));
+    	str_array[n-1] = ptr;
+    	ptr = strtok(NULL, delimiters);
+    }
+
+    *size = n;
+    return str_array;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Convert a string into boolean
+  @param    s String to parse
+  @param    invalid Value to return in case of error
+  @return   integer
+
+  This function parses a string and decides by looking at the first non white-space character
+  if the value is true or false
+
+  A true boolean is found if one of the following is matched:
+
+  - A string starting with 'y'
+  - A string starting with 'Y'
+  - A string starting with 't'
+  - A string starting with 'T'
+  - A string starting with '1'
+
+  A false boolean is found if one of the following is matched:
+
+  - A string starting with 'n'
+  - A string starting with 'N'
+  - A string starting with 'f'
+  - A string starting with 'F'
+  - A string starting with '0'
+
+  The invalid value returned if no boolean is identified, does not
+  necessarily have to be 0 or 1.
+ */
+/*--------------------------------------------------------------------------*/
+static int strtob(char * s, int invalid)
+{
+	int ret;
+	int i=0;
+
+	while (s[i]) {
+		if (isspace(s[i])!=0) {
+			i++;
+		} else {
+			break;
+		}
+	}
+
+	if (s[i]=='y' || s[i]=='Y' || s[i]=='1' || s[i]=='t' || s[i]=='T') {
+		ret = 1 ;
+	} else if (s[i]=='n' || s[i]=='N' || s[i]=='0' || s[i]=='f' || s[i]=='F') {
+		ret = 0 ;
+	} else {
+		ret = invalid;
+	}
+
+	return ret;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -380,6 +467,41 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def)
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Get the string associated to a key, split to an array
+  @param    d   Dictionary to search
+  @param    key   Key string to look for
+  @param    delimiters   Delimiter characters
+  @param    size   Ptr to an int variable were the size of the array will be stored
+  @return   pointer to statically allocated character strings
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  an empty array (size = 0) is returned.
+  The string will be split at every delimeter character.
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+char ** iniparser_getstring_array(dictionary * d, const char * key, const char * delimiters, int * size)
+{
+	char    *   str ;
+	char    **  str_array;
+
+	str_array = NULL;
+	str = iniparser_getstring(d, key, INI_INVALID_KEY);
+	if (str==INI_INVALID_KEY) {
+		*size = 0;
+		return str_array;
+	}
+	else {
+		str_array = strsplit(str, delimiters, size);
+	}
+
+	return str_array;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get the string associated to a key, convert to an int
   @param    d Dictionary to search
   @param    key Key string to look for
@@ -416,6 +538,54 @@ int iniparser_getint(dictionary * d, const char * key, int notfound)
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Get the string associated to a key, convert to an int array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    delimiters   Delimiter characters
+  @param    size   Ptr to an int variable were the size of the array will be stored
+  @return   pointer to statically allocated integer array
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  an empty array (size = 0) is returned.
+  The individual numbers are seperated by the delimeter characters.
+
+  Supported values for integers include the usual C notation
+  so decimal, octal (starting with 0) and hexadecimal (starting with 0x)
+  are supported. Examples:
+
+  "42"      ->  42
+  "042"     ->  34 (octal -> decimal)
+  "0x42"    ->  66 (hexa  -> decimal)
+
+  Warning: the conversion may overflow in various ways. Conversion is
+  totally outsourced to strtol(), see the associated man page for overflow
+  handling.
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+int * iniparser_getint_array(dictionary * d, const char * key, const char * delimiters, int * size)
+{
+    char    **  str_array;
+    int     *   int_array;
+    int         j;
+
+    int_array = NULL;
+    str_array = iniparser_getstring_array(d, key, delimiters, size);
+    if (*size != 0) {
+		int_array = malloc(*size * sizeof(int));
+		for (j=0; j<*size; j++)
+		{
+			int_array[j] = (int)strtol(str_array[j], NULL, 0);
+		}
+    }
+
+    return int_array;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get the string associated to a key, convert to a double
   @param    d Dictionary to search
   @param    key Key string to look for
@@ -434,6 +604,45 @@ double iniparser_getdouble(dictionary * d, const char * key, double notfound)
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
     return atof(str);
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to an double array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    delimiters   Delimiter characters
+  @param    size   Ptr to an int variable were the size of the array will be stored
+  @return   pointer to statically allocated double array
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  an empty array (size = 0) is returned.
+  The individual numbers are seperated by the delimeter characters.
+
+  Handling of numbers is completly delegated to atof() function. For more info look
+  into the manual.
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+double * iniparser_getdouble_array(dictionary * d, const char * key, const char * delimiters, int * size)
+{
+    char    **  str_array;
+    double  *   double_array;
+    int         j;
+
+    double_array = NULL;
+    str_array = iniparser_getstring_array(d, key, delimiters, size);
+    if (*size != 0) {
+    	double_array = malloc(*size * sizeof(double));
+		for (j=0; j<*size; j++)
+		{
+			double_array[j] = atof(str_array[j]);
+		}
+    }
+
+    return double_array;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -475,14 +684,65 @@ int iniparser_getboolean(dictionary * d, const char * key, int notfound)
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (c==INI_INVALID_KEY) return notfound ;
-    if (c[0]=='y' || c[0]=='Y' || c[0]=='1' || c[0]=='t' || c[0]=='T') {
-        ret = 1 ;
-    } else if (c[0]=='n' || c[0]=='N' || c[0]=='0' || c[0]=='f' || c[0]=='F') {
-        ret = 0 ;
-    } else {
-        ret = notfound ;
-    }
+    ret = strtob(c, notfound);
     return ret;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to a boolean array
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    delimiters   Delimiter characters
+  @param    notfound Value to return in case of error
+  @param    size   Ptr to an int variable were the size of the array will be stored
+  @return   pointer to statically allocated integer array
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  an empty array (size = 0) is returned.
+  The individual values are seperated by the delimeter characters.
+
+  A true boolean is found if one of the following is matched:
+
+  - A string starting with 'y'
+  - A string starting with 'Y'
+  - A string starting with 't'
+  - A string starting with 'T'
+  - A string starting with '1'
+
+  A false boolean is found if one of the following is matched:
+
+  - A string starting with 'n'
+  - A string starting with 'N'
+  - A string starting with 'f'
+  - A string starting with 'F'
+  - A string starting with '0'
+
+  The notfound value returned if no boolean is identified, does not
+  necessarily have to be 0 or 1.
+
+  This function returns NULL in case of error.
+ */
+/*--------------------------------------------------------------------------*/
+int * iniparser_getboolean_array(dictionary * d, const char * key, const char * delimiters, int notfound, int * size)
+{
+    char    **  str_array;
+    int     *   int_array;
+    int         j;
+
+    int_array = NULL;
+    str_array = iniparser_getstring_array(d, key, delimiters, size);
+
+    if (*size != 0) {
+		int_array = malloc(*size * sizeof(int));
+		for (j=0; j<*size; j++)
+		{
+			int_array[j] = strtob(str_array[j], notfound);
+		}
+	}
+
+    return int_array;
 }
 
 /*-------------------------------------------------------------------------*/
