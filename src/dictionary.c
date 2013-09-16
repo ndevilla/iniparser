@@ -116,7 +116,7 @@ unsigned dictionary_hash(const char * key)
   it. If you do not know in advance (roughly) the number of entries in the
   dictionary, give size=0.
  */
-/*--------------------------------------------------------------------------*/
+/*----------CCC----------------------------------------------------------------*/
 dictionary * dictionary_new(size_t size)
 {
     dictionary  *   d ;
@@ -241,7 +241,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
                     /* Found a value: modify and return */
                     if (d->val[i]!=NULL)
                         free(d->val[i]);
-                    d->val[i] = val ? xstrdup(val) : NULL ;
+                    d->val[i] = (val ? xstrdup(val) : NULL);
                     /* Value has been modified: return */
                     return 0 ;
                 }
@@ -272,7 +272,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     }
     /* Copy key */
     d->key[i]  = xstrdup(key);
-    d->val[i]  = val ? xstrdup(val) : NULL ;
+    d->val[i]  = (val ? xstrdup(val) : NULL) ;
     d->hash[i] = hash;
     d->n ++ ;
     return 0 ;
