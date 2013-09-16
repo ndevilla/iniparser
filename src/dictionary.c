@@ -33,21 +33,6 @@
                             Private functions
  ---------------------------------------------------------------------------*/
 
-/* Doubles the allocated size associated to a pointer */
-/* 'size' is the current allocated size. */
-static void * mem_double(void * ptr, size_t size)
-{
-    void * newptr ;
- 
-    newptr = calloc(2*size, 1);
-    if (newptr==NULL) {
-        return NULL ;
-    }
-    memcpy(newptr, ptr, size);
-    free(ptr);
-    return newptr ;
-}
-
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Duplicate a string
@@ -224,8 +209,11 @@ char * dictionary_get(dictionary * d, const char * key, char * def)
 /*--------------------------------------------------------------------------*/
 int dictionary_set(dictionary * d, const char * key, const char * val)
 {
-    size_t      i ;
-    unsigned    hash ;
+    size_t         i ;
+    unsigned       hash ;
+    char        ** new_val ;
+    char        ** new_key ;
+    unsigned     * new_hash ;
 
     if (d==NULL || key==NULL) return -1 ;
     
@@ -253,15 +241,22 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     if (d->n==d->size) {
 
         /* Reached maximum size: reallocate dictionary */
-        d->val  = mem_double(d->val,  d->size * sizeof *d->val) ;
-        d->key  = mem_double(d->key,  d->size * sizeof *d->key) ;
-        d->hash = mem_double(d->hash, d->size * sizeof *d->hash) ;
-        if ((d->val==NULL) || (d->key==NULL) || (d->hash==NULL)) {
-            /* Cannot grow dictionary */
+        new_val  = realloc(d->val,  2 * d->size * sizeof *d->val);
+        new_key  = realloc(d->key,  2 * d->size * sizeof *d->key);
+        new_hash = realloc(d->hash, 2 * d->size * sizeof *d->hash);
+        if ((new_val==NULL) || (new_key==NULL) || (new_hash==NULL)) {
+            /* The size allocation failed, leave the dictionary unchanged */
             return -1 ;
         }
-        /* Double size */
+        /* Initialize the newly allocated space */
+        memset(new_val + d->size, 0, d->size);
+        memset(new_key + d->size, 0, d->size);
+        memset(new_hash + d->size, 0, d->size);
+        /* Actually update the dictionary */
         d->size *= 2 ;
+        d->val = new_val;
+        d->key = new_key;
+        d->hash = new_hash;
     }
 
     /* Insert key in the first empty slot. Start at d->n and wrap at
