@@ -47,13 +47,12 @@ static char * strlwc(const char * s)
     int i ;
 
     if (s==NULL) return NULL ;
-    memset(l, 0, ASCIILINESZ+1);
     i=0 ;
     while (s[i] && i<ASCIILINESZ) {
         l[i] = (char)tolower((int)s[i]);
         i++ ;
     }
-    l[ASCIILINESZ]=(char)0;
+    l[i] = '\0';
     return l ;
 }
 

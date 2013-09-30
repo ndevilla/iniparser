@@ -58,6 +58,48 @@ static char * xstrdup(const char * s)
     return t ;
 }
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Double the size of the dictionary
+  @param    d Dictionary to grow
+  @return   This function returns non-zero in case of failure
+ */
+/*--------------------------------------------------------------------------*/
+static int dictionary_grow(dictionary * d)
+{
+    char        ** new_val ;
+    char        ** new_key ;
+    unsigned     * new_hash ;
+
+    new_val  = calloc(d->size * 2, sizeof *d->val);
+    new_key  = calloc(d->size * 2, sizeof *d->key);
+    new_hash = calloc(d->size * 2, sizeof *d->hash);
+    if (!new_val || !new_key || !new_hash) {
+        /* An allocation failed, leave the dictionary unchanged */
+        if (new_val)
+            free(new_val);
+        if (new_key)
+            free(new_key);
+        if (new_hash)
+            free(new_hash);
+        return -1 ;
+    }
+    /* Initialize the newly allocated space */
+    memcpy(new_val, d->val, d->size * sizeof(char *));
+    memcpy(new_key, d->key, d->size * sizeof(char *));
+    memcpy(new_hash, d->hash, d->size * sizeof(unsigned));
+    /* Delete previous data */
+    free(d->val);
+    free(d->key);
+    free(d->hash);
+    /* Actually update the dictionary */
+    d->size *= 2 ;
+    d->val = new_val;
+    d->key = new_key;
+    d->hash = new_hash;
+    return 0 ;
+}
+
 /*---------------------------------------------------------------------------
                             Function codes
  ---------------------------------------------------------------------------*/
@@ -78,6 +120,9 @@ unsigned dictionary_hash(const char * key)
     size_t      len ;
     unsigned    hash ;
     size_t      i ;
+
+    if (!key)
+        return 0 ;
 
     len = strlen(key);
     for (hash=0, i=0 ; i<len ; i++) {
@@ -211,9 +256,6 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
 {
     size_t         i ;
     unsigned       hash ;
-    char        ** new_val ;
-    char        ** new_key ;
-    unsigned     * new_hash ;
 
     if (d==NULL || key==NULL) return -1 ;
     
@@ -239,24 +281,9 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     /* Add a new value */
     /* See if dictionary needs to grow */
     if (d->n==d->size) {
-
         /* Reached maximum size: reallocate dictionary */
-        new_val  = realloc(d->val,  2 * d->size * sizeof *d->val);
-        new_key  = realloc(d->key,  2 * d->size * sizeof *d->key);
-        new_hash = realloc(d->hash, 2 * d->size * sizeof *d->hash);
-        if ((new_val==NULL) || (new_key==NULL) || (new_hash==NULL)) {
-            /* The size allocation failed, leave the dictionary unchanged */
-            return -1 ;
-        }
-        /* Initialize the newly allocated space */
-        memset(new_val + d->size, 0, d->size);
-        memset(new_key + d->size, 0, d->size);
-        memset(new_hash + d->size, 0, d->size);
-        /* Actually update the dictionary */
-        d->size *= 2 ;
-        d->val = new_val;
-        d->key = new_key;
-        d->hash = new_hash;
+        if (dictionary_grow(d) != 0)
+            return -1;
     }
 
     /* Insert key in the first empty slot. Start at d->n and wrap at
