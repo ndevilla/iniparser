@@ -25,7 +25,11 @@ void create_example_ini_file(void)
 {
     FILE    *   ini ;
 
-    ini = fopen("example.ini", "w");
+    if ((ini=fopen("example.ini", "w"))==NULL) {
+        fprintf(stderr, "iniparser: cannot create example.ini\n");
+        return ;
+    }
+
     fprintf(ini,
     "#\n"
     "# This is an example of ini file\n"
@@ -83,13 +87,13 @@ int parse_ini_file(char * ini_name)
     printf("Wine:\n");
     s = iniparser_getstring(ini, "wine:grape", NULL);
     printf("Grape:     [%s]\n", s ? s : "UNDEF");
-    
+
     i = iniparser_getint(ini, "wine:year", -1);
     printf("Year:      [%d]\n", i);
 
     s = iniparser_getstring(ini, "wine:country", NULL);
     printf("Country:   [%s]\n", s ? s : "UNDEF");
-    
+
     d = iniparser_getdouble(ini, "wine:alcohol", -1.0);
     printf("Alcohol:   [%g]\n", d);
 
