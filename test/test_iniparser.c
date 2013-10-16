@@ -57,7 +57,7 @@ void Test_iniparser_strstrip(CuTest *tc)
     };
     char string_very_long[ASCIILINESZ * 2];
     char error_msg[128];
-    char *stripped;
+    const char *stripped;
     unsigned i;
 
     /* NULL ptr as input */

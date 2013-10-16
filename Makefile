@@ -5,7 +5,7 @@
 # Compiler settings
 CC      ?= gcc
 
-CFLAGS  += -fPIC -Wall -ansi -pedantic
+CFLAGS  += -fPIC -Wall -Wextra -ansi -pedantic
 ifndef DEBUG
 CFLAGS	+= -O2
 else
@@ -72,5 +72,9 @@ veryclean:
 docs:
 	@(cd doc ; $(MAKE))
 	
-check:
+check: libiniparser.so
 	@(cd test ; $(MAKE))
+
+.PHONY: example
+example: libiniparser.so
+	@(cd example ; $(MAKE))	

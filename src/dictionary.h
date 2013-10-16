@@ -107,7 +107,7 @@ void dictionary_del(dictionary * vd);
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, const char * key, char * def);
+const char * dictionary_get(const dictionary * d, const char * key, const char * def);
 
 
 /*-------------------------------------------------------------------------*/
@@ -164,7 +164,7 @@ void dictionary_unset(dictionary * d, const char * key);
   output file pointers.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_dump(dictionary * d, FILE * out);
+void dictionary_dump(const dictionary * d, FILE * out);
 
 #ifdef __cplusplus
 }

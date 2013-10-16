@@ -176,7 +176,7 @@ dictionary * dictionary_new(size_t size)
 /*--------------------------------------------------------------------------*/
 void dictionary_del(dictionary * d)
 {
-    size_t  i ;
+    ssize_t  i ;
 
     if (d==NULL) return ;
     for (i=0 ; i<d->size ; i++) {
@@ -206,10 +206,10 @@ void dictionary_del(dictionary * d)
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, const char * key, char * def)
+const char * dictionary_get(const dictionary * d, const char * key, const char * def)
 {
     unsigned    hash ;
-    size_t      i ;
+    ssize_t      i ;
 
     hash = dictionary_hash(key);
     for (i=0 ; i<d->size ; i++) {
@@ -254,7 +254,7 @@ char * dictionary_get(dictionary * d, const char * key, char * def)
 /*--------------------------------------------------------------------------*/
 int dictionary_set(dictionary * d, const char * key, const char * val)
 {
-    size_t         i ;
+    ssize_t         i ;
     unsigned       hash ;
 
     if (d==NULL || key==NULL) return -1 ;
@@ -314,7 +314,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
 void dictionary_unset(dictionary * d, const char * key)
 {
     unsigned    hash ;
-    size_t      i ;
+    ssize_t      i ;
 
     if (key == NULL) {
         return;
@@ -360,9 +360,9 @@ void dictionary_unset(dictionary * d, const char * key)
   output file pointers.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_dump(dictionary * d, FILE * out)
+void dictionary_dump(const dictionary * d, FILE * out)
 {
-    size_t  i ;
+    ssize_t  i ;
 
     if (d==NULL || out==NULL) return ;
     if (d->n<1) {
