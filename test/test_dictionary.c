@@ -44,6 +44,7 @@ void Test_dictionary_grow(CuTest *tc)
     dictionary *dic;
 
     dic = dictionary_new(DICTMINSZ);
+    CuAssertPtrNotNull(tc, dic);
     CuAssertIntEquals(tc, 0, dic->n);
     CuAssertIntEquals(tc, DICTMINSZ, dic->size);
 
@@ -68,6 +69,7 @@ void Test_dictionary_growing(CuTest *tc)
     dictionary *dic;
 
     dic = dictionary_new(DICTMINSZ);
+    CuAssertPtrNotNull(tc, dic);
     CuAssertIntEquals(tc, 0, dic->n);
 
     /* Makes the dictionary grow */
@@ -147,6 +149,7 @@ void Test_dictionary_dump(CuTest *tc)
 ";
 
     dic = dictionary_new(DICTMINSZ);
+    CuAssertPtrNotNull(tc, dic);
 
     /* Try with empty dictionary first */
     dump_buff = get_dump(dic);
