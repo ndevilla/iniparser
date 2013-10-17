@@ -307,16 +307,18 @@ int iniparser_getsecnkeys(const dictionary * d, const char * s)
   @return   pointer to statically allocated character strings
 
   This function queries a dictionary and finds all keys in a given section.
+  The returned pointer is obtained with malloc(3), and can be freed
+  with free(3).
   Each pointer in the returned char pointer-to-pointer is pointing to
   a string allocated in the dictionary; do not free or modify them.
 
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char ** iniparser_getseckeys(const dictionary * d, const char * s)
+const char ** iniparser_getseckeys(const dictionary * d, const char * s)
 {
 
-    char **keys;
+    const char **keys;
 
     int i, j ;
     char    keym[ASCIILINESZ+1];
@@ -329,7 +331,7 @@ char ** iniparser_getseckeys(const dictionary * d, const char * s)
 
     nkeys = iniparser_getsecnkeys(d, s);
 
-    keys = (char**) malloc(nkeys*sizeof(char*));
+    keys = (const char**) malloc(nkeys*sizeof(char*));
 
     seclen  = (int)strlen(s);
     sprintf(keym, "%s:", s);
