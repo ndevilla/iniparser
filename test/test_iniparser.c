@@ -37,36 +37,27 @@ static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_
 
 void Test_iniparser_strlwc(CuTest *tc)
 {
-    /* First element in the array is the expected stripping result */
-    const char *strings_empty[] = {
-        "",
-        "       "
-    };
-    const char *strings_test[] = {
-        "test",
-        "test ",
-        "test          ",
-        " test",
-        "   test    "
-    };
-    char error_msg[128];
-    unsigned i;
+    char out_buffer[128];
 
     /* NULL ptr as input */
-    CuAssertPtrEquals(tc, NULL, strstrip(NULL));
+    CuAssertPtrEquals(tc, NULL, strlwc(NULL, NULL, 0));
+    CuAssertPtrEquals(tc, NULL, strlwc(NULL, out_buffer, sizeof (out_buffer)));
+    CuAssertPtrEquals(tc, NULL, strlwc("", NULL, sizeof (out_buffer)));
+    CuAssertPtrEquals(tc, NULL, strlwc("", out_buffer, 0));
+    CuAssertPtrEquals(tc, NULL, strlwc(NULL, NULL, 0));
 
     /* empty string */
-    for (i = 0 ; i < sizeof (strings_empty) / sizeof (char *) ; ++i) {
-        sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> %s",
-            strings_empty[i], strstrip(strings_empty[i]));
-        CuAssertStrEquals_Msg(tc, error_msg, strstrip(strings_empty[i]), strings_empty[0]);
-    }
-    /* test string */
-    for (i = 0 ; i < sizeof (strings_test) / sizeof (char *) ; ++i) {
-        sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> %s",
-            strings_test[i], strstrip(strings_test[i]));
-        CuAssertStrEquals_Msg(tc, error_msg, strstrip(strings_test[i]), strings_test[0]);
-    }
+    CuAssertStrEquals(tc, "", strlwc("", out_buffer, sizeof (out_buffer)));
+
+    CuAssertStrEquals(tc, "  ", strlwc("  ", out_buffer, sizeof (out_buffer)));
+    CuAssertStrEquals(tc, "test", strlwc("test", out_buffer, sizeof (out_buffer)));
+    CuAssertStrEquals(tc, "test", strlwc("TEST", out_buffer, sizeof (out_buffer)));
+    CuAssertStrEquals(tc, "test", strlwc("TeSt", out_buffer, sizeof (out_buffer)));
+    CuAssertStrEquals(tc, "test test",
+                      strlwc("TEST TEST", out_buffer, sizeof (out_buffer)));
+    CuAssertStrEquals(tc, "very long string !!!!!!!",
+                      strlwc("very long string !!!!!!!", out_buffer, sizeof (out_buffer)));
+    CuAssertStrEquals(tc, "cutted string", strlwc("cutted string<---here", out_buffer, 14));
 }
 
 void Test_iniparser_strstrip(CuTest *tc)
@@ -82,18 +73,22 @@ void Test_iniparser_strstrip(CuTest *tc)
         "test          ",
         " test",
         "   test    "
+        " test test "
     };
-    char string_very_long[ASCIILINESZ * 2];
+    char stripped[ASCIILINESZ+1];
     char error_msg[128];
-    const char *stripped;
     unsigned i;
 
     /* NULL ptr as input */
-    CuAssertPtrEquals(tc, NULL, strstrip(NULL));
+    CuAssertPtrEquals(tc, NULL, strstrip(NULL, NULL, 0));
+    CuAssertPtrEquals(tc, NULL, strstrip(NULL, stripped, sizeof (stripped)));
+    CuAssertPtrEquals(tc, NULL, strstrip("", NULL, sizeof (stripped)));
+    CuAssertPtrEquals(tc, NULL, strstrip("", stripped, 0));
+    CuAssertPtrEquals(tc, NULL, strstrip(NULL, NULL, 0));
 
     /* empty string */
     for (i = 0 ; i < sizeof (strings_empty) / sizeof (char *) ; ++i) {
-        stripped = strstrip(strings_empty[i]);
+        CuAssertPtrNotNull(tc, strstrip(strings_empty[i], stripped, sizeof(stripped)));
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
             strings_empty[i], stripped);
         CuAssertStrEquals_Msg(tc, error_msg, stripped, strings_empty[0]);
@@ -101,16 +96,15 @@ void Test_iniparser_strstrip(CuTest *tc)
 
     /* test string */
     for (i = 0 ; i < sizeof (strings_test) / sizeof (char *) ; ++i) {
-        stripped = strstrip(strings_test[i]);
+        CuAssertPtrNotNull(tc, strstrip(strings_test[i], stripped, sizeof(stripped)));
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
             strings_test[i], stripped);
         CuAssertStrEquals_Msg(tc, error_msg, stripped, strings_test[0]);
     }
 
     /* test a overflowing string */
-    memset(string_very_long, '#', sizeof (string_very_long));
-    string_very_long[sizeof (string_very_long) - 1] = '\0';
-    CuAssertPtrEquals(tc, NULL, strstrip(string_very_long));
+    CuAssertPtrNotNull(tc, strstrip("  Overflowing_string<--here", stripped, 19));
+    CuAssertStrEquals(tc, "Overflowing_string", stripped);
 }
 
 void Test_iniparser_getnsec(CuTest *tc)

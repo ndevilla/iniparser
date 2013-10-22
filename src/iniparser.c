@@ -32,62 +32,54 @@ typedef enum _line_status_ {
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Convert a string to lowercase.
-  @param    s   String to convert.
-  @return   ptr to statically allocated string.
+  @param    in   String to convert.
+  @param    out Output buffer.
+  @param    len Size of the out buffer.
+  @return   ptr to the out buffer or NULL if an error occured.
 
-  This function returns a pointer to a statically allocated string
-  containing a lowercased version of the input string. Do not free
-  or modify the returned string! Since the returned string is statically
-  allocated, it will be modified at each function call (not re-entrant).
+  This function convert a string into lowercase.
+  At most len - 1 elements of the input string will be converted.
  */
 /*--------------------------------------------------------------------------*/
-static const char * strlwc(const char * s)
+static const char * strlwc(const char * in, char *out, unsigned len)
 {
-    static char l[ASCIILINESZ+1];
-    int i ;
+    unsigned i ;
 
-    if (s==NULL) return NULL ;
+    if (in==NULL || out == NULL || len==0) return NULL ;
     i=0 ;
-    while (s[i] && i<ASCIILINESZ) {
-        l[i] = (char)tolower((int)s[i]);
+    while (in[i] != '\0' && i < len-1) {
+        out[i] = (char)tolower((int)in[i]);
         i++ ;
     }
-    l[i] = '\0';
-    return l ;
+    out[i] = '\0';
+    return out ;
 }
 
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Remove blanks at the beginning and the end of a string.
-  @param    s   String to parse.
-  @return   ptr to statically allocated string.
+  @param    in  String to parse.
+  @param    out Output buffer.
+  @param    len Size of the out buffer.
+  @return   ptr to the out buffer or NULL if an error occured.
 
-  This function returns a pointer to a statically allocated string,
-  which is identical to the input string, except that all blank
-  characters at the end and the beg. of the string have been removed.
-  Do not free or modify the returned string! Since the returned string
-  is statically allocated, it will be modified at each function call
-  (not re-entrant).
+  At most len - 1 elements of the input string will be stripped.
  */
 /*--------------------------------------------------------------------------*/
-static const char * strstrip(const char * s)
+static const char * strstrip(const char * in, char *out, unsigned len)
 {
-    static char l[ASCIILINESZ+1];
-    char * last ;
+    unsigned count ;
 
-    if (s==NULL) return NULL ;
+    if (in==NULL || out == NULL || len==0) return NULL ;
 
-    while (isspace((int)*s) && *s) s++;
-    memset(l, 0, ASCIILINESZ+1);
-    strcpy(l, s);
-    last = l + strlen(l);
-    while (last > l) {
-        if (!isspace((int)*(last-1)))
-            break ;
-        last -- ;
-    }
-    *last = (char)0;
-    return (char*)l ;
+    for ( ; isspace((int)*in) && *in != '\0'; ++in)
+      ;
+    for (count = 0; !isspace((int)in[count]) && in[count] != '\0'; ++count)
+      ;
+    count = (count < len - 1) ? count : len - 1;
+    strncpy(out, in, count);
+    out[count] = '\0';
+    return out;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -370,11 +362,12 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
 {
     const char * lc_key ;
     const char * sval ;
+    char tmp_str[ASCIILINESZ+1];
 
     if (d==NULL || key==NULL)
         return def ;
 
-    lc_key = strlwc(key);
+    lc_key = strlwc(key, tmp_str, sizeof(tmp_str));
     sval = dictionary_get(d, lc_key, def);
     return sval ;
 }
@@ -522,7 +515,8 @@ int iniparser_find_entry(const dictionary * ini, const char * entry)
 /*--------------------------------------------------------------------------*/
 int iniparser_set(dictionary * ini, const char * entry, const char * val)
 {
-    return dictionary_set(ini, strlwc(entry), val) ;
+    char tmp_str[ASCIILINESZ+1];
+    return dictionary_set(ini, strlwc(entry, tmp_str, sizeof(tmp_str)), val) ;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -537,7 +531,8 @@ int iniparser_set(dictionary * ini, const char * entry, const char * val)
 /*--------------------------------------------------------------------------*/
 void iniparser_unset(dictionary * ini, const char * entry)
 {
-    dictionary_unset(ini, strlwc(entry));
+    char tmp_str[ASCIILINESZ+1];
+    dictionary_unset(ini, strlwc(entry, tmp_str, sizeof(tmp_str)));
 }
 
 /*-------------------------------------------------------------------------*/
@@ -558,9 +553,10 @@ static line_status iniparser_line(
 {
     line_status sta ;
     char        line[ASCIILINESZ+1];
+    char        tmp_str[ASCIILINESZ+1];
     int         len ;
 
-    strcpy(line, strstrip(input_line));
+    strcpy(line, strstrip(input_line, tmp_str, sizeof(tmp_str)));
     len = (int)strlen(line);
 
     sta = LINE_UNPROCESSED ;
@@ -573,16 +569,16 @@ static line_status iniparser_line(
     } else if (line[0]=='[' && line[len-1]==']') {
         /* Section name */
         sscanf(line, "[%[^]]", section);
-        strcpy(section, strstrip(section));
-        strcpy(section, strlwc(section));
+        strcpy(section, strstrip(section, tmp_str, sizeof(tmp_str)));
+        strcpy(section, strlwc(section, tmp_str, sizeof(tmp_str)));
         sta = LINE_SECTION ;
     } else if (sscanf (line, "%[^=] = \"%[^\"]\"", key, value) == 2
            ||  sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2
            ||  sscanf (line, "%[^=] = %[^;#]",     key, value) == 2) {
         /* Usual key=value, with or without comments */
-        strcpy(key, strstrip(key));
-        strcpy(key, strlwc(key));
-        strcpy(value, strstrip(value));
+        strcpy(key, strstrip(key, tmp_str, sizeof(tmp_str)));
+        strcpy(key, strlwc(key, tmp_str, sizeof(tmp_str)));
+        strcpy(value, strstrip(value, tmp_str, sizeof(tmp_str)));
         /*
          * sscanf cannot handle '' or "" as empty values
          * this is done here
@@ -599,8 +595,8 @@ static line_status iniparser_line(
          * key=;
          * key=#
          */
-        strcpy(key, strstrip(key));
-        strcpy(key, strlwc(key));
+        strcpy(key, strstrip(key, tmp_str, sizeof(tmp_str)));
+        strcpy(key, strlwc(key, tmp_str, sizeof(tmp_str)));
         value[0]=0 ;
         sta = LINE_VALUE ;
     } else {
