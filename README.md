@@ -14,6 +14,13 @@ This modules offers parsing of ini files from the C level.
 See a complete documentation in HTML format, from this directory
 open the file html/index.html with any HTML-capable browser.
 
+Key features :
+
+ - Small : around 1500 sloc inside 4 files (2 .c and 2 .h)
+ - Portable : no dependancies, written in `-ansi -pedantic` C89
+ - Fully reintrant : easy to make it thread-safe (just surround
+   library calls by mutex)
+
 ## II - Building project
 
 A simple `make` at the root of the project should be enough to get the static
