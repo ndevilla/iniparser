@@ -58,7 +58,7 @@ void Test_dictionary_grow(CuTest *tc)
 void Test_dictionary_hash(CuTest *tc)
 {
     /* NULL test */
-    CuAssertTrue(tc, dictionary_hash(NULL) == 0);
+    CuAssertIntEquals(tc, 0, dictionary_hash(NULL));
 }
 
 void Test_dictionary_growing(CuTest *tc)

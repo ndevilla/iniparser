@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "CuTest.h"
 #include "dictionary.h"
@@ -6,6 +10,10 @@
 /* We need to directly insert the .c file in order to test the */
 /* static functions as well */
 #include "iniparser.c"
+
+#define GOOD_INI_PATH "ressources/good_ini"
+#define BAD_INI_PATH "ressources/bad_ini"
+
 
 /* Tool function to create and populate a generic non-empty dictionary */
 static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_section)
@@ -58,6 +66,11 @@ void Test_iniparser_strlwc(CuTest *tc)
     CuAssertStrEquals(tc, "very long string !!!!!!!",
                       strlwc("very long string !!!!!!!", out_buffer, sizeof (out_buffer)));
     CuAssertStrEquals(tc, "cutted string", strlwc("cutted string<---here", out_buffer, 14));
+
+    /* test using same buffer as input and output */
+    strcpy(out_buffer, "OVERWRITE ME !");
+    CuAssertPtrNotNull(tc, strlwc(out_buffer, out_buffer, sizeof(out_buffer)));
+    CuAssertStrEquals(tc, "overwrite me !", out_buffer);
 }
 
 void Test_iniparser_strstrip(CuTest *tc)
@@ -72,9 +85,12 @@ void Test_iniparser_strstrip(CuTest *tc)
         "test ",
         "test          ",
         " test",
-        "   test    "
-        " test test "
+        "   test    ",
+        "\ttest\t",
+        "\ttest\n"
+
     };
+    const char *test_with_spaces = "I am a test with\tspaces.";
     char stripped[ASCIILINESZ+1];
     char error_msg[128];
     unsigned i;
@@ -99,12 +115,23 @@ void Test_iniparser_strstrip(CuTest *tc)
         CuAssertPtrNotNull(tc, strstrip(strings_test[i], stripped, sizeof(stripped)));
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
             strings_test[i], stripped);
-        CuAssertStrEquals_Msg(tc, error_msg, stripped, strings_test[0]);
+        CuAssertStrEquals_Msg(tc, error_msg, strings_test[0], stripped);
     }
+    CuAssertPtrNotNull(tc, strstrip(".", stripped, sizeof(stripped)));
+    CuAssertStrEquals(tc, ".", stripped);
+
+    /* string containing spaces */
+    CuAssertPtrNotNull(tc, strstrip(test_with_spaces, stripped, sizeof(stripped)));
+    CuAssertStrEquals(tc, test_with_spaces, stripped);
 
     /* test a overflowing string */
     CuAssertPtrNotNull(tc, strstrip("  Overflowing_string<--here", stripped, 19));
     CuAssertStrEquals(tc, "Overflowing_string", stripped);
+
+    /* test using same buffer as input and output */
+    strcpy(stripped, "   STRIP_ME_!  ");
+    CuAssertPtrNotNull(tc, strstrip(stripped, stripped, sizeof(stripped)));
+    CuAssertStrEquals(tc, "STRIP_ME_!", stripped);
 }
 
 void Test_iniparser_getnsec(CuTest *tc)
@@ -285,4 +312,96 @@ void Test_iniparser_getint(CuTest *tc)
                           iniparser_getint(dic, key_name, 0));
     }
     dictionary_del(dic);
+}
+
+void Test_iniparser_line(CuTest *tc)
+{
+    char section [ASCIILINESZ+1] ;
+    char key     [ASCIILINESZ+1] ;
+    char val     [ASCIILINESZ+1] ;
+
+    /* Test empty line */
+    CuAssertIntEquals(tc, LINE_EMPTY, iniparser_line("", section, key, val));
+    CuAssertIntEquals(tc, LINE_EMPTY, iniparser_line("    ", section, key, val));
+    CuAssertIntEquals(tc, LINE_EMPTY, iniparser_line("\t", section, key, val));
+
+    /* Test valid syntax */
+    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[s]", section, key, val));
+    CuAssertStrEquals(tc, "s", section);
+
+    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[ section ]", section, key, val));
+    CuAssertStrEquals(tc, "section", section);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("k=1", section, key, val));
+    CuAssertStrEquals(tc, "k", key);
+    CuAssertStrEquals(tc, "1", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = 0x42", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "0x42", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key= value with spaces", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "value with spaces", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("k =_!<>''", section, key, val));
+    CuAssertStrEquals(tc, "k", key);
+    CuAssertStrEquals(tc, "_!<>''", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("empty_value =", section, key, val));
+    CuAssertStrEquals(tc, "empty_value", key);
+    CuAssertStrEquals(tc, "", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key =\tval # comment", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "val", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key \n\n = \n val", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "val", val);
+
+    CuAssertIntEquals(tc, LINE_COMMENT, iniparser_line(";comment", section, key, val));
+    CuAssertIntEquals(tc, LINE_COMMENT, iniparser_line(" # comment", section, key, val));
+
+    /* Test syntax error */
+    CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("empty_value", section, key, val));
+    CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("not finished\\", section, key, val));
+    CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("0x42 / 0b101010", section, key, val));
+}
+
+void Test_iniparser_load(CuTest *tc)
+{
+    DIR *dir;
+    struct dirent *curr;
+    struct stat curr_stat;
+    dictionary *dic;
+    char ini_path[256];
+
+    /* Test all the good .ini files */
+    dir = opendir(GOOD_INI_PATH);
+    CuAssertPtrNotNullMsg(tc, "Cannot open good .ini conf directory", dir);
+    for (curr = readdir(dir); curr != NULL; curr = readdir(dir)) {
+        sprintf(ini_path, "%s/%s", GOOD_INI_PATH, curr->d_name);
+        stat(ini_path, &curr_stat);
+        if (S_ISREG(curr_stat.st_mode)) {
+            dic = iniparser_load(ini_path);
+            CuAssertPtrNotNullMsg(tc, ini_path, dic);
+            dictionary_del(dic);
+        }
+    }
+    closedir(dir);
+
+    /* Test all the bad .ini files */
+    dir = opendir(BAD_INI_PATH);
+    CuAssertPtrNotNullMsg(tc, "Cannot open bad .ini conf directory", dir);
+    for (curr = readdir(dir); curr != NULL; curr = readdir(dir)) {
+        sprintf(ini_path, "%s/%s", BAD_INI_PATH, curr->d_name);
+        stat(ini_path, &curr_stat);
+        if (S_ISREG(curr_stat.st_mode)) {
+            dic = iniparser_load(ini_path);
+            CuAssertPtrEquals_Msg(tc, ini_path, NULL, dic);
+            dictionary_del(dic);
+        }
+    }
+    closedir(dir);
 }

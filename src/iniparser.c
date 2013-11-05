@@ -68,15 +68,15 @@ static const char * strlwc(const char * in, char *out, unsigned len)
 /*--------------------------------------------------------------------------*/
 static const char * strstrip(const char * in, char *out, unsigned len)
 {
-    unsigned count ;
+    size_t count ;
 
     if (in==NULL || out == NULL || len==0) return NULL ;
 
     for ( ; isspace((int)*in) && *in != '\0'; ++in)
-      ;
-    for (count = 0; !isspace((int)in[count]) && in[count] != '\0'; ++count)
-      ;
-    count = (count < len - 1) ? count : len - 1;
+        ;
+    for (count = strlen(in) ; count > 0 && isspace((int)in[count - 1]); --count)
+        ;
+    count = count < len - 1 ? count : len - 1;
     strncpy(out, in, count);
     out[count] = '\0';
     return out;
@@ -553,11 +553,10 @@ static line_status iniparser_line(
 {
     line_status sta ;
     char        line[ASCIILINESZ+1];
-    char        tmp_str[ASCIILINESZ+1];
-    int         len ;
+    size_t      len ;
 
-    strcpy(line, strstrip(input_line, tmp_str, sizeof(tmp_str)));
-    len = (int)strlen(line);
+    strstrip(input_line, line, sizeof(line));
+    len = strlen(line);
 
     sta = LINE_UNPROCESSED ;
     if (len<1) {
@@ -569,16 +568,16 @@ static line_status iniparser_line(
     } else if (line[0]=='[' && line[len-1]==']') {
         /* Section name */
         sscanf(line, "[%[^]]", section);
-        strcpy(section, strstrip(section, tmp_str, sizeof(tmp_str)));
-        strcpy(section, strlwc(section, tmp_str, sizeof(tmp_str)));
+        strstrip(section, section, len);
+        strlwc(section, section, len);
         sta = LINE_SECTION ;
     } else if (sscanf (line, "%[^=] = \"%[^\"]\"", key, value) == 2
            ||  sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2
            ||  sscanf (line, "%[^=] = %[^;#]",     key, value) == 2) {
         /* Usual key=value, with or without comments */
-        strcpy(key, strstrip(key, tmp_str, sizeof(tmp_str)));
-        strcpy(key, strlwc(key, tmp_str, sizeof(tmp_str)));
-        strcpy(value, strstrip(value, tmp_str, sizeof(tmp_str)));
+        strstrip(key, key, len);
+        strlwc(key, key, len);
+        strstrip(value, value, len);
         /*
          * sscanf cannot handle '' or "" as empty values
          * this is done here
@@ -595,8 +594,8 @@ static line_status iniparser_line(
          * key=;
          * key=#
          */
-        strcpy(key, strstrip(key, tmp_str, sizeof(tmp_str)));
-        strcpy(key, strlwc(key, tmp_str, sizeof(tmp_str)));
+        strstrip(key, key, len);
+        strlwc(key, key, len);
         value[0]=0 ;
         sta = LINE_VALUE ;
     } else {
