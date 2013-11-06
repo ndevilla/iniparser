@@ -128,6 +128,61 @@ static char *get_dump(dictionary *d)
     return dump_buff;
 }
 
+void Test_dictionary_unset(CuTest *tc)
+{
+    int i, j;
+    char sec_name[32];
+    char key_name[64];
+    dictionary *dic1;
+    dictionary *dic2;
+    char *dic1_dump;
+    char *dic2_dump;
+
+    /* try dummy unsets */
+    dictionary_unset(NULL, NULL);
+    dictionary_unset(NULL, key_name);
+
+    /* Generate two similar dictionaries */
+    dic1 = dictionary_new(DICTMINSZ);
+    CuAssertPtrNotNull(tc, dic1);
+    for (i = 1 ; i < 10; ++i) {
+        sprintf(sec_name, "sec%d", i);
+        dictionary_set(dic1, sec_name, "");
+        for (j = 1 ; j < 10; ++j) {
+            sprintf(key_name, "%s:key%d", sec_name, j);
+            dictionary_set(dic1, key_name, "dummy_value");
+        }
+    }
+    dic2 = dictionary_new(DICTMINSZ);
+    CuAssertPtrNotNull(tc, dic2);
+    for (i = 1 ; i < 10; ++i) {
+        sprintf(sec_name, "sec%d", i);
+        dictionary_set(dic2, sec_name, "");
+        for (j = 1 ; j < 10; ++j) {
+            sprintf(key_name, "%s:key%d", sec_name, j);
+            dictionary_set(dic2, key_name, "dummy_value");
+        }
+    }
+
+    /* Make sure the dictionaries are the same */
+    dic1_dump = get_dump(dic1);
+    dic2_dump = get_dump(dic2);
+    CuAssertStrEquals(tc, dic1_dump, dic2_dump);
+    free(dic1_dump);
+    free(dic2_dump);
+
+    /* Those tests should not change the dictionary */
+    dictionary_unset(dic2, NULL);
+    dictionary_unset(dic2, "bad_key");
+
+    /* dic1 and dic2 must still be the same */
+    dic1_dump = get_dump(dic1);
+    dic2_dump = get_dump(dic2);
+    CuAssertStrEquals(tc, dic1_dump, dic2_dump);
+    free(dic1_dump);
+    free(dic2_dump);
+}
+
 void Test_dictionary_dump(CuTest *tc)
 {
     int i, j;
@@ -150,6 +205,10 @@ void Test_dictionary_dump(CuTest *tc)
 
     dic = dictionary_new(DICTMINSZ);
     CuAssertPtrNotNull(tc, dic);
+
+    /* Try dummy values */
+    dictionary_dump(NULL, NULL);
+    dictionary_dump(dic, NULL);
 
     /* Try with empty dictionary first */
     dump_buff = get_dump(dic);

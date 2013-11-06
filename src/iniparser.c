@@ -737,5 +737,3 @@ void iniparser_freedict(dictionary * d)
 {
     dictionary_del(d);
 }
-
-/* vim: set ts=4 et sw=4 tw=75 */

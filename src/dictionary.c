@@ -316,7 +316,7 @@ void dictionary_unset(dictionary * d, const char * key)
     unsigned    hash ;
     ssize_t      i ;
 
-    if (key == NULL) {
+    if (key == NULL || d == NULL) {
         return;
     }
 
@@ -378,47 +378,3 @@ void dictionary_dump(const dictionary * d, FILE * out)
     }
     return ;
 }
-
-
-/* Test code */
-#ifdef TESTDIC
-#define NVALS 20000
-int main(int argc, char *argv[])
-{
-    dictionary  *   d ;
-    char    *   val ;
-    int         i ;
-    char        cval[90] ;
-
-    /* Allocate dictionary */
-    printf("allocating...\n");
-    d = dictionary_new(0);
-
-    /* Set values in dictionary */
-    printf("setting %d values...\n", NVALS);
-    for (i=0 ; i<NVALS ; i++) {
-        sprintf(cval, "%04d", i);
-        dictionary_set(d, cval, "salut");
-    }
-    printf("getting %d values...\n", NVALS);
-    for (i=0 ; i<NVALS ; i++) {
-        sprintf(cval, "%04d", i);
-        val = dictionary_get(d, cval, DICT_INVALID_KEY);
-        if (val==DICT_INVALID_KEY) {
-            printf("cannot get value for key [%s]\n", cval);
-        }
-    }
-    printf("unsetting %d values...\n", NVALS);
-    for (i=0 ; i<NVALS ; i++) {
-        sprintf(cval, "%04d", i);
-        dictionary_unset(d, cval);
-    }
-    if (d->n != 0) {
-        printf("error deleting values\n");
-    }
-    printf("deallocating...\n");
-    dictionary_del(d);
-    return 0 ;
-}
-#endif
-/* vim: set ts=4 et sw=4 tw=75 */

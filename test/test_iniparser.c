@@ -223,6 +223,30 @@ void Test_iniparser_getseckeys(CuTest *tc)
         CuAssertStrEquals(tc, key_name, sections[i]);
     }
     free(sections);
+
+    /* Remove some keys to make the dictionary more real */
+    dictionary_unset(dic, "sec42");
+    dictionary_unset(dic, "sec99:key9");
+    dictionary_unset(dic, "sec0:key0");
+    dictionary_unset(dic, "sec0:key1");
+    dictionary_unset(dic, "sec0:key2");
+
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "sec42"));
+    sections = iniparser_getseckeys(dic, "sec99");
+    CuAssertPtrNotNull(tc, sections);
+    for (i = 0; i < 9; ++i) {
+        sprintf(key_name, "sec99:key%d", i);
+        CuAssertStrEquals(tc, key_name, sections[i]);
+    }
+    free(sections);
+    sections = iniparser_getseckeys(dic, "sec0");
+    CuAssertPtrNotNull(tc, sections);
+    for (i = 0; i < 7; ++i) {
+        sprintf(key_name, "sec0:key%d", i + 3);
+        CuAssertStrEquals(tc, key_name, sections[i]);
+    }
+    free(sections);
+
     dictionary_del(dic);
 }
 
