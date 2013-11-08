@@ -245,10 +245,10 @@ int iniparser_getboolean(const dictionary * d, const char * key, int notfound);
   @param    ini     Dictionary to modify.
   @param    entry   Entry to modify (entry name)
   @param    val     New value to associate to the entry.
-  @return   int 0 if Ok, -1 otherwise.
+  @return   int     0 if Ok, -1 otherwise.
 
   If the given entry can be found in the dictionary, it is modified to
-  contain the provided value. If it cannot be found, -1 is returned.
+  contain the provided value. If it cannot be found, the entry is created.
   It is Ok to set val to NULL.
  */
 /*--------------------------------------------------------------------------*/

@@ -338,6 +338,118 @@ void Test_iniparser_getint(CuTest *tc)
     dictionary_del(dic);
 }
 
+void Test_iniparser_getdouble(CuTest *tc)
+{
+    dictionary *dic;
+
+    /* NULL test */
+    CuAssertDblEquals(tc, -42, iniparser_getdouble(NULL, NULL, -42), 0);
+    CuAssertDblEquals(tc, 4.2, iniparser_getdouble(NULL, "dummy", 4.2), 0);
+
+    /* Check the def return element */
+    dic = dictionary_new(10);
+    CuAssertDblEquals(tc, 3.1415, iniparser_getdouble(dic, "dummy", 3.1415), 0);
+    CuAssertDblEquals(tc, 0xFFFFFFFF, iniparser_getdouble(dic, NULL, 0xFFFFFFFF), 0);
+    CuAssertDblEquals(tc, -0xFFFFFFFF, iniparser_getdouble(dic, "dummy", -0xFFFFFFFF), 0);
+
+    /* Insert some values */
+    dictionary_set(dic, "double", "");
+    dictionary_set(dic, "double:good0", "0");
+    dictionary_set(dic, "double:good1", "-0");
+    dictionary_set(dic, "double:good2", "1.0");
+    dictionary_set(dic, "double:good3", "3.1415");
+    dictionary_set(dic, "double:good4", "6.6655957");
+    dictionary_set(dic, "double:good5", "-123456789.123456789");
+
+    /* Add dummy stuff too */
+    dictionary_set(dic, "double:bad0", "foo");
+
+    /* Get back the values */
+    CuAssertDblEquals(tc, 0, iniparser_getdouble(dic, "double:good0", 0xFF), 0);
+    CuAssertDblEquals(tc, 0, iniparser_getdouble(dic, "double:good1", 0xFF), 0);
+    CuAssertDblEquals(tc, 1.0, iniparser_getdouble(dic, "double:good2", 0xFF), 0);
+    CuAssertDblEquals(tc, 3.1415, iniparser_getdouble(dic, "double:good3", 0xFF), 0);
+    CuAssertDblEquals(tc, 6.6655957, iniparser_getdouble(dic, "double:good4", 0xFF), 0);
+    CuAssertDblEquals(tc, -123456789.123456789,
+                         iniparser_getdouble(dic, "double:good5", 0xFF), 0);
+
+    CuAssertDblEquals(tc, 0, iniparser_getdouble(dic, "double:bad0", 42.42), 0);
+
+    dictionary_del(dic);
+}
+
+void Test_iniparser_getboolean(CuTest *tc)
+{
+    unsigned i;
+    char key_name[64];
+
+    dictionary *dic;
+    const char *token_true[] = {
+        "1",
+        "true",
+        "t",
+        "TRUE",
+        "T",
+        "yes",
+        "y",
+        "YES"
+        "Y",
+        NULL
+    };
+    const char *token_false[] = {
+        "0",
+        "false",
+        "f",
+        "FALSE",
+        "F",
+        "no",
+        "n",
+        "NO",
+        "N",
+        NULL
+    };
+
+    /* NULL test */
+    CuAssertIntEquals(tc, 1, iniparser_getboolean(NULL, NULL, 1));
+    CuAssertIntEquals(tc, 1, iniparser_getboolean(NULL, "dummy", 1));
+
+    /* Check the def return element */
+    dic = dictionary_new(10);
+    CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, "dummy", 1));
+    CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, NULL, 0));
+    CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, "dummy", 1));
+
+    for (i = 0; token_true[i] != NULL; ++i) {
+        sprintf(key_name, "bool:true%d", i);
+        iniparser_set(dic, key_name, token_true[i]);
+    }
+    for (i = 0; token_false[i] != NULL; ++i) {
+        sprintf(key_name, "bool:false%d", i);
+        iniparser_set(dic, key_name, token_false[i]);
+    }
+
+    for (i = 0; token_true[i] != NULL; ++i) {
+        sprintf(key_name, "bool:true%d", i);
+        CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, key_name, 0));
+    }
+    for (i = 0; token_false[i] != NULL; ++i) {
+        sprintf(key_name, "bool:false%d", i);
+        CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, key_name, 1));
+    }
+
+    /* Test bad boolean */
+    iniparser_set(dic, "bool:bad0", "");
+    iniparser_set(dic, "bool:bad1", "m'kay");
+    iniparser_set(dic, "bool:bad2", "42");
+    iniparser_set(dic, "bool:bad3", "_true");
+    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad0", 0xFF));
+    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad1", 0xFF));
+    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad2", 0xFF));
+    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad3", 0xFF));
+
+    dictionary_del(dic);
+}
+
 void Test_iniparser_line(CuTest *tc)
 {
     char section [ASCIILINESZ+1] ;
@@ -401,6 +513,10 @@ void Test_iniparser_load(CuTest *tc)
     dictionary *dic;
     char ini_path[256];
 
+    /* Dummy tests */
+    dic = iniparser_load("/you/shall/not/path");
+    CuAssertPtrEquals(tc, NULL, dic);
+
     /* Test all the good .ini files */
     dir = opendir(GOOD_INI_PATH);
     CuAssertPtrNotNullMsg(tc, "Cannot open good .ini conf directory", dir);
@@ -428,4 +544,37 @@ void Test_iniparser_load(CuTest *tc)
         }
     }
     closedir(dir);
+}
+
+void Test_dictionary_wrapper(CuTest *tc)
+{
+    dictionary *dic;
+
+    dic = dictionary_new(10);
+
+    CuAssertIntEquals(tc, -1, iniparser_set(dic, NULL, NULL));
+    CuAssertIntEquals(tc, -1, iniparser_set(NULL, "section", "value"));
+
+    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section", NULL));
+    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", "value"));
+
+    CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
+    /* reset the key's value*/
+    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section:key", "dummy"));
+    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", "value"));
+    CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
+
+    iniparser_unset(dic, "section:key");
+    CuAssertStrEquals(tc, "dummy", iniparser_getstring(dic, "section:key", "dummy"));
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section", "dummy"));
+
+    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
+    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key1", NULL));
+    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key2", NULL));
+
+    iniparser_unset(dic, "section");
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section", NULL));
+
+    iniparser_freedict(dic);
 }

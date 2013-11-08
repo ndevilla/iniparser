@@ -509,7 +509,7 @@ int iniparser_find_entry(const dictionary * ini, const char * entry)
   @return   int 0 if Ok, -1 otherwise.
 
   If the given entry can be found in the dictionary, it is modified to
-  contain the provided value. If it cannot be found, -1 is returned.
+  contain the provided value. If it cannot be found, the entry is created.
   It is Ok to set val to NULL.
  */
 /*--------------------------------------------------------------------------*/
