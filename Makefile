@@ -48,7 +48,7 @@ OBJS = $(SRCS:.c=.o)
 default:	libiniparser.a libiniparser.so
 
 libiniparser.a:	$(OBJS)
-	$(QUIET_AR)$(AR) $(ARFLAGS) $@ $<
+	$(QUIET_AR)$(AR) $(ARFLAGS) $@ $^
 	$(QUIET_RANLIB)$(RANLIB) $@
 
 libiniparser.so:	$(OBJS)
@@ -66,5 +66,7 @@ veryclean:
 docs:
 	@(cd doc ; $(MAKE))
 	
-check:
+check: default
 	@(cd test ; $(MAKE))
+
+.PHONY: default clean veryclean docs check
