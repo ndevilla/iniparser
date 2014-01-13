@@ -54,6 +54,7 @@ libiniparser.a:	$(OBJS)
 libiniparser.so:	$(OBJS)
 	$(QUIET_LINK)$(SHLD) $(LDSHFLAGS) $(LDFLAGS) -o $@.0 $(OBJS) \
 		-Wl,-soname=`basename $@`.0
+	@(ln -s `basename $@`.0 libiniparser.so)
 
 clean:
 	$(RM) $(OBJS)
