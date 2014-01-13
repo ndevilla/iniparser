@@ -98,7 +98,7 @@ void iniparser_dump_ini(dictionary * d, FILE * f);
  */
 /*--------------------------------------------------------------------------*/
 
-void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f);
+void iniparser_dumpsection_ini(dictionary * d, const char * s, FILE * f);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -123,7 +123,7 @@ void iniparser_dump(dictionary * d, FILE * f);
   @return   Number of keys in section
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_getsecnkeys(dictionary * d, char * s);
+int iniparser_getsecnkeys(dictionary * d, const char * s);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -139,7 +139,7 @@ int iniparser_getsecnkeys(dictionary * d, char * s);
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-char ** iniparser_getseckeys(dictionary * d, char * s);
+char ** iniparser_getseckeys(dictionary * d, const char * s);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -156,7 +156,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s);
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, const char * key, char * def);
+char * iniparser_getstring(dictionary * d, const char * key, const char * def);
 
 /*-------------------------------------------------------------------------*/
 /**
