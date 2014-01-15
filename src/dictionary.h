@@ -166,6 +166,18 @@ void dictionary_unset(dictionary * d, const char * key);
 /*--------------------------------------------------------------------------*/
 void dictionary_dump(dictionary * d, FILE * out);
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Duplicate a string
+  @param    s String to duplicate
+  @return   Pointer to a newly allocated string, to be freed with free()
+
+  This is a replacement for strdup(). This implementation is provided
+  for systems that do not have it.
+ */
+/*--------------------------------------------------------------------------*/
+char * xstrdup(const char * s);
+
 #ifdef __cplusplus
 }
 #endif

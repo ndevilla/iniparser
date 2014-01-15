@@ -58,7 +58,7 @@ static void * mem_double(void * ptr, size_t size)
   for systems that do not have it.
  */
 /*--------------------------------------------------------------------------*/
-static char * xstrdup(const char * s)
+char * xstrdup(const char * s)
 {
     char * t ;
     size_t len ;
