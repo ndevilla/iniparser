@@ -337,7 +337,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
             i++;
         }
     }
-
+    free(keym);
     return keys;
 
 }
