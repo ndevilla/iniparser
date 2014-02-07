@@ -869,6 +869,14 @@ out:
         free(section);
         section = NULL;
     }
+    if (full_line) {
+        free(full_line);
+        full_line = NULL;
+    }
+    if (prev_line) {
+        free(prev_line);
+        prev_line = NULL;
+    }
     fclose(in);
     return dict ;
 }
