@@ -63,10 +63,10 @@ static void strlwc(char * s)
 /*--------------------------------------------------------------------------*/
 void strstrip(char * s)
 {
+    if (s==NULL) return ;
+
     char *last = s + strlen(s);
     char *dest = s;
-    
-    if (s==NULL) return ;
     
     while (isspace((int)*s) && *s) s++;
     while (last > s) {
