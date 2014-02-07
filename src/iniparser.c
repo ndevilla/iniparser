@@ -592,7 +592,8 @@ static line_status iniparser_line(
 
     if (!key || (equals && !value)) {
         fprintf(stderr, "iniparser: memory alloc error\n");
-        return LINE_ERROR;
+        sta = LINE_ERROR;
+        goto out;
     }
 
     *key = 0;
@@ -654,7 +655,8 @@ static line_status iniparser_line(
         /* Generate syntax error */
         sta = LINE_ERROR ;
     }
-    
+
+out:    
     if (line) {
         free(line);
         line = NULL;
