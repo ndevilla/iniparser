@@ -879,7 +879,9 @@ out:
         free(prev_line);
         prev_line = NULL;
     }
-    fclose(in);
+    if (in) {
+        fclose(in);
+    }
     return dict ;
 }
 
