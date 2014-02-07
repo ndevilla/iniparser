@@ -686,7 +686,7 @@ static line_status iniparser_line(
 /*--------------------------------------------------------------------------*/
 dictionary * iniparser_load(const char * ininame)
 {
-    FILE * in ;
+    FILE * in = NULL ;
 
     char line    [ASCIILINESZ+1] ;
     char *section = xstrdup("");
@@ -701,17 +701,16 @@ dictionary * iniparser_load(const char * ininame)
     int  errs=0;
     int  seckey_size=0;
 
-    dictionary * dict ;
+    dictionary * dict = NULL ;
 
     if ((in=fopen(ininame, "r"))==NULL) {
         fprintf(stderr, "iniparser: cannot open %s\n", ininame);
-        return NULL ;
+	goto out;
     }
 
     dict = dictionary_new(0) ;
     if (!dict) {
-        fclose(in);
-        return NULL ;
+	goto out;
     }
 
     memset(line,    0, ASCIILINESZ);
