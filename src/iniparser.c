@@ -63,10 +63,10 @@ static void strlwc(char * s)
 /*--------------------------------------------------------------------------*/
 void strstrip(char * s)
 {
+    if (s==NULL) return ;
+
     char *last = s + strlen(s);
     char *dest = s;
-    
-    if (s==NULL) return ;
     
     while (isspace((int)*s) && *s) s++;
     while (last > s) {
@@ -337,7 +337,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
             i++;
         }
     }
-
+    free(keym);
     return keys;
 
 }
@@ -592,7 +592,8 @@ static line_status iniparser_line(
 
     if (!key || (equals && !value)) {
         fprintf(stderr, "iniparser: memory alloc error\n");
-        return LINE_ERROR;
+        sta = LINE_ERROR;
+        goto out;
     }
 
     *key = 0;
@@ -654,7 +655,8 @@ static line_status iniparser_line(
         /* Generate syntax error */
         sta = LINE_ERROR ;
     }
-    
+
+out:    
     if (line) {
         free(line);
         line = NULL;
@@ -686,7 +688,7 @@ static line_status iniparser_line(
 /*--------------------------------------------------------------------------*/
 dictionary * iniparser_load(const char * ininame)
 {
-    FILE * in ;
+    FILE * in = NULL ;
 
     char line    [ASCIILINESZ+1] ;
     char *section = xstrdup("");
@@ -701,17 +703,16 @@ dictionary * iniparser_load(const char * ininame)
     int  errs=0;
     int  seckey_size=0;
 
-    dictionary * dict ;
+    dictionary * dict = NULL ;
 
     if ((in=fopen(ininame, "r"))==NULL) {
         fprintf(stderr, "iniparser: cannot open %s\n", ininame);
-        return NULL ;
+	goto out;
     }
 
     dict = dictionary_new(0) ;
     if (!dict) {
-        fclose(in);
-        return NULL ;
+	goto out;
     }
 
     memset(line,    0, ASCIILINESZ);
@@ -870,7 +871,17 @@ out:
         free(section);
         section = NULL;
     }
-    fclose(in);
+    if (full_line) {
+        free(full_line);
+        full_line = NULL;
+    }
+    if (prev_line) {
+        free(prev_line);
+        prev_line = NULL;
+    }
+    if (in) {
+        fclose(in);
+    }
     return dict ;
 }
 
