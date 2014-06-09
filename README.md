@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/touilleMan/iniparser4.svg?branch=master)](https://travis-ci.org/touilleMan/iniparser4)
+
 # Iniparser 4 #
 
 ## 0 - Foreword
