@@ -61,7 +61,7 @@ static void strlwc(char * s)
   characters at the end and the beg. of the string have been removed.
  */
 /*--------------------------------------------------------------------------*/
-void strstrip(char * s)
+static void strstrip(char * s)
 {
     if (s==NULL) return ;
 
