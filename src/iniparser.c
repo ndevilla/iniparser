@@ -752,6 +752,10 @@ dictionary * iniparser_load(const char * ininame)
             len-- ;
         }
 
+        if (len < 0) { /* Line was entirely \n and/or spaces */
+            len = 0;
+        }
+
         /* Detect multi-line */
         if (line[len]=='\\') {
             multi_line = 1;
