@@ -10,6 +10,15 @@
 #include <ctype.h>
 #include "iniparser.h"
 
+#ifdef WIN32
+#include <memory.h>
+#include <string.h>
+#include <stdio.h>
+#include <tchar.h>
+
+#define snprintf sprintf_s
+#endif
+
 /*---------------------------- Defines -------------------------------------*/
 #define ASCIILINESZ         (1024)
 #define INI_INVALID_KEY     ((char*)-1)
@@ -63,20 +72,23 @@ static void strlwc(char * s)
 /*--------------------------------------------------------------------------*/
 static void strstrip(char * s)
 {
-    if (s==NULL) return ;
+    if (s==NULL) return;
+	else
+	{
 
-    char *last = s + strlen(s);
-    char *dest = s;
+		char *last = s + strlen(s);
+		char *dest = s;
 
-    while (isspace((int)*s) && *s) s++;
-    while (last > s) {
-        if (!isspace((int)*(last-1)))
-            break ;
-        last -- ;
-    }
-    *last = (char)0;
+		while (isspace((int)*s) && *s) s++;
+		while (last > s) {
+			if (!isspace((int)*(last-1)))
+				break ;
+			last -- ;
+		}
+		*last = (char)0;
 
-    memmove(dest, s, last - s + 1);
+		memmove(dest, s, last - s + 1);
+	}
 }
 
 /*-------------------------------------------------------------------------*/
