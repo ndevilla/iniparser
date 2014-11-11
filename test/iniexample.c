@@ -54,6 +54,10 @@ int parse_ini_file(char * ini_name)
 {
     dictionary  *   ini ;
 
+    int             rv;
+    char            *tmp_name;
+    FILE            *out;
+
     /* Some temporary variables to hold query results */
     int             b ;
     int             i ;
@@ -68,7 +72,7 @@ int parse_ini_file(char * ini_name)
     iniparser_dump(ini, stderr);
 
     /* Get pizza attributes */
-    printf("Pizza:\n");
+    printf("Pizza-------------:\n");
 
     b = iniparser_getboolean(ini, "pizza:ham", -1);
     printf("Ham:       [%d]\n", b);
@@ -92,6 +96,33 @@ int parse_ini_file(char * ini_name)
 
     d = iniparser_getdouble(ini, "wine:alcohol", -1.0);
     printf("Alcohol:   [%g]\n", d);
+
+    /* add fruit */
+    rv = iniparser_set(ini, "Fruit:North:Apple", "12.5");
+    if (rv) {
+        printf("Add Apple data fail!\n");
+    }
+    rv = iniparser_set(ini, "Fruit:South:Orange", "6.5");
+    if (rv) {
+        printf("Add Orange data fail!\n");
+    }
+
+    /* export ini to tmpfile */
+    tmp_name =  malloc(strlen("tmp_") + strlen(ini_name) + 1);
+    if (!tmp_name) {
+        printf("Make tmpfile name fail!\n");
+        return -1;
+    }
+    sprintf(tmp_name, "tmp_%s", ini_name);
+
+    if ((out = fopen(tmp_name, "w")) == NULL ) {
+        printf("Open %s fail!\n", tmp_name);
+        free(tmp_name);
+        return -1;
+    };
+
+    iniparser_dump_ini(ini, out);
+    fclose(out);
 
     iniparser_freedict(ini);
     return 0 ;

@@ -20,18 +20,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /*---------------------------------------------------------------------------
                                 New types
  ---------------------------------------------------------------------------*/
-
-
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Dictionary object
@@ -48,8 +46,18 @@ typedef struct _dictionary_ {
     char        **  val ;   /** List of string values */
     char        **  key ;   /** List of string keys */
     unsigned     *  hash ;  /** List of hash values for keys */
+    void         *  mdict;
 } dictionary ;
 
+/**
+ @brief   Multi-level Dictionary
+ */
+typedef struct _mdict_ {
+    int             level;  /** Current Dict's level in vertical */
+    dictionary    * dict;   /** Current level Dict */
+    struct _mdict_* parent;
+    char            data[1];
+} mdict_t;
 
 /*---------------------------------------------------------------------------
                             Function prototypes

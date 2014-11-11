@@ -57,6 +57,7 @@ libiniparser.so:	$(OBJS)
 
 clean:
 	$(RM) $(OBJS)
+	$(RM) libiniparser.a libiniparser.so.0
 
 veryclean:
 	$(RM) $(OBJS) libiniparser.a libiniparser.so*
@@ -69,4 +70,17 @@ docs:
 check: default
 	@(cd test ; $(MAKE))
 
+install: default
+	cp -f libiniparser.a $(PREFIX)/lib/libiniparser.a
+	cp -f libiniparser.so* $(PREFIX)/lib/
+	cp -f src/dictionary.h $(PREFIX)/include/dictionary.h
+	cp -f src/iniparser.h $(PREFIX)/include/iniparser.h
+
+uninstall:
+	rm -f  $(PREFIX)/lib/libiniparser.a
+	rm -f  $(PREFIX)/lib/libiniparser.so*
+	rm -f $(PREFIX)/include/dictionary.h
+	rm -f $(PREFIX)/include/iniparser.h
+
 .PHONY: default clean veryclean docs check
+

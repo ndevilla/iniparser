@@ -23,6 +23,9 @@
 
     @verbatim
     [Section Name]
+      [[Sub-Section Name]]
+        [[[Sub-Section Name]]]
+        ...
     @endverbatim
 
     i.e. the section name enclosed in square brackets, alone on a
@@ -130,6 +133,18 @@
     ("section:keyword", "value")
     @endverbatim
 
+    and the syntax like this:
+    @verbatim
+    [Section]
+      [[Subsection]]
+      Keyword = value ; comment
+    @endverbatim
+    
+    can be regarded as the following key pair:
+    @verbatim
+    ("section:subsection:keyword", "value")
+    @endverbatim
+
     This means that if you want to retrieve the value that was stored
     in the section called @c Pizza, in the keyword @c Cheese,
     you would make a request to the dictionary for
@@ -177,6 +192,15 @@
     iniparser_set(ini, "section:key2", NULL);
     @endverbatim
 
+    Every Subsection can be treaded as an sub config, and there are serval
+    interface can be used:
+
+    @verbatim
+    iniparser_key_getsec(ini, "section");
+    iniparser_idx_getsec(ini, idx);
+    iniparser_getsecvals(ini, "section");
+    iniparser_getsecvals(ini, "section:subsection");
+    @endverbatim
 
     @section implementation     A word about the implementation
 

@@ -20,6 +20,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifndef container_of
+#define container_of(ptr, type, member) ( (type *)( (char *)ptr - offsetof(type,member) ))
+#endif
+
 /** Maximum value size for integers and doubles. */
 #define MAXVALSZ    1024
 
@@ -71,6 +75,37 @@ char * xstrdup(const char * s)
         memcpy(t, s, len) ;
     }
     return t ;
+}
+
+char *val_dup(const char *s)
+{
+    mdict_t* t ;
+    size_t len ;
+    if (!s)
+        return NULL ;
+
+    len = strlen(s);
+    t = calloc(1, sizeof(mdict_t) + len) ;
+    if (t) {
+        memcpy(t->data, s, len) ;
+    }
+
+    return t->data;
+}
+
+void val_free(const char *v)
+{
+    mdict_t *t;
+    
+    t = container_of(v, mdict_t, data);
+    
+    if (t->dict != NULL) {
+      dictionary_del(t->dict);
+      t->dict = NULL;
+    }
+    free(t);
+
+    return;
 }
 
 /*---------------------------------------------------------------------------
@@ -152,8 +187,9 @@ void dictionary_del(dictionary * d)
     for (i=0 ; i<d->size ; i++) {
         if (d->key[i]!=NULL)
             free(d->key[i]);
-        if (d->val[i]!=NULL)
-            free(d->val[i]);
+        if (d->val[i] != NULL) {
+            val_free(d->val[i]);
+        }
     }
     free(d->val);
     free(d->key);
@@ -240,8 +276,8 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
                 if (!strcmp(key, d->key[i])) {   /* Same key */
                     /* Found a value: modify and return */
                     if (d->val[i]!=NULL)
-                        free(d->val[i]);
-                    d->val[i] = val ? xstrdup(val) : NULL ;
+                        val_free(d->val[i]);
+                    d->val[i] = val ? val_dup(val) : NULL ;
                     /* Value has been modified: return */
                     return 0 ;
                 }
@@ -272,7 +308,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     }
     /* Copy key */
     d->key[i]  = xstrdup(key);
-    d->val[i]  = val ? xstrdup(val) : NULL ;
+    d->val[i]  = val ? val_dup(val) : NULL ;
     d->hash[i] = hash;
     d->n ++ ;
     return 0 ;
@@ -318,7 +354,7 @@ void dictionary_unset(dictionary * d, const char * key)
     free(d->key[i]);
     d->key[i] = NULL ;
     if (d->val[i]!=NULL) {
-        free(d->val[i]);
+        val_free(d->val[i]);
         d->val[i] = NULL ;
     }
     d->hash[i] = 0 ;
@@ -340,23 +376,63 @@ void dictionary_unset(dictionary * d, const char * key)
 /*--------------------------------------------------------------------------*/
 void dictionary_dump(dictionary * d, FILE * out)
 {
-    size_t  i ;
+    size_t  i, j;
+    mdict_t *m;
+    char    *start;
+    char    *sec_start;
+    char    *sec_end;
 
     if (d==NULL || out==NULL) return ;
-    if (d->n<1) {
-        fprintf(out, "empty dictionary\n");
-        return ;
+    
+    m = d->mdict;
+    if (!m) {
+      fprintf(out, "#Error, can not find mdict!\n");
+      return;
     }
+
+    start = malloc(strlen("    ") * m->level + 1);
+    sec_start = malloc(m->level + 2 );
+    sec_end = malloc(m->level + 2 );
+    start[0] = '\0';
+    sec_start[0] = '\0';
+    sec_end[0] = '\0';
+
+    j = 0;
+    while (j++ < m->level) {
+        sprintf(start, "%s    ", start);
+    }
+    j = 0;
+    while (j++ < m->level + 1) {
+        sprintf(sec_start, "%s[", sec_start);
+        sprintf(sec_end, "%s]", sec_end);
+    }
+
+    if (d->n<1) {
+        fprintf(out, "%s#empty dictionary\n", start);
+        goto out;
+    }
+
     for (i=0 ; i<d->size ; i++) {
         if (d->key[i]) {
-            fprintf(out, "%20s\t[%s]\n",
-                    d->key[i],
+            m = container_of(d->val[i], mdict_t, data);
+            if (m->dict != NULL) {
+                fprintf(out, "%s%s%s%s\n", start, sec_start, d->key[i], sec_end);
+                dictionary_dump(m->dict, out);
+                continue;
+            }
+            fprintf(out, "%s%20s\t= %s\n",
+                    start, d->key[i],
                     d->val[i] ? d->val[i] : "UNDEF");
+
         }
     }
+
+out:
+    free(start);
+    free(sec_start);
+    free(sec_end);
     return ;
 }
-
 
 /* Test code */
 #ifdef TESTDIC
