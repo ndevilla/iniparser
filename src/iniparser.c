@@ -10,6 +10,8 @@
 #include <ctype.h>
 #include "iniparser.h"
 
+#define xstrdup(_s)	_iniparser_xstrdup(_s)
+
 /*---------------------------- Defines -------------------------------------*/
 #define ASCIILINESZ         (1024)
 #define INI_INVALID_KEY     ((char*)-1)

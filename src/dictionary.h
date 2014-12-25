@@ -176,7 +176,7 @@ void dictionary_dump(dictionary * d, FILE * out);
   for systems that do not have it.
  */
 /*--------------------------------------------------------------------------*/
-char * xstrdup(const char * s);
+char * _iniparser_xstrdup(const char * s);
 
 #ifdef __cplusplus
 }

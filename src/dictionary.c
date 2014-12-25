@@ -20,6 +20,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define xstrdup(_s)	_iniparser_xstrdup(_s)
+
 /** Maximum value size for integers and doubles. */
 #define MAXVALSZ    1024
 
@@ -58,7 +60,7 @@ static void * mem_double(void * ptr, size_t size)
   for systems that do not have it.
  */
 /*--------------------------------------------------------------------------*/
-char * xstrdup(const char * s)
+char * _iniparser_xstrdup(const char * s)
 {
     char * t ;
     size_t len ;
