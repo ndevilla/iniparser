@@ -58,7 +58,7 @@ int parse_ini_file(char * ini_name)
     int             b ;
     int             i ;
     double          d ;
-    char        *   s ;
+    char const  *   s ;
 
     ini = iniparser_load(ini_name);
     if (ini==NULL) {
