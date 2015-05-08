@@ -78,7 +78,10 @@ void Test_iniparser_strstrip(CuTest *tc)
     /* First element in the array is the expected stripping result */
     const char *strings_empty[] = {
         "",
-        "       "
+        "       ",
+        "\n\n\n\n",
+        "\t\t\t\t",
+        "\n     \t\n\t\n    "
     };
     const char *strings_test[] = {
         "test",
