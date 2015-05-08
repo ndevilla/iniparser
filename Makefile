@@ -76,5 +76,5 @@ check: libiniparser.so
 	@(cd test ; $(MAKE))
 
 .PHONY: example
-example: libiniparser.so
+example: libiniparser.a
 	@(cd example ; $(MAKE))	

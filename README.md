@@ -31,7 +31,7 @@ A simple `make` at the root of the project should be enough to get the static
 You should consider trying the following rules too :
 
  - `make check` : run the unitary tests
- - `make exemples` : compile the exemples
+ - `make example` : compile the example, run it with `./example/iniexample`
 
 ## III - License
 
