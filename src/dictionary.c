@@ -18,7 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef WIN32
+#else
 #include <unistd.h>
+#endif
 
 /** Maximum value size for integers and doubles. */
 #define MAXVALSZ    1024
@@ -149,7 +152,7 @@ void dictionary_del(dictionary * d)
     size_t  i ;
 
     if (d==NULL) return ;
-    for (i=0 ; i<d->size ; i++) {
+    for (i=0 ; i< (size_t)d->size ; i++) {
         if (d->key[i]!=NULL)
             free(d->key[i]);
         if (d->val[i]!=NULL)
@@ -182,7 +185,7 @@ char * dictionary_get(dictionary * d, const char * key, char * def)
     size_t      i ;
 
     hash = dictionary_hash(key);
-    for (i=0 ; i<d->size ; i++) {
+    for (i=0 ; i<(size_t)d->size ; i++) {
         if (d->key[i]==NULL)
             continue ;
         /* Compare hash */
@@ -233,7 +236,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
     hash = dictionary_hash(key) ;
     /* Find if value is already in dictionary */
     if (d->n>0) {
-        for (i=0 ; i<d->size ; i++) {
+        for (i=0 ; i<(size_t)d->size ; i++) {
             if (d->key[i]==NULL)
                 continue ;
             if (hash==d->hash[i]) { /* Same hash value */
@@ -299,7 +302,7 @@ void dictionary_unset(dictionary * d, const char * key)
     }
 
     hash = dictionary_hash(key);
-    for (i=0 ; i<d->size ; i++) {
+    for (i=0 ; i<(size_t)d->size ; i++) {
         if (d->key[i]==NULL)
             continue ;
         /* Compare hash */
@@ -311,7 +314,7 @@ void dictionary_unset(dictionary * d, const char * key)
             }
         }
     }
-    if (i>=d->size)
+    if (i>=(size_t)d->size)
         /* Key not found */
         return ;
 
@@ -347,7 +350,7 @@ void dictionary_dump(dictionary * d, FILE * out)
         fprintf(out, "empty dictionary\n");
         return ;
     }
-    for (i=0 ; i<d->size ; i++) {
+    for (i=0 ; i<(size_t)d->size ; i++) {
         if (d->key[i]) {
             fprintf(out, "%20s\t[%s]\n",
                     d->key[i],

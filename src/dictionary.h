@@ -21,7 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef WIN32
+#else
 #include <unistd.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
