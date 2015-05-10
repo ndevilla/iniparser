@@ -51,7 +51,7 @@ static char * xstrdup(const char * s)
         return NULL ;
 
     len = strlen(s) + 1 ;
-    t = malloc(len) ;
+    t = (char*) malloc(len) ;
     if (t) {
         memcpy(t, s, len) ;
     }
@@ -71,9 +71,9 @@ static int dictionary_grow(dictionary * d)
     char        ** new_key ;
     unsigned     * new_hash ;
 
-    new_val  = calloc(d->size * 2, sizeof *d->val);
-    new_key  = calloc(d->size * 2, sizeof *d->key);
-    new_hash = calloc(d->size * 2, sizeof *d->hash);
+    new_val  = (char**) calloc(d->size * 2, sizeof *d->val);
+    new_key  = (char**) calloc(d->size * 2, sizeof *d->key);
+    new_hash = (unsigned*) calloc(d->size * 2, sizeof *d->hash);
     if (!new_val || !new_key || !new_hash) {
         /* An allocation failed, leave the dictionary unchanged */
         if (new_val)
@@ -154,13 +154,13 @@ dictionary * dictionary_new(size_t size)
     /* If no size was specified, allocate space for DICTMINSZ */
     if (size<DICTMINSZ) size=DICTMINSZ ;
 
-    d = calloc(1, sizeof *d) ;
+    d = (dictionary*) calloc(1, sizeof *d) ;
 
     if (d) {
         d->size = size ;
-        d->val  = calloc(size, sizeof *d->val);
-        d->key  = calloc(size, sizeof *d->key);
-        d->hash = calloc(size, sizeof *d->hash);
+        d->val  = (char**) calloc(size, sizeof *d->val);
+        d->key  = (char**) calloc(size, sizeof *d->key);
+        d->hash = (unsigned*) calloc(size, sizeof *d->hash);
     }
     return d ;
 }
