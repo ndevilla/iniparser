@@ -58,28 +58,28 @@ static const char * strlwc(const char * in, char *out, unsigned len)
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Remove blanks at the beginning and the end of a string.
-  @param    in  String to parse.
-  @param    out Output buffer.
-  @param    len Size of the out buffer.
-  @return   ptr to the out buffer or NULL if an error occured.
+  @param    str  String to parse.
+  @return   void
 
   At most len - 1 elements of the input string will be stripped.
  */
 /*--------------------------------------------------------------------------*/
-static const char * strstrip(const char * in, char *out, unsigned len)
+void strstrip(char * s)
 {
-    size_t count ;
+    char *last = s + strlen(s);
+    char *dest = s;
+    
+    if (s==NULL) return ;
+    
+    while (isspace((int)*s) && *s) s++;
+    while (last > s) {
+        if (!isspace((int)*(last-1)))
+            break ;
+        last -- ;
+    }
+    *last = (char)0;
 
-    if (in==NULL || out == NULL || len==0) return NULL ;
-
-    for ( ; isspace((int)*in) && *in != '\0'; ++in)
-        ;
-    for (count = strlen(in) ; count > 0 && isspace((int)in[count - 1]); --count)
-        ;
-    count = count < len - 1 ? count : len - 1;
-    strncpy(out, in, count);
-    out[count] = '\0';
-    return out;
+    memmove(dest,s,last - s + 1);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -552,10 +552,11 @@ static line_status iniparser_line(
     char * value)
 {
     line_status sta ;
-    char        line[ASCIILINESZ+1];
+    char * line = NULL;
     size_t      len ;
 
-    strstrip(input_line, line, sizeof(line));
+    line = strdup(input_line);
+    strstrip(line);
     len = strlen(line);
 
     sta = LINE_UNPROCESSED ;
@@ -568,16 +569,16 @@ static line_status iniparser_line(
     } else if (line[0]=='[' && line[len-1]==']') {
         /* Section name */
         sscanf(line, "[%[^]]", section);
-        strstrip(section, section, len);
+        strstrip(section);
         strlwc(section, section, len);
         sta = LINE_SECTION ;
     } else if (sscanf (line, "%[^=] = \"%[^\"]\"", key, value) == 2
            ||  sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2
            ||  sscanf (line, "%[^=] = %[^;#]",     key, value) == 2) {
         /* Usual key=value, with or without comments */
-        strstrip(key, key, len);
+        strstrip(key);
         strlwc(key, key, len);
-        strstrip(value, value, len);
+        strstrip(value);
         /*
          * sscanf cannot handle '' or "" as empty values
          * this is done here
@@ -594,7 +595,7 @@ static line_status iniparser_line(
          * key=;
          * key=#
          */
-        strstrip(key, key, len);
+        strstrip(key);
         strlwc(key, key, len);
         value[0]=0 ;
         sta = LINE_VALUE ;
@@ -602,6 +603,8 @@ static line_status iniparser_line(
         /* Generate syntax error */
         sta = LINE_ERROR ;
     }
+
+    free(line);
     return sta ;
 }
 
