@@ -28,7 +28,7 @@ void Test_xstrdup(CuTest *tc)
     }
 
     /* test a overflowing string */
-    string_very_long = malloc(10 * 1024);
+    string_very_long = (char*) malloc(10 * 1024);
     memset(string_very_long, '#', 10 * 1024);
     string_very_long[10 * 1024 - 1] = '\0';
     dup_str = xstrdup(string_very_long);
@@ -117,7 +117,7 @@ static char *get_dump(dictionary *d)
     }
     rewind(fd);
 
-    dump_buff = calloc(1, dump_size + 1);
+    dump_buff = (char*) calloc(1, dump_size + 1);
     if (dump_buff == NULL) {
         fclose(fd);
         return NULL;
