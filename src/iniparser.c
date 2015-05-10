@@ -57,20 +57,35 @@ static const char * strlwc(const char * in, char *out, unsigned len)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Remove blanks at the beginning and the end of a string.
-  @param    str  String to parse.
-  @return   void
+  @brief    Copy string in a newly mallocced area
+  @param    str  String to copy.
+  @return   str  Copied version of the given string allocated with malloc
 
-  At most len - 1 elements of the input string will be stripped.
+  Original strdup is not portable, need to implement our own
  */
 /*--------------------------------------------------------------------------*/
-void strstrip(char * s)
+static char * _strdup(const char *s)
 {
-    char *last = s + strlen(s);
+    char * copy = malloc(strlen(s));
+    strcpy(copy, s);
+    return copy ;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Remove blanks at the beginning and the end of a string.
+  @param    str  String to parse and alter.
+  @return   unsigned New size of the string.
+ */
+/*--------------------------------------------------------------------------*/
+unsigned strstrip(char * s)
+{
+    char *last = NULL ;
     char *dest = s;
-    
-    if (s==NULL) return ;
-    
+
+    if (s==NULL) return 0;
+
+    last = s + strlen(s);
     while (isspace((int)*s) && *s) s++;
     while (last > s) {
         if (!isspace((int)*(last-1)))
@@ -80,6 +95,7 @@ void strstrip(char * s)
     *last = (char)0;
 
     memmove(dest,s,last - s + 1);
+    return last - s;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -555,9 +571,8 @@ static line_status iniparser_line(
     char * line = NULL;
     size_t      len ;
 
-    line = strdup(input_line);
-    strstrip(line);
-    len = strlen(line);
+    line = _strdup(input_line);
+    len = strstrip(line);
 
     sta = LINE_UNPROCESSED ;
     if (len<1) {

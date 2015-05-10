@@ -99,15 +99,12 @@ void Test_iniparser_strstrip(CuTest *tc)
     unsigned i;
 
     /* NULL ptr as input */
-    CuAssertPtrEquals(tc, NULL, strstrip(NULL, NULL, 0));
-    CuAssertPtrEquals(tc, NULL, strstrip(NULL, stripped, sizeof (stripped)));
-    CuAssertPtrEquals(tc, NULL, strstrip("", NULL, sizeof (stripped)));
-    CuAssertPtrEquals(tc, NULL, strstrip("", stripped, 0));
-    CuAssertPtrEquals(tc, NULL, strstrip(NULL, NULL, 0));
+    strstrip(NULL);
 
     /* empty string */
     for (i = 0 ; i < sizeof (strings_empty) / sizeof (char *) ; ++i) {
-        CuAssertPtrNotNull(tc, strstrip(strings_empty[i], stripped, sizeof(stripped)));
+        strcpy(stripped, strings_empty[i]);
+        strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
             strings_empty[i], stripped);
         CuAssertStrEquals_Msg(tc, error_msg, stripped, strings_empty[0]);
@@ -115,26 +112,20 @@ void Test_iniparser_strstrip(CuTest *tc)
 
     /* test string */
     for (i = 0 ; i < sizeof (strings_test) / sizeof (char *) ; ++i) {
-        CuAssertPtrNotNull(tc, strstrip(strings_test[i], stripped, sizeof(stripped)));
+        strcpy(stripped, strings_test[i]);
+        strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
             strings_test[i], stripped);
         CuAssertStrEquals_Msg(tc, error_msg, strings_test[0], stripped);
     }
-    CuAssertPtrNotNull(tc, strstrip(".", stripped, sizeof(stripped)));
+    strcpy(stripped, ".");
+    strstrip(stripped);
     CuAssertStrEquals(tc, ".", stripped);
 
     /* string containing spaces */
-    CuAssertPtrNotNull(tc, strstrip(test_with_spaces, stripped, sizeof(stripped)));
+    strcpy(stripped, test_with_spaces);
+    strstrip(stripped);
     CuAssertStrEquals(tc, test_with_spaces, stripped);
-
-    /* test a overflowing string */
-    CuAssertPtrNotNull(tc, strstrip("  Overflowing_string<--here", stripped, 19));
-    CuAssertStrEquals(tc, "Overflowing_string", stripped);
-
-    /* test using same buffer as input and output */
-    strcpy(stripped, "   STRIP_ME_!  ");
-    CuAssertPtrNotNull(tc, strstrip(stripped, stripped, sizeof(stripped)));
-    CuAssertStrEquals(tc, "STRIP_ME_!", stripped);
 }
 
 void Test_iniparser_getnsec(CuTest *tc)
