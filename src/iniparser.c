@@ -597,12 +597,17 @@ static line_status iniparser_line(
     if (equals) {
         value = malloc((len + line) - equals + 1);
         key = malloc(equals - line + 1);
+        if (!value) {
+            fprintf(stderr, "iniparser: memory alloc error\n");
+            sta = LINE_ERROR;
+            goto out;
+        }
        *value = 0;
     } else {
         key = malloc(line_size + 1);
     }
 
-    if (!key || (equals && !value)) {
+    if (!key) {
         fprintf(stderr, "iniparser: memory alloc error\n");
         sta = LINE_ERROR;
         goto out;
