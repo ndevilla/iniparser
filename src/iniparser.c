@@ -323,7 +323,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
     char **keys;
 
     int i, j ;
-    char    *keym;
+    char    *keym = NULL;
     int     secsize, nkeys ;
 
     keys = NULL;
@@ -337,6 +337,11 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
 
     secsize  = (int)strlen(s) + 2;
     keym = malloc(secsize);
+    if (!keym) {
+        fprintf(stderr, "iniparser: memory alloc error\n");
+        goto out;
+    }
+
     snprintf(keym, secsize, "%s:", s);
 
     i = 0;
@@ -352,6 +357,12 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
     free(keym);
     return keys;
 
+out:
+    if (keys) {
+        free(keys);
+        keys = NULL;
+    }
+    return keys;
 }
 
 /*-------------------------------------------------------------------------*/
