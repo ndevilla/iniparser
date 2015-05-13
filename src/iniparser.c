@@ -253,6 +253,11 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
     fprintf(f, "\n[%s]\n", s);
     secsize = (int)strlen(s) + 2;
     keym = malloc(secsize);
+    if (!keym) {
+        fprintf(stderr, "iniparser: memory alloc error\n");
+        goto out;
+    }
+
     snprintf(keym, secsize, "%s:", s);
     for (j=0 ; j<d->size ; j++) {
         if (d->key[j]==NULL)
@@ -266,6 +271,7 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
     }
     fprintf(f, "\n");
     free(keym);
+out:
     return ;
 }
 
@@ -280,7 +286,7 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
 int iniparser_getsecnkeys(dictionary * d, char * s)
 {
     int     secsize, nkeys ;
-    char    *keym;
+    char    *keym = NULL;
     int j ;
 
     nkeys = 0;
@@ -290,6 +296,10 @@ int iniparser_getsecnkeys(dictionary * d, char * s)
 
     secsize  = (int)strlen(s)+2;
     keym = malloc(secsize);
+    if (!keym) {
+        fprintf(stderr, "iniparser: memory alloc error\n");
+        goto out;
+    }
     snprintf(keym, secsize, "%s:", s);
 
     for (j=0 ; j<d->size ; j++) {
@@ -299,8 +309,8 @@ int iniparser_getsecnkeys(dictionary * d, char * s)
             nkeys++;
     }
     free(keym);
+out:
     return nkeys;
-
 }
 
 /*-------------------------------------------------------------------------*/
@@ -323,7 +333,7 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
     char **keys;
 
     int i, j ;
-    char    *keym;
+    char    *keym = NULL;
     int     secsize, nkeys ;
 
     keys = NULL;
@@ -337,6 +347,11 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
 
     secsize  = (int)strlen(s) + 2;
     keym = malloc(secsize);
+    if (!keym) {
+        fprintf(stderr, "iniparser: memory alloc error\n");
+        goto out;
+    }
+
     snprintf(keym, secsize, "%s:", s);
 
     i = 0;
@@ -352,6 +367,12 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
     free(keym);
     return keys;
 
+out:
+    if (keys) {
+        free(keys);
+        keys = NULL;
+    }
+    return keys;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -597,12 +618,17 @@ static line_status iniparser_line(
     if (equals) {
         value = malloc((len + line) - equals + 1);
         key = malloc(equals - line + 1);
+        if (!value) {
+            fprintf(stderr, "iniparser: memory alloc error\n");
+            sta = LINE_ERROR;
+            goto out;
+        }
        *value = 0;
     } else {
         key = malloc(line_size + 1);
     }
 
-    if (!key || (equals && !value)) {
+    if (!key) {
         fprintf(stderr, "iniparser: memory alloc error\n");
         sta = LINE_ERROR;
         goto out;
