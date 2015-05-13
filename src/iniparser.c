@@ -253,6 +253,11 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
     fprintf(f, "\n[%s]\n", s);
     secsize = (int)strlen(s) + 2;
     keym = malloc(secsize);
+    if (!keym) {
+        fprintf(stderr, "iniparser: memory alloc error\n");
+        goto out;
+    }
+
     snprintf(keym, secsize, "%s:", s);
     for (j=0 ; j<d->size ; j++) {
         if (d->key[j]==NULL)
@@ -266,6 +271,7 @@ void iniparser_dumpsection_ini(dictionary * d, char * s, FILE * f)
     }
     fprintf(f, "\n");
     free(keym);
+out:
     return ;
 }
 
