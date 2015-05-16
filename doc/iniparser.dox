@@ -1,5 +1,5 @@
 PROJECT_NAME           = iniparser
-PROJECT_NUMBER         = 3.1
+PROJECT_NUMBER         = 3.2
 OUTPUT_DIRECTORY       = ..
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = YES
