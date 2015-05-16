@@ -195,28 +195,32 @@ void Test_iniparser_getseckeys(CuTest *tc)
     unsigned i;
     char key_name[64];
     dictionary *dic;
-    const char ** sections;
+    int nkeys;
+    const char * keys[10]; /* At most 10 elements per section */
     /* NULL test */
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, NULL));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, "dummy"));
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, NULL, NULL));
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, "dummy", NULL));
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, "dummy", keys));
 
     /* Empty dictionary */
     dic = dictionary_new(10);
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, NULL));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "dummy"));
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, NULL, keys));
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "dummy", keys));
     dictionary_del(dic);
 
     /* Generic dictionary */
+
     dic = generate_dictionary(100, 10);
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, NULL));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "dummy"));
-    sections = iniparser_getseckeys(dic, "sec42");
-    CuAssertPtrNotNull(tc, sections);
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, NULL, keys));
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "dummy", keys));
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "sec0", NULL));
+    nkeys = iniparser_getsecnkeys(dic, "sec42");
+    CuAssertIntEquals(tc, nkeys, 10);
+    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "sec42", keys));
     for (i = 0; i < 10; ++i) {
         sprintf(key_name, "sec42:key%d", i);
-        CuAssertStrEquals(tc, key_name, sections[i]);
+        CuAssertStrEquals(tc, key_name, keys[i]);
     }
-    free(sections);
 
     /* Remove some keys to make the dictionary more real */
     dictionary_unset(dic, "sec42");
@@ -225,21 +229,22 @@ void Test_iniparser_getseckeys(CuTest *tc)
     dictionary_unset(dic, "sec0:key1");
     dictionary_unset(dic, "sec0:key2");
 
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "sec42"));
-    sections = iniparser_getseckeys(dic, "sec99");
-    CuAssertPtrNotNull(tc, sections);
+    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "sec42", keys));
+    nkeys = iniparser_getsecnkeys(dic, "sec99");
+    CuAssertIntEquals(tc, nkeys, 9);
+    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "sec99", keys));
     for (i = 0; i < 9; ++i) {
         sprintf(key_name, "sec99:key%d", i);
-        CuAssertStrEquals(tc, key_name, sections[i]);
+        CuAssertStrEquals(tc, key_name, keys[i]);
     }
-    free(sections);
-    sections = iniparser_getseckeys(dic, "sec0");
-    CuAssertPtrNotNull(tc, sections);
+
+    nkeys = iniparser_getsecnkeys(dic, "sec0");
+    CuAssertIntEquals(tc, nkeys, 7);
+    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "sec0", keys));
     for (i = 0; i < 7; ++i) {
         sprintf(key_name, "sec0:key%d", i + 3);
-        CuAssertStrEquals(tc, key_name, sections[i]);
+        CuAssertStrEquals(tc, key_name, keys[i]);
     }
-    free(sections);
 
     dictionary_del(dic);
 }

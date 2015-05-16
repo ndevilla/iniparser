@@ -310,36 +310,26 @@ int iniparser_getsecnkeys(const dictionary * d, const char * s)
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get the number of keys in a section of a dictionary.
-  @param    d   Dictionary to examine
-  @param    s   Section name of dictionary to examine
-  @return   pointer to statically allocated character strings
+  @param    d    Dictionary to examine
+  @param    s    Section name of dictionary to examine
+  @param    keys Already allocated array to store the keys in
+  @return   The pointer passed as `keys` argument or NULL in case of error
 
   This function queries a dictionary and finds all keys in a given section.
-  The returned pointer is obtained with malloc(3), and can be freed
-  with free(3).
+  The keys argument should be an array of pointers which size has been
+  determined by calling `iniparser_getsecnkeys` function prior to this one.
+
   Each pointer in the returned char pointer-to-pointer is pointing to
   a string allocated in the dictionary; do not free or modify them.
-
-  This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-const char ** iniparser_getseckeys(const dictionary * d, const char * s)
+const char ** iniparser_getseckeys(const dictionary * d, const char * s, const char ** keys)
 {
+    int i, j, seclen ;
+    char keym[ASCIILINESZ+1];
 
-    const char **keys;
-
-    int i, j ;
-    char    keym[ASCIILINESZ+1];
-    int     seclen, nkeys ;
-
-    keys = NULL;
-
-    if (d==NULL) return keys;
-    if (! iniparser_find_entry(d, s)) return keys;
-
-    nkeys = iniparser_getsecnkeys(d, s);
-
-    keys = (const char**) malloc(nkeys*sizeof(char*));
+    if (d==NULL || keys==NULL) return NULL;
+    if (! iniparser_find_entry(d, s)) return NULL;
 
     seclen  = (int)strlen(s);
     sprintf(keym, "%s:", s);
@@ -356,7 +346,6 @@ const char ** iniparser_getseckeys(const dictionary * d, const char * s)
     }
 
     return keys;
-
 }
 
 /*-------------------------------------------------------------------------*/
