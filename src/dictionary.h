@@ -21,11 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef WIN32
-#else
 #include <unistd.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +44,7 @@ extern "C" {
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
     int             n ;     /** Number of entries in dictionary */
-    int             size ;  /** Storage size */
+    ssize_t         size ;  /** Storage size */
     char        **  val ;   /** List of string values */
     char        **  key ;   /** List of string keys */
     unsigned     *  hash ;  /** List of hash values for keys */
@@ -111,7 +107,7 @@ void dictionary_del(dictionary * vd);
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * dictionary_get(dictionary * d, const char * key, char * def);
+const char * dictionary_get(const dictionary * d, const char * key, const char * def);
 
 
 /*-------------------------------------------------------------------------*/
@@ -168,19 +164,7 @@ void dictionary_unset(dictionary * d, const char * key);
   output file pointers.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_dump(dictionary * d, FILE * out);
-
-/*-------------------------------------------------------------------------*/
-/**
-  @brief    Duplicate a string
-  @param    s String to duplicate
-  @return   Pointer to a newly allocated string, to be freed with free()
-
-  This is a replacement for strdup(). This implementation is provided
-  for systems that do not have it.
- */
-/*--------------------------------------------------------------------------*/
-char * xstrdup(const char * s);
+void dictionary_dump(const dictionary * d, FILE * out);
 
 #ifdef __cplusplus
 }

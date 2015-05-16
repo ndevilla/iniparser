@@ -4,8 +4,13 @@
 
 # Compiler settings
 CC      ?= gcc
-CFLAGS	?= -O2
-CFLAGS  += -fPIC -Wall -ansi -std=c99 -pedantic
+
+CFLAGS  += -fPIC -Wall -Wextra -ansi -pedantic
+ifndef DEBUG
+CFLAGS	+= -O2
+else
+CFLAGS  += -g
+endif
 
 # Ar settings to build the library
 AR	    ?= ar
@@ -57,16 +62,20 @@ libiniparser.so:	$(OBJS)
 
 clean:
 	$(RM) $(OBJS)
+	@(cd test ; $(MAKE) clean)
 
 veryclean:
 	$(RM) $(OBJS) libiniparser.a libiniparser.so*
 	rm -rf ./html ; mkdir html
+	cd example ; $(MAKE) veryclean
 	cd test ; $(MAKE) veryclean
 
 docs:
 	@(cd doc ; $(MAKE))
 	
-check: default
+check: libiniparser.so
 	@(cd test ; $(MAKE))
 
-.PHONY: default clean veryclean docs check
+.PHONY: example
+example: libiniparser.a
+	@(cd example ; $(MAKE))	

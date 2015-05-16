@@ -1,27 +1,34 @@
-#
-# iniparser tests Makefile
-#
+CC   ?= gcc
 
-CC      = gcc
-CFLAGS  = -g -I../src
-LFLAGS  = -L.. -liniparser
-AR	    = ar
-ARFLAGS = rcv
-RM      = rm -f
+ifndef V
+QUIET_CC         = @echo "CC	$@";
+QUIET_MAKE_TESTS = @echo "GN	Alltests.c";
+endif
 
+DEPS = $(shell ls ../src/*.[ch])
 
-default: all
+SRC = $(shell ls *.c | sed 's/AllTests.c//')
+OBJ = $(SRC:.c=.o)
 
-all: iniexample parse
+INCLUDE = -I../src
+CFLAGS  = -pipe -ansi -pedantic -Wall -Wextra -g
+LDFLAGS =
+all: check
 
-iniexample: iniexample.c
-	$(CC) $(CFLAGS) -o iniexample iniexample.c -I../src -L.. -liniparser
+check: testrun
+	@./testrun
 
-parse: parse.c
-	$(CC) $(CFLAGS) -o parse parse.c -I../src -L.. -liniparser
+testrun: AllTests.o $(OBJ)
+	$(QUIET_CC)$(CC) -o $@ AllTests.o $(OBJ) $(LDFLAGS)
+
+AllTests.o: $(OBJ)
+	$(QUIET_MAKE_TESTS)./make-tests.sh > AllTests.c
+	$(QUIET_CC)$(CC) -c -o AllTests.o AllTests.c $(CFLAGS) $(INCLUDE)
+
+%.o: %.c $(DEPS)
+	$(QUIET_CC)$(CC) -c -o $@ $< $(CFLAGS) $(INCLUDE)
 
 clean veryclean:
-	$(RM) iniexample example.ini parse
-
-
-
+	rm -rf AllTests.c
+	rm -rf $(OBJ) AllTests.o
+	rm -rf testrun
