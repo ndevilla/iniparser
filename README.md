@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/touilleMan/iniparser4.svg?branch=master)](https://travis-ci.org/touilleMan/iniparser4)
+[![Build Status](https://travis-ci.org/ndevilla/iniparser.svg?branch=master)](https://travis-ci.org/ndevilla/iniparser)
 
 # Iniparser 4 #
 
