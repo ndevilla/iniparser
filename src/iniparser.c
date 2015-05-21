@@ -66,7 +66,7 @@ static const char * strlwc(const char * in, char *out, unsigned len)
 /*--------------------------------------------------------------------------*/
 static char * _strdup(const char *s)
 {
-    char * copy = (char*) malloc(strlen(s));
+    char * copy = (char*) malloc(strlen(s) + 1);
     strcpy(copy, s);
     return copy ;
 }
