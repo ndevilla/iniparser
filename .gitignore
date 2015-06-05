@@ -1,0 +1,64 @@
+### Files produced by autotools
+#
+Makefile.in
+/aclocal.m4
+/autom4te.cache
+/autoscan.log
+/build/aux/ar-lib
+/build/aux/compile
+/build/aux/config.guess
+/build/aux/config.sub
+/build/aux/depcomp
+/build/aux/install-sh
+/build/aux/ltmain.sh
+/build/aux/missing
+/build/aux/test-driver
+/build/m4/libtool.m4
+/build/m4/lt*.m4
+/configure
+/config.h
+/config.log
+/config.status
+/config.h.in~
+/stamp-h?
+
+
+### Temporary files creating during ./build/bootstrap.sh run
+#
+/configure.tmp
+
+
+### Files produced by ./configure
+#
+Makefile
+/libtool
+
+# Temporary files created during ./configure run
+/conf*/
+/confdefs.h
+/conftest
+/conftest.c
+/conftest.cpp
+/conftest.err
+/libtoolT
+
+
+### Files produced by build process
+#
+.dirstamp
+*.a
+*.o
+*.la
+*.lo
+.deps/
+.libs/
+/a.out
+/example/iniexample
+/example/parse
+
+
+### Files produced by test suite
+#
+/test/*.log
+/test/*.trs
+/test/AllTests

@@ -1,0 +1,9 @@
+### Autoconf defaults
+#
+MAINTAINERCLEANFILES = Makefile.in
+
+
+
+### Automake defaults
+#
+AM_CFLAGS = -fPIC -Wall -Werror -Wextra -ansi -pedantic
