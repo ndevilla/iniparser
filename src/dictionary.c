@@ -146,7 +146,7 @@ unsigned dictionary_hash(const char * key)
   it. If you do not know in advance (roughly) the number of entries in the
   dictionary, give size=0.
  */
-/*----------CCC----------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 dictionary * dictionary_new(size_t size)
 {
     dictionary  *   d ;

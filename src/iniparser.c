@@ -57,18 +57,27 @@ static const char * strlwc(const char * in, char *out, unsigned len)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Copy string in a newly mallocced area
-  @param    str  String to copy.
-  @return   str  Copied version of the given string allocated with malloc
+  @brief    Duplicate a string
+  @param    s String to duplicate
+  @return   Pointer to a newly allocated string, to be freed with free()
 
-  Original strdup is not portable, need to implement our own
+  This is a replacement for strdup(). This implementation is provided
+  for systems that do not have it.
  */
 /*--------------------------------------------------------------------------*/
-static char * _strdup(const char *s)
+static char * xstrdup(const char * s)
 {
-    char * copy = (char*) malloc(strlen(s) + 1);
-    strcpy(copy, s);
-    return copy ;
+    char * t ;
+    size_t len ;
+    if (!s)
+        return NULL ;
+
+    len = strlen(s) + 1 ;
+    t = (char*) malloc(len) ;
+    if (t) {
+        memcpy(t, s, len) ;
+    }
+    return t ;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -560,7 +569,7 @@ static line_status iniparser_line(
     char * line = NULL;
     size_t      len ;
 
-    line = _strdup(input_line);
+    line = xstrdup(input_line);
     len = strstrip(line);
 
     sta = LINE_UNPROCESSED ;
