@@ -6,3 +6,6 @@
 *.so.0
 /example/iniexample
 /example/parse
+# Autogenerate source file
+/test/AllTests.c
+/test/testrun
