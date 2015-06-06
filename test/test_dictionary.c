@@ -122,7 +122,12 @@ static char *get_dump(dictionary *d)
         fclose(fd);
         return NULL;
     }
-    fread(dump_buff, 1, dump_size, fd);
+    /*
+     * Assignment to dump_size is not necessarry, but when compiling with -O1 or
+     * higher and combined with -Wall, it produces the 'ignoring return value'
+     * error.
+     */
+    dump_size = fread(dump_buff, 1, dump_size, fd);
 
     fclose(fd);
     return dump_buff;
