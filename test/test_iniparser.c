@@ -498,6 +498,10 @@ void Test_iniparser_line(CuTest *tc)
     CuAssertIntEquals(tc, LINE_COMMENT, iniparser_line(";comment", section, key, val));
     CuAssertIntEquals(tc, LINE_COMMENT, iniparser_line(" # comment", section, key, val));
 
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = \"  do_not_strip  \"", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "  do_not_strip  ", val);
+
     /* Test syntax error */
     CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("empty_value", section, key, val));
     CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("not finished\\", section, key, val));
