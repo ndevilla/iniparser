@@ -29,6 +29,11 @@ typedef enum _line_status_ {
     LINE_VALUE
 } line_status ;
 
+/**
+ * For picky compilers/flags.
+ */
+unsigned strstrip(char * s);
+
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Convert a string to lowercase.
