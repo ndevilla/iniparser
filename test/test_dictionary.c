@@ -122,7 +122,10 @@ static char *get_dump(dictionary *d)
         fclose(fd);
         return NULL;
     }
-    fread(dump_buff, 1, dump_size, fd);
+    if (fread(dump_buff, 1, dump_size, fd) != (size_t)dump_size) {
+        fclose(fd);
+        return NULL;
+    }
 
     fclose(fd);
     return dump_buff;
