@@ -15,7 +15,7 @@
 #define _DICTIONARY_H_
 
 /*---------------------------------------------------------------------------
-                                   Includes
+                                Includes
  ---------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -23,8 +23,12 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*---------------------------------------------------------------------------
-                                   New types
+                                New types
  ---------------------------------------------------------------------------*/
 
 
@@ -39,16 +43,16 @@
  */
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
-    int                n;        /** Number of entries in dictionary */
-    int                size;    /** Storage size */
-    char         **    val;    /** List of string values */
-    char         **    key;    /** List of string keys */
-    unsigned     *     hash;    /** List of hash values for keys */
+    int             n ;     /** Number of entries in dictionary */
+    ssize_t         size ;  /** Storage size */
+    char        **  val ;   /** List of string values */
+    char        **  key ;   /** List of string keys */
+    unsigned     *  hash ;  /** List of hash values for keys */
 } dictionary ;
 
 
 /*---------------------------------------------------------------------------
-                              Function prototypes
+                            Function prototypes
  ---------------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------------*/
@@ -103,13 +107,12 @@ void dictionary_del(dictionary * d);
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-const char * dictionary_get(const dictionary * const d, const char * key, const char * def);
-
+const char * dictionary_get(const dictionary * d, const char * key, const char * def);
 
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get a value from a dictionary, as a char.
-  @param    d       dictionary object to search.
+  @param    d       Dictionary object to search.
   @param    key     Key to look for in the dictionary.
   @param    def     Default value for the key if not found.
   @return   char    
@@ -118,12 +121,12 @@ const char * dictionary_get(const dictionary * const d, const char * key, const 
   and returns the first char of the found string.
  */
 /*--------------------------------------------------------------------------*/
-char dictionary_getchar(const dictionary * const d, const char * key, char def) ;
+char dictionary_getchar(const dictionary * d, const char * key, char def) ;
 
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get a value from a dictionary, as an int.
-  @param    d       dictionary object to search.
+  @param    d       Dictionary object to search.
   @param    key     Key to look for in the dictionary.
   @param    def     Default value for the key if not found.
   @return   int
@@ -133,12 +136,12 @@ char dictionary_getchar(const dictionary * const d, const char * key, char def) 
   in the dictionary, the default is returned.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_getint(const dictionary * const d, const char * key, int def);
+int dictionary_getint(const dictionary * d, const char * key, int def);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief        Get a value from a dictionary, as a double.
-  @param    d       dictionary object to search.
+  @brief    Get a value from a dictionary, as a double.
+  @param    d       Dictionary object to search.
   @param    key     Key to look for in the dictionary.
   @param    def     Default value for the key if not found.
   @return   double
@@ -148,7 +151,7 @@ int dictionary_getint(const dictionary * const d, const char * key, int def);
   in the dictionary, the default is returned.
  */
 /*--------------------------------------------------------------------------*/
-double dictionary_getdouble(const dictionary * const d, const char * key, double def);
+double dictionary_getdouble(const dictionary * d, const char * key, double def);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -232,6 +235,10 @@ void dictionary_setdouble(dictionary * d, const char * key, double val);
   output file pointers.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_dump(dictionary * d, FILE * out);
+void dictionary_dump(const dictionary * d, FILE * out);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
