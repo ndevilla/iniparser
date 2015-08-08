@@ -7,10 +7,12 @@ CC      ?= gcc
 
 CFLAGS  += -fPIC -Wall -Wextra -ansi -pedantic
 ifndef DEBUG
-CFLAGS	+= -O2
+ADDITIONAL_CFLAGS  ?= -O2
 else
-CFLAGS  += -g
+ADDITIONAL_CFLAGS  ?= -g
 endif
+
+CFLAGS += ${ADDITIONAL_CFLAGS}
 
 # Ar settings to build the library
 AR	    ?= ar
