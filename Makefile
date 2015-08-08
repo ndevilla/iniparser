@@ -1,6 +1,7 @@
 #
 # iniparser Makefile
 #
+.PHONY: example libiniparser.so
 
 # Compiler settings
 CC      ?= gcc
@@ -21,6 +22,9 @@ ARFLAGS = rcv
 SHLD = ${CC} ${CFLAGS}
 LDSHFLAGS = -shared -Wl,-Bsymbolic
 LDFLAGS += -Wl,-rpath -Wl,/usr/lib -Wl,-rpath,/usr/lib
+
+# .so.0 is for version 3.x, .so.1 is 4.x
+SONAME_CURRENT ?= 1
 
 # Set RANLIB to ranlib on systems that require it (Sun OS < 4, Mac OSX)
 # RANLIB  = ranlib
@@ -59,8 +63,8 @@ libiniparser.a:	$(OBJS)
 	$(QUIET_RANLIB)$(RANLIB) $@
 
 libiniparser.so:	$(OBJS)
-	$(QUIET_LINK)$(SHLD) $(LDSHFLAGS) $(LDFLAGS) -o $@.0 $(OBJS) \
-		-Wl,-soname=`basename $@`.0
+	$(QUIET_LINK)$(SHLD) $(LDSHFLAGS) $(LDFLAGS) -o $@.$(SONAME_CURRENT) $(OBJS) \
+		-Wl,-soname=`basename $@`.$(SONAME_CURRENT)
 
 clean:
 	$(RM) $(OBJS)
@@ -78,6 +82,5 @@ docs:
 check: libiniparser.so
 	@(cd test ; $(MAKE))
 
-.PHONY: example
 example: libiniparser.a
 	@(cd example ; $(MAKE))	
