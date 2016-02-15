@@ -7,7 +7,7 @@ foreach(it ${exfiles})
 	## Construct Example Executables
 	get_filename_component(exname ${it} NAME_WE)
 	add_executable(${exname} ${it})
-	target_link_libraries(${exname} iniparser)
+	target_link_libraries(${exname} Iniparser)
 
 	## properties
 	set_property(TARGET ${exname} PROPERTY C_STANDARD 11)

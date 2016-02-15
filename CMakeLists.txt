@@ -39,17 +39,3 @@ set(BUILD_TESTS OFF CACHE BOOL "Build Tests")
 if(BUILD_TESTS)
 	add_subdirectory(test)
 endif(BUILD_TESTS)
-
-## Config.cmake -> so find_package(Iniparser works)
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include)
-set(LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
-
-include(CMakePackageConfigHelpers)
-configure_package_config_file(IniparserConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/IniparserConfig.cmake
-                              INSTALL_DESTINATION ${LIBRARY_INSTALL_DIR}/cmake
-                              PATH_VARS INCLUDE_INSTALL_DIR LIBRARY_INSTALL_DIR)
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/IniparserConfigVersion.cmake
-                                 VERSION ${INIPARSER_VERSION} 
-                                 COMPATIBILITY AnyNewerVersion )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/IniparserConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/IniparserConfigVersion.cmake
-        DESTINATION ${LIBRARY_INSTALL_DIR}/cmake/Iniparser )
