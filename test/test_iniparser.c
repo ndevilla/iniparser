@@ -481,7 +481,8 @@ void Test_iniparser_line(CuTest *tc)
 
     CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("k =_!<>''", section, key, val));
     CuAssertStrEquals(tc, "k", key);
-    CuAssertStrEquals(tc, "_!<>''", val);
+    /* Quotes are striped */
+    CuAssertStrEquals(tc, "_!<>", val);
 
     CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("empty_value =", section, key, val));
     CuAssertStrEquals(tc, "empty_value", key);
@@ -580,4 +581,182 @@ void Test_dictionary_wrapper(CuTest *tc)
     CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section", NULL));
 
     iniparser_freedict(dic);
+}
+
+void Test_iniparser_write_entry_value(CuTest *tc)
+{
+    unsigned i;
+    const char *values[] = {
+        "value",
+        "value with spaces",
+        "special ; value",
+        "special # value",
+        "special 'value'",
+        "special \"value\"",
+        "mixed #; \"'values\"'",
+        NULL
+    };
+    const char *expected[] = {
+        "value",
+        "value with spaces",
+        "\"special ; value\"",
+        "\"special # value\"",
+        "\"special 'value'\"",
+        "\"special \\\"value\\\"\"",
+        "\"mixed #; \\\"'values\\\"'\"",
+        NULL
+    };
+
+    FILE *fd;
+    char buff[256];
+
+
+    /* Dummy tests, should not chrash */
+    iniparser_write_entry_value(NULL, "");
+    fd = tmpfile();
+    iniparser_write_entry_value(fd, NULL);
+    fclose(fd);
+
+    for (i = 0; values[i] != NULL; ++i) {
+        fd = tmpfile();
+        CuAssertPtrNotNull(tc, fd);
+
+        iniparser_write_entry_value(fd, values[i]);
+        rewind(fd);
+        buff[fread(buff, 1, sizeof(buff), fd)] = '\0';
+        CuAssertStrEquals(tc, buff, expected[i]);
+
+        fclose(fd);
+    }
+}
+
+void Test_iniparser_read_entry_value(CuTest *tc)
+{
+    unsigned i;
+    const char *values[] = {
+        "value",
+        "value with spaces",
+        "\"special ; value\"",
+        "\"special # value\"",
+        "\"special 'value'\"",
+        "\"special \\\"value\\\"\"",
+        "\"mixed #; \\\"'values\\\"'\"",
+        NULL
+    };
+    const char *expected[] = {
+        "value",
+        "value with spaces",
+        "special ; value",
+        "special # value",
+        "special 'value'",
+        "special \"value\"",
+        "mixed #; \"'values\"'",
+        NULL
+    };
+
+    char output[256];
+    char line[256];
+
+    /* Dummy tests, should not chrash */
+    memset(output, 0, sizeof(output));
+    iniparser_read_entry_value(NULL, output);
+    memset(line, 0, sizeof(line));
+    iniparser_read_entry_value(line, NULL);
+
+    for (i = 0; values[i] != NULL; ++i) {
+        memset(output, 0, sizeof(output));
+        strcpy(line, values[i]);
+        iniparser_read_entry_value(line, output);
+        CuAssertStrEquals(tc, output, expected[i]);
+    }
+}
+
+static dictionary *dump_and_reload(const dictionary *d)
+{
+    FILE *fd;
+    dictionary *dic;
+
+    /* Dump the dictionary in temporary file */
+    fd = tmpfile();
+    if (fd == NULL)
+        return NULL;
+    iniparser_dump_ini(d, fd);
+
+    /* Now reload the dump */
+    rewind(fd);
+    dic = iniparser_load_from_fd("temp_dump.ini", fd);
+
+    fclose(fd);
+    return dic;
+}
+
+static char *get_dump(dictionary *d)
+{
+    FILE *fd;
+    char *dump_buff;
+    int dump_size;
+
+    /* Dump the dictionary in temporary file */
+    fd = tmpfile();
+    if (fd == NULL)
+        return NULL;
+    dictionary_dump(d, fd);
+
+    /* Retrieve the dump file */
+    dump_size = ftell(fd);
+    if (dump_size == -1) {
+        fclose(fd);
+        return NULL;
+    }
+    rewind(fd);
+
+    dump_buff = (char*) calloc(1, dump_size + 1);
+    if (dump_buff == NULL) {
+        fclose(fd);
+        return NULL;
+    }
+    if (fread(dump_buff, 1, dump_size, fd) != (size_t)dump_size) {
+        fclose(fd);
+        return NULL;
+    }
+
+    fclose(fd);
+    return dump_buff;
+}
+
+void Test_iniparser_idempotent_dump(CuTest *tc)
+{
+    DIR *dir;
+    struct dirent *curr;
+    struct stat curr_stat;
+    dictionary *dic1;
+    dictionary *dic2;
+    char *dic1_dump;
+    char *dic2_dump;
+    char ini_path[256];
+
+    /* Test all the good .ini files */
+    dir = opendir(GOOD_INI_PATH);
+    CuAssertPtrNotNullMsg(tc, "Cannot open good .ini conf directory", dir);
+    for (curr = readdir(dir); curr != NULL; curr = readdir(dir)) {
+        sprintf(ini_path, "%s/%s", GOOD_INI_PATH, curr->d_name);
+        stat(ini_path, &curr_stat);
+        if (S_ISREG(curr_stat.st_mode)) {
+            dic1 = iniparser_load(ini_path);
+            CuAssertPtrNotNullMsg(tc, ini_path, dic1);
+
+            /* Make sure dumping a dict doesn't alter it values */
+            dic2 = dump_and_reload(dic1);
+            CuAssertPtrNotNull(tc, dic2);
+            dic1_dump = get_dump(dic1);
+            dic2_dump = get_dump(dic2);
+            CuAssertStrEquals_Msg(tc, ini_path, dic1_dump, dic2_dump);
+
+            free(dic1_dump);
+            free(dic2_dump);
+            dictionary_del(dic1);
+            dictionary_del(dic2);
+        }
+    }
+    closedir(dir);
 }

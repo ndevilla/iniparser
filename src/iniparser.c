@@ -210,6 +210,141 @@ void iniparser_dump(const dictionary * d, FILE * f)
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Write the entry into the given file descriptor
+  @param    f     Opened file pointer to dump to
+  @param    key   Key of the entry
+  @param    value Value of the entry
+  @return   void
+
+  If the value contains specials characters (`'`, `"`, `#` or `;`), the value
+  will be written between double quotes (`"`) and it eventual double quotes
+  will be escaped.
+ */
+/*--------------------------------------------------------------------------*/
+static void iniparser_write_entry_value(FILE * f, const char * value)
+{
+    const char * cp;
+    char c;
+    int  need_quotes = 0;
+
+    if (f==NULL || value==NULL) return ;
+
+    for (cp=value; *cp != '\0'; cp++) {
+        c = *cp;
+        if (c == '\'' || c == '"' || c == '#' || c == ';') {
+            need_quotes = 1;
+            break;
+        }
+    }
+    if (need_quotes) {
+        fputc('"', f);
+        for (cp=value; *cp != '\0'; cp++) {
+            c = *cp;
+            if (c == '"') {
+                fputc('\\', f);
+            }
+            fputc(c, f);
+        }
+        fputc('"', f);
+    } else {
+        fputs(value, f);
+    }
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Read the raw value to handle escaping and quotes
+  @param    line   Raw value
+  @param    value  Value of the entry
+  @return   1 in case of syntax error, 0 else
+ */
+/*--------------------------------------------------------------------------*/
+static int iniparser_read_entry_value(char * line, char * value) {
+    const char * cp;
+    char         c;
+    char         quoted = 0;
+    int          escaped = 0;
+    unsigned     i = 0;
+    unsigned     j = 0;
+
+    if (line==NULL || value==NULL) return 1;
+
+    /* Strip begining spaces */
+    for (cp=line; isspace((int)*cp); cp++)
+        ;
+
+    /* Parse value and decode escapes/quotes */
+    for (; *cp != '\0'; cp++) {
+        c = *cp;
+        if (!escaped) {
+            if (c == '\\') {
+                escaped = 1;
+            } else if (!quoted && (c == ';' || c == '#')) {
+                /* We hit a comment, nothing more to do */
+                break;
+            } else if (!quoted && (c == '"' || c == '\'')) {
+                /* Start of quote, store the type of quote to avoid mix */
+                quoted = c;
+            } else if (quoted && c == quoted) {
+                /* End of quote */
+                quoted = 0;
+            } else if (!quoted && isspace(c)) {
+                /* Ending spaces are stipped if not inside quotes */
+                for (j=0; isspace(cp[j]); j++) {
+                    value[i + j] = cp[j];
+                }
+                cp += j - 1;
+                if (cp[1] != '#' && cp[1] != ';' && cp[1] != '\0') {
+                    /* Current spaces are between word and must be keept */
+                    i += j;
+                }
+            } else {
+                value[i++] = c;
+            }
+        } else if (!quoted) {
+            if (c == '#' || c == '\'' || c == '"' ||
+                c == ';' || c == '=' || c == '\\') {
+                value[i++] = c;
+            } else if (c == 'n') {
+                value[i++] = '\n';
+            } else if (c == 't') {
+                value[i++] = '\t';
+            } else if (c == 'r') {
+                value[i++] = '\r';
+            } else {
+                /* Nothing to escape, so print the `\` */
+                value[i++] = '\\';
+                value[i++] = c;
+            }
+            escaped = 0;
+        } else {
+            /* Quoted string */
+            if (c == quoted || c == '\\') {
+                /* To escape char */
+                value[i++] = c;
+            } else if (c == 'n') {
+                value[i++] = '\n';
+            } else if (c == 't') {
+                value[i++] = '\t';
+            } else if (c == 'r') {
+                value[i++] = '\r';
+            } else {
+                /* All other elements are already escaped by the quotes */
+                value[i++] = '\\';
+                value[i++] = c;
+            }
+            escaped = 0;
+        }
+    }
+    value[i] = '\0';
+    if (escaped || quoted) {
+        return 1;
+    }
+    return 0;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Save a dictionary to a loadable ini file
   @param    d   Dictionary to dump
   @param    f   Opened file pointer to dump to
@@ -233,7 +368,9 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
         for (i=0 ; i<d->size ; i++) {
             if (d->key[i]==NULL)
                 continue ;
-            fprintf(f, "%s = %s\n", d->key[i], d->val[i]);
+            fprintf(f, "%s = ", d->key[i]);
+            iniparser_write_entry_value(f, d->val[i]);
+            fputc('\n', f);
         }
         return ;
     }
@@ -241,7 +378,7 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
         secname = iniparser_getsecname(d, i) ;
         iniparser_dumpsection_ini(d, secname, f);
     }
-    fprintf(f, "\n");
+    fputc('\n', f);
     return ;
 }
 
@@ -267,19 +404,20 @@ void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f)
     if (! iniparser_find_entry(d, s)) return ;
 
     seclen  = (int)strlen(s);
-    fprintf(f, "\n[%s]\n", s);
+    fputs("\n[", f);
+    iniparser_write_entry_value(f, s);
+    fputs("]\n", f);
     sprintf(keym, "%s:", s);
     for (j=0 ; j<d->size ; j++) {
         if (d->key[j]==NULL)
             continue ;
         if (!strncmp(d->key[j], keym, seclen+1)) {
-            fprintf(f,
-                    "%-30s = %s\n",
-                    d->key[j]+seclen+1,
-                    d->val[j] ? d->val[j] : "");
+            fprintf(f, "%-30s = ", d->key[j]+seclen+1);
+            iniparser_write_entry_value(f, d->val[j] ? d->val[j] : "");
+            fputc('\n', f);
         }
     }
-    fprintf(f, "\n");
+    fputc('\n', f);
     return ;
 }
 
@@ -568,6 +706,7 @@ static line_status iniparser_line(
     line_status sta ;
     char * line = NULL;
     size_t      len ;
+    char * cp = NULL;
 
     line = xstrdup(input_line);
     len = strstrip(line);
@@ -585,42 +724,26 @@ static line_status iniparser_line(
         strstrip(section);
         strlwc(section, section, len);
         sta = LINE_SECTION ;
-    } else if (sscanf (line, "%[^=] = \"%[^\"]\"", key, value) == 2
-           ||  sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2) {
-        /* Usual key=value with quotes, with or without comments */
-        strstrip(key);
-        strlwc(key, key, len);
-        /* Don't strip spaces from values surrounded with quotes */
-        /*
-         * sscanf cannot handle '' or "" as empty values
-         * this is done here
-         */
-        if (!strcmp(value, "\"\"") || (!strcmp(value, "''"))) {
-            value[0]=0 ;
-        }
-        sta = LINE_VALUE ;
-    } else if (sscanf (line, "%[^=] = %[^;#]", key, value) == 2) {
-        /* Usual key=value without quotes, with or without comments */
-        strstrip(key);
-        strlwc(key, key, len);
-        strstrip(value);
-        
-        sta = LINE_VALUE ;
-    } else if (sscanf(line, "%[^=] = %[;#]", key, value)==2
-           ||  sscanf(line, "%[^=] %[=]", key, value) == 2) {
-        /*
-         * Special cases:
-         * key=
-         * key=;
-         * key=#
-         */
-        strstrip(key);
-        strlwc(key, key, len);
-        value[0]=0 ;
-        sta = LINE_VALUE ;
     } else {
-        /* Generate syntax error */
-        sta = LINE_ERROR ;
+        /* key=value case */
+        /* Keep key in `line` and set `cp` to the begining of the value */
+        for (cp = line; *cp != '\0' && *cp != '='; cp++)
+            ;
+        if (*cp == '=') {
+            *cp = '\0';
+            cp++;
+            /* Cook key and value */
+            strstrip(line);
+            strcpy(key, line);
+            if (iniparser_read_entry_value(cp, value)) {
+                sta = LINE_ERROR;
+            } else {
+                sta = LINE_VALUE;
+            }
+        } else {
+            /* Missing `=` */
+            sta = LINE_ERROR;
+        }
     }
 
     free(line);
@@ -630,21 +753,18 @@ static line_status iniparser_line(
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Parse an ini file and return an allocated dictionary object
-  @param    ininame Name of the ini file to read.
+  @param    ininame Name of the ini file (only used to display errors).
+  @param    FILE File descriptor on to read.
   @return   Pointer to newly allocated dictionary
 
-  This is the parser for ini files. This function is called, providing
-  the name of the file to be read. It returns a dictionary object that
-  should not be accessed directly, but through accessor functions
-  instead.
+  Build the dictionary from the given FILE*. This function doesn't
+  close the FILE * once done.
 
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(const char * ininame)
+static dictionary * iniparser_load_from_fd(const char * ininame, FILE * in)
 {
-    FILE * in ;
-
     char line    [ASCIILINESZ+1] ;
     char section [ASCIILINESZ+1] ;
     char key     [ASCIILINESZ+1] ;
@@ -658,14 +778,8 @@ dictionary * iniparser_load(const char * ininame)
 
     dictionary * dict ;
 
-    if ((in=fopen(ininame, "r"))==NULL) {
-        fprintf(stderr, "iniparser: cannot open %s\n", ininame);
-        return NULL ;
-    }
-
     dict = dictionary_new(0) ;
     if (!dict) {
-        fclose(in);
         return NULL ;
     }
 
@@ -687,7 +801,6 @@ dictionary * iniparser_load(const char * ininame)
                     ininame,
                     lineno);
             dictionary_del(dict);
-            fclose(in);
             return NULL ;
         }
         /* Get rid of \n and spaces at end of line */
@@ -713,12 +826,12 @@ dictionary * iniparser_load(const char * ininame)
             break ;
 
             case LINE_SECTION:
-            errs = dictionary_set(dict, section, NULL);
+            if (dictionary_set(dict, section, NULL)) errs++;
             break ;
 
             case LINE_VALUE:
             sprintf(tmp, "%s:%s", section, key);
-            errs = dictionary_set(dict, tmp, val) ;
+            if (dictionary_set(dict, tmp, val)) errs++;
             break ;
 
             case LINE_ERROR:
@@ -743,7 +856,36 @@ dictionary * iniparser_load(const char * ininame)
         dictionary_del(dict);
         dict = NULL ;
     }
+    return dict ;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Parse an ini file and return an allocated dictionary object
+  @param    ininame Name of the ini file to read.
+  @return   Pointer to newly allocated dictionary
+
+  This is the parser for ini files. This function is called, providing
+  the name of the file to be read. It returns a dictionary object that
+  should not be accessed directly, but through accessor functions
+  instead.
+
+  The returned dictionary must be freed using iniparser_freedict().
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_load(const char * ininame)
+{
+    FILE * in ;
+    dictionary * dict ;
+
+    if ((in=fopen(ininame, "r"))==NULL) {
+        fprintf(stderr, "iniparser: cannot open %s\n", ininame);
+        return NULL ;
+    }
+
+    dict = iniparser_load_from_fd(ininame, in) ;
     fclose(in);
+
     return dict ;
 }
 
