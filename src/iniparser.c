@@ -678,7 +678,7 @@ dictionary * iniparser_load(const char * ininame)
     while (fgets(line+last, ASCIILINESZ-last, in)!=NULL) {
         lineno++ ;
         len = (int)strlen(line)-1;
-        if (len==0)
+        if (len<=0)
             continue;
         /* Safety check against buffer overflows */
         if (line[len]!='\n' && !feof(in)) {
