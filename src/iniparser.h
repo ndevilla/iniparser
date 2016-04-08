@@ -33,6 +33,18 @@ extern "C" {
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Get last error message occured in iniparser
+  @return   Statically allocated string containing message
+
+  This function returns the number last error message occured in
+  functions in iniparser. However, currently the only function that
+  adds a message is iniparser_load.
+ */
+/*--------------------------------------------------------------------------*/
+const char * iniparser_getlasterror();
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get number of sections in a dictionary
   @param    d   Dictionary to examine
   @return   int Number of sections found in dictionary
