@@ -230,9 +230,9 @@ void Test_iniparser_getseckeys(CuTest *tc)
     dictionary_unset(dic, "sec0:key2");
 
     CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "sec42", keys));
-    nkeys = iniparser_getsecnkeys(dic, "sec99");
+    nkeys = iniparser_getsecnkeys(dic, "Sec99");
     CuAssertIntEquals(tc, nkeys, 9);
-    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "sec99", keys));
+    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "Sec99", keys));
     for (i = 0; i < 9; ++i) {
         sprintf(key_name, "sec99:key%d", i);
         CuAssertStrEquals(tc, key_name, keys[i]);
