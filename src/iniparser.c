@@ -303,7 +303,8 @@ int iniparser_getsecnkeys(const dictionary * d, const char * s)
     if (! iniparser_find_entry(d, s)) return nkeys;
 
     seclen  = (int)strlen(s);
-    sprintf(keym, "%s:", s);
+    strlwc(s, keym, sizeof(keym));
+    keym[seclen] = ':';
 
     for (j=0 ; j<d->size ; j++) {
         if (d->key[j]==NULL)
@@ -341,7 +342,8 @@ const char ** iniparser_getseckeys(const dictionary * d, const char * s, const c
     if (! iniparser_find_entry(d, s)) return NULL;
 
     seclen  = (int)strlen(s);
-    sprintf(keym, "%s:", s);
+    strlwc(s, keym, sizeof(keym));
+    keym[seclen] = ':';
 
     i = 0;
 
@@ -604,7 +606,7 @@ static line_status iniparser_line(
         strstrip(key);
         strlwc(key, key, len);
         strstrip(value);
-        
+
         sta = LINE_VALUE ;
     } else if (sscanf(line, "%[^=] = %[;#]", key, value)==2
            ||  sscanf(line, "%[^=] %[=]", key, value) == 2) {
