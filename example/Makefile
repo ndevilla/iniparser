@@ -2,12 +2,12 @@
 # iniparser tests Makefile
 #
 
-CC      = gcc
-CFLAGS  = -g -I../src
-LFLAGS  = -L.. -liniparser
-AR	    = ar
-ARFLAGS = rcv
-RM      = rm -f
+CC      ?= gcc
+CFLAGS  += -g -I../src
+LFLAGS  += -L.. -liniparser
+AR	    ?= ar
+ARFLAGS += rcv
+RM      ?= rm -f
 
 
 default: all
