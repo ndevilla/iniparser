@@ -757,6 +757,9 @@ dictionary * iniparser_load(const char * ininame)
             sprintf(ERRORBUFFER, "memory allocation failure\n");
             break ;
         }
+        if(errs) {
+            break ;
+        }
     }
     if (errs) {
         dictionary_del(dict);
