@@ -389,14 +389,9 @@ int iniparser_getsecnkeys(const dictionary * const d,
         return 0;
     }
 
-<<<<<<< HEAD
-    seclen  = strlen(s);
-    sprintf(keym, "%s:", s);
-=======
     seclen  = (int)strlen(s);
     strlwc(s, keym, sizeof(keym));
     keym[seclen] = ':';
->>>>>>> dd5acfba7ac5141b9040b8d490a92f53f94a43b6
 
     for ( ; j<d->size ; ++j)
     {
@@ -449,14 +444,9 @@ const char ** iniparser_getseckeys(const dictionary *  const d,
         return NULL;
     }
 
-<<<<<<< HEAD
-    seclen  = strlen(s);
-    sprintf(keym, "%s:", s);
-=======
     seclen  = (int)strlen(s);
     strlwc(s, keym, sizeof(keym));
     keym[seclen] = ':';
->>>>>>> dd5acfba7ac5141b9040b8d490a92f53f94a43b6
 
     for( ; j<d->size ; ++j)
     {
@@ -836,6 +826,7 @@ dictionary * iniparser_load(const char * const ininame)
         ++lineno;
         len = (int)strlen(line)-1;
         if (len<=0)
+        {
             continue;
         }
         /* Safety check against buffer overflows */
