@@ -3,7 +3,7 @@
 *.a
 *.o
 *.so
-*.so.0
+*.so.*
 /example/iniexample
 /example/parse
 # Autogenerate source file
