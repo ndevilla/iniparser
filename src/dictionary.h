@@ -91,7 +91,7 @@ dictionary * dictionary_new(size_t size);
   Deallocate a dictionary object and all memory associated to it.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_del(dictionary * vd);
+void dictionary_del(dictionary * d);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -109,6 +109,49 @@ void dictionary_del(dictionary * vd);
 /*--------------------------------------------------------------------------*/
 const char * dictionary_get(const dictionary * d, const char * key, const char * def);
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get a value from a dictionary, as a char.
+  @param    d       Dictionary object to search.
+  @param    key     Key to look for in the dictionary.
+  @param    def     Default value for the key if not found.
+  @return   char    
+
+  This function locates a key in a dictionary using dictionary_get,
+  and returns the first char of the found string.
+ */
+/*--------------------------------------------------------------------------*/
+char dictionary_getchar(const dictionary * d, const char * key, char def) ;
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get a value from a dictionary, as an int.
+  @param    d       Dictionary object to search.
+  @param    key     Key to look for in the dictionary.
+  @param    def     Default value for the key if not found.
+  @return   int
+
+  This function locates a key in a dictionary using dictionary_get,
+  and applies atoi on it to return an int. If the value cannot be found
+  in the dictionary, the default is returned.
+ */
+/*--------------------------------------------------------------------------*/
+int dictionary_getint(const dictionary * d, const char * key, int def);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get a value from a dictionary, as a double.
+  @param    d       Dictionary object to search.
+  @param    key     Key to look for in the dictionary.
+  @param    def     Default value for the key if not found.
+  @return   double
+
+  This function locates a key in a dictionary using dictionary_get,
+  and applies atof on it to return a double. If the value cannot be found
+  in the dictionary, the default is returned.
+ */
+/*--------------------------------------------------------------------------*/
+double dictionary_getdouble(const dictionary * d, const char * key, double def);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -136,7 +179,7 @@ const char * dictionary_get(const dictionary * d, const char * key, const char *
   This function returns non-zero in case of failure.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_set(dictionary * vd, const char * key, const char * val);
+int dictionary_set(dictionary * d, const char * key, const char * val);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -151,6 +194,34 @@ int dictionary_set(dictionary * vd, const char * key, const char * val);
 /*--------------------------------------------------------------------------*/
 void dictionary_unset(dictionary * d, const char * key);
 
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Set a key in a dictionary, providing an int.
+  @param    d       Dictionary to update.
+  @param    key     Key to modify or add
+  @param    val     Integer value to store (will be stored as a string).
+  @return   void
+
+  This helper function calls dictionary_set() with the provided integer
+  converted to a string using %d.
+ */
+/*--------------------------------------------------------------------------*/
+void dictionary_setint(dictionary * d, const char * key, int val);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Set a key in a dictionary, providing a double.
+  @param    d       Dictionary to update.
+  @param    key     Key to modify or add
+  @param    val     Double value to store (will be stored as a string).
+  @return   void
+
+  This helper function calls dictionary_set() with the provided double
+  converted to a string using %g.
+ */
+/*--------------------------------------------------------------------------*/
+void dictionary_setdouble(dictionary * d, const char * key, double val);
 
 /*-------------------------------------------------------------------------*/
 /**

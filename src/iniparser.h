@@ -17,13 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/*
- * The following #include is necessary on many Unixes but not Linux.
- * It is not needed for Windows platforms.
- * Uncomment it if needed.
- */
-/* #include <unistd.h> */
+#include <unistd.h>
 
 #include "dictionary.h"
 
@@ -33,9 +27,9 @@ extern "C" {
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Get number of sections in a dictionary
-  @param    d   Dictionary to examine
-  @return   int Number of sections found in dictionary
+  @brief    Get     number of sections in a dictionary
+  @param    d       Dictionary to examine
+  @return   ssize_t Number of sections found in dictionary
 
   This function returns the number of sections found in a dictionary.
   The test to recognize sections is done on the string stored in the
@@ -49,9 +43,7 @@ extern "C" {
   This function returns -1 in case of error.
  */
 /*--------------------------------------------------------------------------*/
-
-int iniparser_getnsec(const dictionary * d);
-
+ssize_t iniparser_getnsec(const dictionary * d);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -67,9 +59,7 @@ int iniparser_getnsec(const dictionary * d);
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-
-const char * iniparser_getsecname(const dictionary * d, int n);
-
+const char * iniparser_getsecname(const dictionary * d, ssize_t n);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -82,7 +72,6 @@ const char * iniparser_getsecname(const dictionary * d, int n);
   It is Ok to specify @c stderr or @c stdout as output files.
  */
 /*--------------------------------------------------------------------------*/
-
 void iniparser_dump_ini(const dictionary * d, FILE * f);
 
 /*-------------------------------------------------------------------------*/
@@ -97,7 +86,6 @@ void iniparser_dump_ini(const dictionary * d, FILE * f);
   file.  It is Ok to specify @c stderr or @c stdout as output files.
  */
 /*--------------------------------------------------------------------------*/
-
 void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f);
 
 /*-------------------------------------------------------------------------*/
@@ -142,7 +130,6 @@ int iniparser_getsecnkeys(const dictionary * d, const char * s);
  */
 /*--------------------------------------------------------------------------*/
 const char ** iniparser_getseckeys(const dictionary * d, const char * s, const char ** keys);
-
 
 /*-------------------------------------------------------------------------*/
 /**
