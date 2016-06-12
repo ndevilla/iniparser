@@ -487,6 +487,10 @@ void Test_iniparser_line(CuTest *tc)
     CuAssertStrEquals(tc, "empty_value", key);
     CuAssertStrEquals(tc, "", val);
 
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("empty_value =        \t\n", section, key, val));
+    CuAssertStrEquals(tc, "empty_value", key);
+    CuAssertStrEquals(tc, "", val);
+
     CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key =\tval # comment", section, key, val));
     CuAssertStrEquals(tc, "key", key);
     CuAssertStrEquals(tc, "val", val);
@@ -502,10 +506,23 @@ void Test_iniparser_line(CuTest *tc)
     CuAssertStrEquals(tc, "key", key);
     CuAssertStrEquals(tc, "  do_not_strip  ", val);
 
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = '    '", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "    ", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = \"\"", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "", val);
+
+    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = ''", section, key, val));
+    CuAssertStrEquals(tc, "key", key);
+    CuAssertStrEquals(tc, "", val);
+
     /* Test syntax error */
     CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("empty_value", section, key, val));
     CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("not finished\\", section, key, val));
     CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("0x42 / 0b101010", section, key, val));
+
 }
 
 void Test_iniparser_load(CuTest *tc)
