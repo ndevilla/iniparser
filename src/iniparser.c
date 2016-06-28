@@ -714,12 +714,12 @@ dictionary * iniparser_load(const char * ininame)
             break ;
 
             case LINE_SECTION:
-            errs = dictionary_set(dict, section, NULL);
+            errs += dictionary_set(dict, section, NULL) ? 1: 0;
             break ;
 
             case LINE_VALUE:
             sprintf(tmp, "%s:%s", section, key);
-            errs = dictionary_set(dict, tmp, val) ;
+            errs += dictionary_set(dict, tmp, val) ? 1: 0;
             break ;
 
             case LINE_ERROR:
