@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdarg.h>
 
 #include "CuTest.h"
 #include "dictionary.h"
@@ -597,4 +598,38 @@ void Test_dictionary_wrapper(CuTest *tc)
     CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section", NULL));
 
     iniparser_freedict(dic);
+}
+
+static char _last_error[1024];
+static int _error_callback(const char *format, ...)
+{
+    int ret;
+    va_list argptr;
+    va_start(argptr, format);
+    ret = vsprintf(_last_error, format, argptr);
+    va_end(argptr);
+    return ret;
+
+}
+
+void Test_iniparser_error_callback(CuTest *tc)
+{
+    dictionary *dic;
+
+    /* Specify our custom error_callback */
+    iniparser_set_error_callback(_error_callback);
+
+    /* Trigger an error and check it was written on the right output */
+    dic = iniparser_load("/path/to/nowhere.ini");
+    CuAssertPtrEquals(tc, NULL, dic);
+    CuAssertStrEquals(tc, "iniparser: cannot open /path/to/nowhere.ini\n", _last_error);
+
+    /* Reset erro_callback */
+    _last_error[0] = '\0';
+    iniparser_set_error_callback(NULL);
+
+    /* Make sure custom callback is no more called */
+    dic = iniparser_load("/path/to/nowhere.ini");
+    CuAssertPtrEquals(tc, NULL, dic);
+    CuAssertStrEquals(tc, "", _last_error);
 }
