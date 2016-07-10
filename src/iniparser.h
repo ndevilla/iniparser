@@ -27,6 +27,18 @@
 
 #include "dictionary.h"
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Maximum size of string returned by iniparser_getlasterror.
+
+  You can use this safely like:
+  char msg[INIPARSER_ERROR_SIZE];
+  strcpy(msg, iniparser_getlasterror());
+ */
+/*--------------------------------------------------------------------------*/
+#define INIPARSER_ERROR_SIZE (FILENAME_MAX + ASCIILINESZ + 100)
+                             // path + line content + error message
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,6 +53,7 @@ extern "C" {
   adds a message is iniparser_load.
  */
 /*--------------------------------------------------------------------------*/
+
 const char * iniparser_getlasterror();
 
 /*-------------------------------------------------------------------------*/
