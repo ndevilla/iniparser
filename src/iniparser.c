@@ -13,6 +13,8 @@
 /*---------------------------- Defines -------------------------------------*/
 #define ASCIILINESZ         (1024)
 #define INI_INVALID_KEY     ((char*)-1)
+#define ERROR_SIZE          (FILENAME_MAX + ASCIILINESZ + 100)
+                            // path + line content + error message
 
 /*---------------------------------------------------------------------------
                         Private to this module
@@ -107,7 +109,7 @@ static unsigned strstrip(char * s)
     return last - s;
 }
 
-static char ERRORBUFFER[ASCIILINESZ+1];
+static char ERRORBUFFER[ERROR_SIZE];
 
 /*-------------------------------------------------------------------------*/
 /**
