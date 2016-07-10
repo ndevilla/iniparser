@@ -37,7 +37,7 @@
  */
 /*--------------------------------------------------------------------------*/
 #define INIPARSER_ERROR_SIZE (FILENAME_MAX + ASCIILINESZ + 100)
-                             // path + line content + error message
+                             /* path + line content + error message */
 
 #ifdef __cplusplus
 extern "C" {
