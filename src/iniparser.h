@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 /*
  * The following #include is necessary on many Unixes but not Linux.
@@ -189,6 +190,34 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
  */
 /*--------------------------------------------------------------------------*/
 int iniparser_getint(const dictionary * d, const char * key, int notfound);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to an int
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value to return in case of error
+  @return   integer
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  the notfound value is returned.
+
+  Supported values for integers include the usual C notation
+  so decimal, octal (starting with 0) and hexadecimal (starting with 0x)
+  are supported. Examples:
+
+  - "42"      ->  42
+  - "042"     ->  34 (octal -> decimal)
+  - "0x42"    ->  66 (hexa  -> decimal)
+
+  Warning: the conversion may overflow in various ways. Conversion is
+  totally outsourced to strtol(), see the associated man page for overflow
+  handling.
+ */
+/*--------------------------------------------------------------------------*/
+int64_t iniparser_getint64(const dictionary * d, const char * key, int64_t notfound);
+
 
 /*-------------------------------------------------------------------------*/
 /**
