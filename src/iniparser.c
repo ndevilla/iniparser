@@ -426,7 +426,7 @@ int iniparser_getint(const dictionary * d, const char * key, int notfound)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Get the string associated to a key, convert to an int
+  @brief    Get the string associated to a key, convert to an int64_t
   @param    d Dictionary to search
   @param    key Key string to look for
   @param    notfound Value to return in case of error
