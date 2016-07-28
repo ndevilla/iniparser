@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -333,6 +334,69 @@ void Test_iniparser_getint(CuTest *tc)
         sprintf(key_name, "int:bad%d", i);
         CuAssertIntEquals(tc, 0,
                           iniparser_getint(dic, key_name, 0));
+    }
+    dictionary_del(dic);
+}
+
+void Test_iniparser_getlongint(CuTest *tc)
+{
+    unsigned i;
+    char key_name[64];
+    dictionary *dic;
+    const struct { int64_t num; const char *value; } good_val[] = {
+        { 0, "0" },
+        { 1, "1" },
+        { -1, "-1" },
+        { 1000, "1000" },
+        { 077, "077" },
+        { -01000, "-01000" },
+        { 0x7FFFFFFFFFFFFFFF, "0x7FFFFFFFFFFFFFFF" },
+        { -0x7FFFFFFFFFFFFFFF, "-0x7FFFFFFFFFFFFFFF" },
+        { 0x4242, "0x4242" },
+        { 0, NULL} /* must be last */
+    };
+    const char *bad_val[] = {
+        "",
+        "notanumber",
+        "0x",
+        "k2000",
+        " ",
+        "0xG1"
+    };
+    /* NULL test */
+    CuAssertLongIntEquals(tc, -42, iniparser_getlongint(NULL, NULL, -42));
+    CuAssertLongIntEquals(tc, -42, iniparser_getlongint(NULL, "dummy", -42));
+
+    /* Check the def return element */
+    dic = dictionary_new(10);
+    CuAssertLongIntEquals(tc, 42, iniparser_getlongint(dic, "dummy", 42));
+    CuAssertLongIntEquals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, NULL, 0x7FFFFFFFFFFFFFFF));
+    CuAssertLongIntEquals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
+    dictionary_del(dic);
+
+    /* Generic dictionary */
+    dic = dictionary_new(10);
+    for (i = 0; good_val[i].value != NULL; ++i) {
+        sprintf(key_name, "longint:value%d", i);
+        dictionary_set(dic, key_name, good_val[i].value);
+    }
+    for (i = 0; good_val[i].value != NULL; ++i) {
+        sprintf(key_name, "longint:value%d", i);
+        CuAssertLongIntEquals(tc, good_val[i].num,
+                          iniparser_getlongint(dic, key_name, 0));
+    }
+    dictionary_del(dic);
+
+    /* Test bad names */
+    dic = dictionary_new(10);
+    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+        sprintf(key_name, "longint:bad%d", i);
+        dictionary_set(dic, key_name, bad_val[i]);
+    }
+    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+        sprintf(key_name, "longint:bad%d", i);
+        CuAssertLongIntEquals(tc, 0,
+                          iniparser_getlongint(dic, key_name, 0));
     }
     dictionary_del(dic);
 }

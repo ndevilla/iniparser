@@ -211,6 +211,15 @@ void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const cha
 	CuFail_Line(tc, file, line, message, buf);
 }
 
+void CuAssertLongIntEquals_LineMsg(CuTest *tc, const char *file, int line, const char *message,
+    int64_t expected, int64_t actual) 
+{
+	char buf[STRING_MAX];
+	if (expected == actual) return;
+	sprintf(buf, "expected <%ld> but was <%ld>", expected, actual);
+	CuFail_Line(tc, file, line, message, buf);
+}
+
 void CuAssertDblEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message,
 	double expected, double actual, double delta)
 {
