@@ -3,7 +3,6 @@
 
 #include <setjmp.h>
 #include <stdarg.h>
-#include <stdint.h>
 
 #define CUTEST_VERSION  "CuTest 1.5"
 
@@ -67,7 +66,7 @@ void CuAssertIntEquals_LineMsg(CuTest* tc,
 	int expected, int actual);
 void CuAssertLongIntEquals_LineMsg(CuTest *tc,
     const char *file, int line, const char *message,
-    int64_t expected, int64_t actual);
+    long int expected, long int actual);
 void CuAssertDblEquals_LineMsg(CuTest* tc,
 	const char* file, int line, const char* message,
 	double expected, double actual, double delta);

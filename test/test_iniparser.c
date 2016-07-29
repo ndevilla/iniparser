@@ -343,7 +343,7 @@ void Test_iniparser_getlongint(CuTest *tc)
     unsigned i;
     char key_name[64];
     dictionary *dic;
-    const struct { int64_t num; const char *value; } good_val[] = {
+    const struct { long int num; const char *value; } good_val[] = {
         { 0, "0" },
         { 1, "1" },
         { -1, "-1" },

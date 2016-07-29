@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 
 /*
  * The following #include is necessary on many Unixes but not Linux.
@@ -193,7 +192,7 @@ int iniparser_getint(const dictionary * d, const char * key, int notfound);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Get the string associated to a key, convert to an int64_t
+  @brief    Get the string associated to a key, convert to an long int
   @param    d Dictionary to search
   @param    key Key string to look for
   @param    notfound Value to return in case of error
@@ -216,7 +215,7 @@ int iniparser_getint(const dictionary * d, const char * key, int notfound);
   handling.
  */
 /*--------------------------------------------------------------------------*/
-int64_t iniparser_getlongint(const dictionary * d, const char * key, int64_t notfound);
+long int iniparser_getlongint(const dictionary * d, const char * key, long int notfound);
 
 
 /*-------------------------------------------------------------------------*/
