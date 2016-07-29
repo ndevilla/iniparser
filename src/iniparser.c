@@ -394,7 +394,7 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
   @param    d Dictionary to search
   @param    key Key string to look for
   @param    notfound Value to return in case of error
-  @return   integer
+  @return   long integer
 
   This function queries a dictionary for a key. A key as read from an
   ini file is given as "section:key". If the key cannot be found,
@@ -411,6 +411,8 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
   Warning: the conversion may overflow in various ways. Conversion is
   totally outsourced to strtol(), see the associated man page for overflow
   handling.
+
+  Credits: Thanks to A. Becker for suggesting strtol()
  */
 /*--------------------------------------------------------------------------*/
 long int iniparser_getlongint(const dictionary * d, const char * key, long int notfound)
