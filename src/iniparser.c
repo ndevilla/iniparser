@@ -666,7 +666,7 @@ static line_status iniparser_line(
   @brief    Parse an ini file and return an allocated dictionary object
   @param    ininame Name of the ini file to read or NULL if with fd.
   @param    inifd File descriptor of the ini file to read or -1 if with name.
-  @return   unsigned New size of the string.
+  @return   Pointer to newly allocated dictionary
  */
 /*--------------------------------------------------------------------------*/
 dictionary * iniparser_load_ini(const char * ininame, const int inifd)
