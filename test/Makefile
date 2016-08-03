@@ -11,7 +11,7 @@ SRC = $(shell ls *.c | sed 's/AllTests.c//')
 OBJ = $(SRC:.c=.o)
 
 INCLUDE = -I../src
-CFLAGS  += -pipe -ansi -pedantic -Wall -Wextra -g
+CFLAGS  += -pipe -ansi -pedantic -Wall -Wextra -g -std=gnu99
 LDFLAGS +=
 
 all: check

@@ -8,6 +8,7 @@
 /*--------------------------------------------------------------------------*/
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
+#include <stdio.h>
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -661,21 +662,14 @@ static line_status iniparser_line(
     return sta ;
 }
 
-/*-------------------------------------------------------------------------*/
 /**
   @brief    Parse an ini file and return an allocated dictionary object
-  @param    ininame Name of the ini file to read.
-  @return   Pointer to newly allocated dictionary
-
-  This is the parser for ini files. This function is called, providing
-  the name of the file to be read. It returns a dictionary object that
-  should not be accessed directly, but through accessor functions
-  instead.
-
-  The returned dictionary must be freed using iniparser_freedict().
+  @param    ininame Name of the ini file to read or NULL if with fd.
+  @param    inifd File descriptor of the ini file to read or -1 if with name.
+  @return   unsigned New size of the string.
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(const char * ininame)
+dictionary * iniparser_load_ini(const char * ininame, const int inifd)
 {
     FILE * in ;
 
@@ -692,14 +686,21 @@ dictionary * iniparser_load(const char * ininame)
 
     dictionary * dict ;
 
-    if ((in=fopen(ininame, "r"))==NULL) {
-        fprintf(stderr, "iniparser: cannot open %s\n", ininame);
-        return NULL ;
+    if (ininame!=NULL) {
+        if ((in=fopen(ininame, "r"))==NULL) {
+            fprintf(stderr, "iniparser: cannot open %s\n", ininame);
+            return NULL ;
+        }
+    } else {
+        if ((in=fdopen(inifd, "r"))==NULL) {
+            fprintf(stderr, "iniparser: cannot open fd %d\n", inifd);
+            return NULL ;
+        }
     }
 
     dict = dictionary_new(0) ;
     if (!dict) {
-        fclose(in);
+        fclose(in); 
         return NULL ;
     }
 
@@ -716,12 +717,19 @@ dictionary * iniparser_load(const char * ininame)
             continue;
         /* Safety check against buffer overflows */
         if (line[len]!='\n' && !feof(in)) {
-            fprintf(stderr,
-                    "iniparser: input line too long in %s (%d)\n",
-                    ininame,
-                    lineno);
+            if (ininame!=NULL){
+                fprintf(stderr,
+                        "iniparser: input line too long in %s (%d)\n",
+                        ininame,
+                        lineno);
+            } else {
+                fprintf(stderr,
+                        "iniparser: input line too long in fd %d (%d)\n",
+                        inifd,
+                        lineno);
+            }
             dictionary_del(dict);
-            fclose(in);
+            fclose(in); 
             return NULL ;
         }
         /* Get rid of \n and spaces at end of line */
@@ -756,12 +764,18 @@ dictionary * iniparser_load(const char * ininame)
             break ;
 
             case LINE_ERROR:
-            fprintf(stderr, "iniparser: syntax error in %s (%d):\n",
-                    ininame,
-                    lineno);
+            if (ininame!=NULL) {
+                    fprintf(stderr, "iniparser: syntax error in %s (%d):\n",
+                        ininame,
+                        lineno);
+            } else {
+                   fprintf(stderr, "iniparser: syntax error in fd %d (%d):\n",
+                        inifd,
+                        lineno);
+            }
             fprintf(stderr, "-> %s\n", line);
             errs++ ;
-            break;
+            break ;
 
             default:
             break ;
@@ -777,8 +791,45 @@ dictionary * iniparser_load(const char * ininame)
         dictionary_del(dict);
         dict = NULL ;
     }
-    fclose(in);
+    fclose(in); 
     return dict ;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Parse an ini file and return an allocated dictionary object
+  @param    ininame Name of the ini file to read.
+  @return   Pointer to newly allocated dictionary
+
+  This is the parser for ini files. This function is called, providing
+  the name of the file to be read. It returns a dictionary object that
+  should not be accessed directly, but through accessor functions
+  instead.
+
+  The returned dictionary must be freed using iniparser_freedict().
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_load(const char * ininame)
+{
+  return iniparser_load_ini(ininame, -1);
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Parse an ini file and return an allocated dictionary object
+  @param    inifd File descriptor of the ini file to read.
+  @return   Pointer to newly allocated dictionary
+
+  This is the parser for ini files. With the exception of taking
+  in a file descriptor instead of a name, this function is identially
+  to a iniparser_load.
+
+  The returned dictionary must be freed using iniparser_freedict().
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_load_fd(const int inifd)
+{
+  return iniparser_load_ini(NULL, inifd);
 }
 
 /*-------------------------------------------------------------------------*/
