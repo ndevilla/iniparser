@@ -328,6 +328,21 @@ dictionary * iniparser_load(const char * ininame);
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Parse an ini file and return an allocated dictionary object
+  @param    inifd File descriptor of the ini file to read.
+  @return   Pointer to newly allocated dictionary
+
+  This is the parser for ini files. With the exception of taking
+  in a file descriptor instead of a name, this function is identially
+  to a iniparser_load.
+
+  The returned dictionary must be freed using iniparser_freedict().
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_load_fd(const int inifd);
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Free all memory associated to an ini dictionary
   @param    d Dictionary to free
   @return   void

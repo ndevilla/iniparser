@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <fcntl.h>
 
 #include "CuTest.h"
 #include "dictionary.h"
@@ -595,6 +596,7 @@ void Test_iniparser_load(CuTest *tc)
     struct stat curr_stat;
     dictionary *dic;
     char ini_path[256];
+    int ini_fd;
 
     /* Dummy tests */
     dic = iniparser_load("/you/shall/not/path");
@@ -610,6 +612,12 @@ void Test_iniparser_load(CuTest *tc)
             dic = iniparser_load(ini_path);
             CuAssertPtrNotNullMsg(tc, ini_path, dic);
             dictionary_del(dic);
+            /* Test inparser_load_fd */
+            ini_fd = open(ini_path, O_RDONLY);
+            dic = iniparser_load_fd(ini_fd);
+            CuAssertPtrNotNullMsg(tc, ini_path, dic);
+            dictionary_del(dic);
+            close(ini_fd);
         }
     }
     closedir(dir);
@@ -624,6 +632,12 @@ void Test_iniparser_load(CuTest *tc)
             dic = iniparser_load(ini_path);
             CuAssertPtrEquals_Msg(tc, ini_path, NULL, dic);
             dictionary_del(dic);
+            /* Test inparser_load_fd */
+            ini_fd = open(ini_path, O_RDONLY);
+            dic = iniparser_load_fd(ini_fd);
+            CuAssertPtrEquals_Msg(tc, ini_path, NULL, dic);
+            dictionary_del(dic);
+            close(ini_fd);
         }
     }
     closedir(dir);

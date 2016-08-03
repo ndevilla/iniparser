@@ -6,7 +6,7 @@
 # Compiler settings
 CC      ?= gcc
 
-CFLAGS  += -fPIC -Wall -Wextra -ansi -pedantic
+CFLAGS  += -fPIC -Wall -Wextra -pedantic
 ifndef DEBUG
 ADDITIONAL_CFLAGS  ?= -O2
 else
