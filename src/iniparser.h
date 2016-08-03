@@ -27,9 +27,34 @@
 
 #include "dictionary.h"
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Maximum size of string returned by iniparser_getlasterror.
+
+  You can use this safely like:
+  char msg[INIPARSER_ERROR_SIZE];
+  strcpy(msg, iniparser_getlasterror());
+ */
+/*--------------------------------------------------------------------------*/
+#define INIPARSER_ERROR_SIZE (FILENAME_MAX + ASCIILINESZ + 100)
+                             /* path + line content + error message */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get last error message occured in iniparser
+  @return   Statically allocated string containing message
+
+  This function returns the number last error message occured in
+  functions in iniparser. However, currently the only function that
+  adds a message is iniparser_load.
+ */
+/*--------------------------------------------------------------------------*/
+
+const char * iniparser_getlasterror();
 
 /*-------------------------------------------------------------------------*/
 /**

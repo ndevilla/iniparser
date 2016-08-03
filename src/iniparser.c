@@ -87,7 +87,7 @@ static char * xstrdup(const char * s)
   @return   unsigned New size of the string.
  */
 /*--------------------------------------------------------------------------*/
-unsigned strstrip(char * s)
+static unsigned strstrip(char * s)
 {
     char *last = NULL ;
     char *dest = s;
@@ -105,6 +105,23 @@ unsigned strstrip(char * s)
 
     memmove(dest,s,last - s + 1);
     return last - s;
+}
+
+static char ERRORBUFFER[INIPARSER_ERROR_SIZE];
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get last error message occured in iniparser
+  @return   Statically allocated string containing message
+
+  This function returns the number last error message occured in
+  functions in iniparser. However, currently the only function that
+  adds a message is iniparser_load.
+ */
+/*--------------------------------------------------------------------------*/
+const char * iniparser_getlasterror()
+{
+    return ERRORBUFFER;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -693,7 +710,7 @@ dictionary * iniparser_load(const char * ininame)
     dictionary * dict ;
 
     if ((in=fopen(ininame, "r"))==NULL) {
-        fprintf(stderr, "iniparser: cannot open %s\n", ininame);
+        sprintf(ERRORBUFFER, "cannot open %s\n", ininame);
         return NULL ;
     }
 
@@ -716,8 +733,8 @@ dictionary * iniparser_load(const char * ininame)
             continue;
         /* Safety check against buffer overflows */
         if (line[len]!='\n' && !feof(in)) {
-            fprintf(stderr,
-                    "iniparser: input line too long in %s (%d)\n",
+            sprintf(ERRORBUFFER,
+                    "input line too long in %s (%d)\n",
                     ininame,
                     lineno);
             dictionary_del(dict);
@@ -756,10 +773,10 @@ dictionary * iniparser_load(const char * ininame)
             break ;
 
             case LINE_ERROR:
-            fprintf(stderr, "iniparser: syntax error in %s (%d):\n",
+            sprintf(ERRORBUFFER, "iniparser: syntax error in %s (%d):\n-> %s\n",
                     ininame,
-                    lineno);
-            fprintf(stderr, "-> %s\n", line);
+                    lineno,
+                    line);
             errs++ ;
             break;
 
@@ -769,7 +786,10 @@ dictionary * iniparser_load(const char * ininame)
         memset(line, 0, ASCIILINESZ);
         last=0;
         if (errs<0) {
-            fprintf(stderr, "iniparser: memory allocation failure\n");
+            sprintf(ERRORBUFFER, "memory allocation failure\n");
+            break ;
+        }
+        if(errs) {
             break ;
         }
     }
