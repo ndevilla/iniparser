@@ -8,7 +8,6 @@
 /*--------------------------------------------------------------------------*/
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
-#include <stdio.h>
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -700,7 +699,7 @@ dictionary * iniparser_load_ini(const char * ininame, const int inifd)
 
     dict = dictionary_new(0) ;
     if (!dict) {
-        fclose(in); 
+        fclose(in);
         return NULL ;
     }
 
@@ -729,7 +728,7 @@ dictionary * iniparser_load_ini(const char * ininame, const int inifd)
                         lineno);
             }
             dictionary_del(dict);
-            fclose(in); 
+            fclose(in);
             return NULL ;
         }
         /* Get rid of \n and spaces at end of line */
@@ -791,7 +790,7 @@ dictionary * iniparser_load_ini(const char * ininame, const int inifd)
         dictionary_del(dict);
         dict = NULL ;
     }
-    fclose(in); 
+    fclose(in);
     return dict ;
 }
 
