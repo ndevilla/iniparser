@@ -33,6 +33,18 @@ extern "C" {
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Configure a function to receive the error messages.
+  @param    errback  Function to call.
+
+  By default, the error will be printed on stderr. If a null pointer is passed
+  as errback the error callback will be switched back to default.
+ */
+/*--------------------------------------------------------------------------*/
+
+void iniparser_set_error_callback(int (*errback)(const char *, ...));
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Get number of sections in a dictionary
   @param    d   Dictionary to examine
   @return   int Number of sections found in dictionary

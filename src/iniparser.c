@@ -8,6 +8,7 @@
 /*--------------------------------------------------------------------------*/
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
+#include <stdarg.h>
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -105,6 +106,41 @@ unsigned strstrip(char * s)
 
     memmove(dest,s,last - s + 1);
     return last - s;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Default error callback for iniparser: wraps `fprintf(stderr, ...)`.
+ */
+/*--------------------------------------------------------------------------*/
+static int default_error_callback(const char *format, ...)
+{
+  int ret;
+  va_list argptr;
+  va_start(argptr, format);
+  ret = vfprintf(stderr, format, argptr);
+  va_end(argptr);
+  return ret;
+}
+
+static int (*iniparser_error_callback)(const char*, ...) = default_error_callback;
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Configure a function to receive the error messages.
+  @param    errback  Function to call.
+
+  By default, the error will be printed on stderr. If a null pointer is passed
+  as errback the error callback will be switched back to default.
+ */
+/*--------------------------------------------------------------------------*/
+void iniparser_set_error_callback(int (*errback)(const char *, ...))
+{
+  if (errback) {
+    iniparser_error_callback = errback;
+  } else {
+    iniparser_error_callback = default_error_callback;
+  }
 }
 
 /*-------------------------------------------------------------------------*/
@@ -694,7 +730,7 @@ dictionary * iniparser_load(const char * ininame)
     dictionary * dict ;
 
     if ((in=fopen(ininame, "r"))==NULL) {
-        fprintf(stderr, "iniparser: cannot open %s\n", ininame);
+        iniparser_error_callback("iniparser: cannot open %s\n", ininame);
         return NULL ;
     }
 
@@ -717,10 +753,10 @@ dictionary * iniparser_load(const char * ininame)
             continue;
         /* Safety check against buffer overflows */
         if (line[len]!='\n' && !feof(in)) {
-            fprintf(stderr,
-                    "iniparser: input line too long in %s (%d)\n",
-                    ininame,
-                    lineno);
+            iniparser_error_callback(
+              "iniparser: input line too long in %s (%d)\n",
+              ininame,
+              lineno);
             dictionary_del(dict);
             fclose(in);
             return NULL ;
@@ -757,10 +793,11 @@ dictionary * iniparser_load(const char * ininame)
             break ;
 
             case LINE_ERROR:
-            fprintf(stderr, "iniparser: syntax error in %s (%d):\n",
-                    ininame,
-                    lineno);
-            fprintf(stderr, "-> %s\n", line);
+            iniparser_error_callback(
+              "iniparser: syntax error in %s (%d):\n-> %s\n",
+              ininame,
+              lineno,
+              line);
             errs++ ;
             break;
 
@@ -770,7 +807,7 @@ dictionary * iniparser_load(const char * ininame)
         memset(line, 0, ASCIILINESZ);
         last=0;
         if (mem_err<0) {
-            fprintf(stderr, "iniparser: memory allocation failure\n");
+            iniparser_error_callback("iniparser: memory allocation failure\n");
             break ;
         }
     }
