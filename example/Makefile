@@ -12,7 +12,7 @@ RM      ?= rm -f
 
 default: all
 
-all: iniexample parse
+all: iniexample parse linebylineexample
 
 iniexample: iniexample.c
 	$(CC) $(CFLAGS) -o iniexample iniexample.c -I../src -L.. -liniparser
@@ -20,8 +20,11 @@ iniexample: iniexample.c
 parse: parse.c
 	$(CC) $(CFLAGS) -o parse parse.c -I../src -L.. -liniparser
 
+linebylineexample: linebylineexample.c
+	$(CC) $(CFLAGS) -o linebylineexample linebylineexample.c -I../src -L.. -liniparser
+
 clean veryclean:
-	$(RM) iniexample example.ini parse
+	$(RM) iniexample example.ini parse linebylineexample
 
 
 
