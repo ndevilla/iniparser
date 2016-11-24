@@ -88,7 +88,7 @@ static char * xstrdup(const char * s)
   @return   unsigned New size of the string.
  */
 /*--------------------------------------------------------------------------*/
-unsigned strstrip(char * s)
+static unsigned strstrip(char * s)
 {
     char *last = NULL ;
     char *dest = s;
