@@ -269,7 +269,8 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
         for (i=0 ; i<d->size ; i++) {
             if (d->key[i]==NULL)
                 continue ;
-            fprintf(f, "%s = %s\n", d->key[i], d->val[i]);
+            if (*(d->key[i]) == ':')
+                fprintf(f, "%s = %s\n", d->key[i] + 1, d->val[i]);
         }
         return ;
     }
