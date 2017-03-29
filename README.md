@@ -39,5 +39,5 @@ Older versions 3.1 and 3.2 with the legacy api are available as tags.
 
 ## V - FAQ
 
-See FAQ-en.md in this directory for answers to Frequently Asked Questions.
+See [FAQ-en.md](FAQ-en.md) in this directory for answers to Frequently Asked Questions.
 
