@@ -1,6 +1,6 @@
-# Iniparser FAQ #
+# iniparser FAQ #
 
-## Is Iniparser thread safe ?
+## Is iniparser thread safe ?
 
 Starting from version 4, iniparser is designed to be thread-safe, provided
 you surround it with your own mutex logic. The choice to not add thread
@@ -29,4 +29,9 @@ buffering parameters to accomodate fprintf(). Something like:
 
 setvbuf(f, NULL, _IOFBF, 0);
 
+## iniparser does not compile with my C++ compiler!
+
+See the docs: iniparser is a C library. C++ is quite a different language,
+despite the promises of compatibility. You will have to modify iniparser
+quite heavily to make it work with a C++ compiler. Good luck!
 
