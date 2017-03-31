@@ -41,3 +41,4 @@ Older versions 3.1 and 3.2 with the legacy api are available as tags.
 
 See [FAQ-en.md](FAQ-en.md) in this directory for answers to Frequently Asked Questions.
 
+还有简化中国翻译在[FAQ-zhcn.md](FAQ-zhcn.md).
