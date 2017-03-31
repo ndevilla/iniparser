@@ -1,0 +1,10 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/IniparserTargets.cmake")
+
+set(INIPARSER_FOUND TRUE)
+get_target_property(INIPARSER_LIBRARIES Iniparser IMPORTED_SONAME_RELEASE)
+set_and_check(INIPARSER_INCLUDE_DIR "@PACKAGE_include_install_dir@")
+set_and_check(INIPARSER_LIBRARY_DIR "@PACKAGE_library_install_dir@")
+
+check_required_components("Iniparser")
