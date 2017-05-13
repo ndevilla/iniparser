@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Includes <unistd.h> on non-Windows */
+/* Includes <unistd.h> or defines own ssize_t on Windows */
 #include "dictionary.h"
 
 #ifdef __cplusplus

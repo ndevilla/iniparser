@@ -21,7 +21,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _WIN32
+#ifdef _WIN32
+	/* long int is the longest signed integer in standard C89 */
+	typedef long int ssize_t;
+#else
 	#include <unistd.h>
 #endif
 
@@ -46,11 +49,7 @@ extern "C" {
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
     int               n ;   /** Number of entries in dictionary */
-#ifdef _WIN32
-    int            size ;
-#else
     ssize_t        size ;   /** Storage size */
-#endif
     char        **  val ;   /** List of string values */
     char        **  key ;   /** List of string keys */
     unsigned     *  hash ;  /** List of hash values for keys */
