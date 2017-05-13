@@ -175,7 +175,7 @@ dictionary * dictionary_new(size_t size)
 /*--------------------------------------------------------------------------*/
 void dictionary_del(dictionary * d)
 {
-    size_t  i ;
+    int  i ;
 
     if (d==NULL) return ;
     for (i=0 ; i<d->size ; i++) {
@@ -208,7 +208,7 @@ void dictionary_del(dictionary * d)
 const char * dictionary_get(const dictionary * d, const char * key, const char * def)
 {
     unsigned    hash ;
-    size_t      i ;
+    int         i ;
 
     hash = dictionary_hash(key);
     for (i=0 ; i<d->size ; i++) {
@@ -253,7 +253,7 @@ const char * dictionary_get(const dictionary * d, const char * key, const char *
 /*--------------------------------------------------------------------------*/
 int dictionary_set(dictionary * d, const char * key, const char * val)
 {
-    size_t         i ;
+    int            i ;
     unsigned       hash ;
 
     if (d==NULL || key==NULL) return -1 ;
@@ -313,7 +313,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
 void dictionary_unset(dictionary * d, const char * key)
 {
     unsigned    hash ;
-    size_t      i ;
+    int         i ;
 
     if (key == NULL || d == NULL) {
         return;
@@ -361,7 +361,7 @@ void dictionary_unset(dictionary * d, const char * key)
 /*--------------------------------------------------------------------------*/
 void dictionary_dump(const dictionary * d, FILE * out)
 {
-    size_t  i ;
+    int  i ;
 
     if (d==NULL || out==NULL) return ;
     if (d->n<1) {

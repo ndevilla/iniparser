@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _WIN32
+	#include <unistd.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,8 +45,12 @@ extern "C" {
  */
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
-    size_t            n ;     /** Number of entries in dictionary */
-    size_t         size ;  /** Storage size */
+    int               n ;   /** Number of entries in dictionary */
+#ifdef _WIN32
+    int            size ;
+#else
+    ssize_t        size ;   /** Storage size */
+#endif
     char        **  val ;   /** List of string values */
     char        **  key ;   /** List of string keys */
     unsigned     *  hash ;  /** List of hash values for keys */

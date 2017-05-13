@@ -163,7 +163,7 @@ void iniparser_set_error_callback(int (*errback)(const char *, ...))
 /*--------------------------------------------------------------------------*/
 int iniparser_getnsec(const dictionary * d)
 {
-    size_t i ;
+    int i ;
     int nsec ;
 
     if (d==NULL) return -1 ;
@@ -194,7 +194,7 @@ int iniparser_getnsec(const dictionary * d)
 /*--------------------------------------------------------------------------*/
 const char * iniparser_getsecname(const dictionary * d, int n)
 {
-    size_t i ;
+    int i ;
     int foundsec ;
 
     if (d==NULL || n<0) return NULL ;
@@ -229,7 +229,7 @@ const char * iniparser_getsecname(const dictionary * d, int n)
 /*--------------------------------------------------------------------------*/
 void iniparser_dump(const dictionary * d, FILE * f)
 {
-    size_t     i ;
+    int     i ;
 
     if (d==NULL || f==NULL) return ;
     for (i=0 ; i<d->size ; i++) {
@@ -257,7 +257,7 @@ void iniparser_dump(const dictionary * d, FILE * f)
 /*--------------------------------------------------------------------------*/
 void iniparser_dump_ini(const dictionary * d, FILE * f)
 {
-    size_t          i ;
+    int          i ;
     int          nsec ;
     const char * secname ;
 
@@ -273,8 +273,7 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
         }
         return ;
     }
-    /* int i>=1 and is therefore castable to size_t */
-    for (i=0 ; i<(size_t)nsec ; i++) {
+    for (i=0 ; i<nsec ; i++) {
         secname = iniparser_getsecname(d, i) ;
         iniparser_dumpsection_ini(d, secname, f);
     }
@@ -296,7 +295,7 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
 /*--------------------------------------------------------------------------*/
 void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f)
 {
-    size_t     j ;
+    int     j ;
     char    keym[ASCIILINESZ+1];
     int     seclen ;
 
@@ -332,7 +331,7 @@ int iniparser_getsecnkeys(const dictionary * d, const char * s)
 {
     int     seclen, nkeys ;
     char    keym[ASCIILINESZ+1];
-    size_t j ;
+    int j ;
 
     nkeys = 0;
 
@@ -372,7 +371,7 @@ int iniparser_getsecnkeys(const dictionary * d, const char * s)
 /*--------------------------------------------------------------------------*/
 const char ** iniparser_getseckeys(const dictionary * d, const char * s, const char ** keys)
 {
-    size_t i, j, seclen ;
+    int i, j, seclen ;
     char keym[ASCIILINESZ+1];
 
     if (d==NULL || keys==NULL) return NULL;
