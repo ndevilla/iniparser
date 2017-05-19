@@ -21,12 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef _WIN32
-	/* long int is the longest signed integer in standard C89 */
-	typedef long int ssize_t;
-#else
-	#include <unistd.h>
-#endif
+/*
+  On WIN32, add src/win32 to the include path or comment this out and
+  typedef your own ssize_t.
+*/
+#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
