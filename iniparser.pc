@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+
+Name: libiniparser
+Description: Iniparser library
+Version: 4.1
+Libs: -L${libdir} -liniparser
+Cflags: -I${includedir}
