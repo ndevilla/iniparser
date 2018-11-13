@@ -12,7 +12,9 @@
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
+#ifndef ASCIILINESZ
 #define ASCIILINESZ         (1024)
+#endif
 #define INI_INVALID_KEY     ((char*)-1)
 
 /*---------------------------------------------------------------------------
