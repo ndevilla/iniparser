@@ -96,9 +96,9 @@ static unsigned strstrip(char * s)
     if (s==NULL) return 0;
 
     last = s + strlen(s);
-    while (isspace((int)*s) && *s) s++;
+    while (isspace((unsigned char)*s) && *s) s++;
     while (last > s) {
-        if (!isspace((int)*(last-1)))
+        if (!isspace((unsigned char)*(last-1)))
             break ;
         last -- ;
     }
@@ -763,7 +763,7 @@ dictionary * iniparser_load(const char * ininame)
         }
         /* Get rid of \n and spaces at end of line */
         while ((len>=0) &&
-                ((line[len]=='\n') || (isspace(line[len])))) {
+                ((line[len]=='\n') || (isspace((unsigned char)line[len])))) {
             line[len]=0 ;
             len-- ;
         }
