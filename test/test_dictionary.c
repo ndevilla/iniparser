@@ -125,6 +125,7 @@ static char *get_dump(dictionary *d)
     }
     if (fread(dump_buff, 1, dump_size, fd) != (size_t)dump_size) {
         fclose(fd);
+        free(dump_buff);
         return NULL;
     }
 

@@ -7,11 +7,17 @@
 */
 /*--------------------------------------------------------------------------*/
 /*---------------------------- Includes ------------------------------------*/
+#include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#if defined(INIPARSER_STRICT_PARSER)
+#include <errno.h>
+#include <limits.h>
+#include <math.h>
+#endif /* INIPARSER_STRICT_PARSER */
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -51,7 +57,7 @@ static const char * strlwc(const char * in, char *out, unsigned len)
 
     if (in==NULL || out == NULL || len==0) return NULL ;
     i=0 ;
-    while (in[i] != '\0' && i < len-1) {
+    while ((i < len-1) && (in[i] != '\0')) {
         out[i] = (char)tolower((int)in[i]);
         i++ ;
     }
@@ -447,20 +453,54 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
   "042"     ->  34 (octal -> decimal)
   "0x42"    ->  66 (hexa  -> decimal)
 
-  Warning: the conversion may overflow in various ways. Conversion is
-  totally outsourced to strtol(), see the associated man page for overflow
-  handling.
-
   Credits: Thanks to A. Becker for suggesting strtol()
  */
 /*--------------------------------------------------------------------------*/
 long int iniparser_getlongint(const dictionary * d, const char * key, long int notfound)
 {
     const char * str ;
+#if defined(INIPARSER_STRICT_PARSER)
+    long int tmp_num;
+    int tmp_errno;
+    char *endptr = NULL;
+#endif /* INIPARSER_STRICT_PARSER */
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==NULL || str==INI_INVALID_KEY) return notfound ;
+
+#if defined(INIPARSER_STRICT_PARSER)
+    /* In case of an error strtol() can return 0,
+     * LONG_MIN or LONG_MAX and errno will be set:
+     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/strtol.html
+     */
+    tmp_errno = errno;
+    tmp_num = strtol(str, &endptr, 0);
+    /* No valid string supplied */
+    if(endptr == NULL || endptr == str)
+    	return notfound;
+
+    /* In case if there are any whitespace character after the
+     * number, endptr will point to the first one.
+     * Ignore whitespace at the end of the string,
+     * but check if there are any junk characters,
+     * and return notfound in case if there are any.*/
+    while(*endptr) {
+    	if(isspace(*endptr)) {
+    		endptr++;
+    	} else {
+    		errno = EINVAL;
+    		return notfound;
+    	}
+    }
+
+    if((tmp_num == 0 || tmp_num == LONG_MIN ||
+    		tmp_num == LONG_MAX) && tmp_errno != errno) {
+    	tmp_num = notfound;
+    }
+    return tmp_num;
+#else
     return strtol(str, NULL, 0);
+#endif /* INIPARSER_STRICT_PARSER */
 }
 
 int64_t iniparser_getint64(const dictionary * d, const char * key, int64_t notfound)
@@ -512,7 +552,17 @@ uint64_t iniparser_getuint64(const dictionary * d, const char * key, uint64_t no
 /*--------------------------------------------------------------------------*/
 int iniparser_getint(const dictionary * d, const char * key, int notfound)
 {
+#if defined(INIPARSER_STRICT_PARSER)
+	long int res = iniparser_getlongint(d, key, notfound);
+	/* Check if the result is within valid range for an integer */
+	if(res != notfound && (res < INT_MIN || res > INT_MAX)) {
+		res = notfound;
+		errno = ERANGE;
+	}
+	return (int)res;
+#else
     return (int)iniparser_getlongint(d, key, notfound);
+#endif
 }
 
 /*-------------------------------------------------------------------------*/
@@ -525,16 +575,50 @@ int iniparser_getint(const dictionary * d, const char * key, int notfound)
 
   This function queries a dictionary for a key. A key as read from an
   ini file is given as "section:key". If the key cannot be found,
-  the notfound value is returned.
+  or if there is an error while parsing then notfound value will be returned.
  */
 /*--------------------------------------------------------------------------*/
 double iniparser_getdouble(const dictionary * d, const char * key, double notfound)
 {
     const char * str ;
-
+#if defined(INIPARSER_STRICT_PARSER)
+    char *endptr = NULL;
+    double tmp_num;
+    int tmp_errno;
+#endif /* INIPARSER_STRICT_PARSER */
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==NULL || str==INI_INVALID_KEY) return notfound ;
+
+#if defined(INIPARSER_STRICT_PARSER)
+    tmp_errno = errno;
+    tmp_num = strtod(str, &endptr);
+    /* No valid string supplied */
+    if(endptr == NULL || endptr == str)
+    	return notfound;
+
+    /* In case if there are any whitespace character after the
+     * number, endptr will point to the first one.
+     * Ignore whitespace at the end of the string,
+     * but check if there are any junk characters,
+     * and return notfound in case if there are any.*/
+    while(*endptr) {
+    	if(isspace(*endptr)) {
+    		endptr++;
+    	} else {
+    		errno = EINVAL;
+    		return notfound;
+    	}
+    }
+
+    if((tmp_num == 0 || tmp_num == HUGE_VAL ||
+    		tmp_num == -(HUGE_VAL)) && tmp_errno != errno) {
+    	tmp_num = notfound;
+    }
+    return tmp_num;
+#else
     return atof(str);
+#endif /* INIPARSER_STRICT_PARSER */
+
 }
 
 /*-------------------------------------------------------------------------*/
