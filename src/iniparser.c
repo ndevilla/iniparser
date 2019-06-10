@@ -726,6 +726,9 @@ dictionary * iniparser_load(const char * ininame)
     int  lineno=0 ;
     int  errs=0;
     int  mem_err=0;
+	
+	int connect_pos = 0;
+	int detect_len;
 
     dictionary * dict ;
 
@@ -747,6 +750,9 @@ dictionary * iniparser_load(const char * ininame)
     last=0 ;
 
     while (fgets(line+last, ASCIILINESZ-last, in)!=NULL) {
+		char equal_flag = 0;
+		char comment_flag = 0;
+		char connect_flag = 0 ;
         lineno++ ;
         len = (int)strlen(line)-1;
         if (len<=0)
