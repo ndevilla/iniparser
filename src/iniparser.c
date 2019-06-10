@@ -767,6 +767,28 @@ dictionary * iniparser_load(const char * ininame)
             line[len]=0 ;
             len-- ;
         }
+		
+		/*detect string include these "=", "\", ";" ,"#"*/
+		detect_len = len;
+		while (line[len] !='\\' && detect_len >= 0){
+			if (line[detect_len] ==';' || line[detect_len] == '#'){
+				comment_flag = 1;
+				
+			}
+			if (comment_flag == 1 && connect_flag == 0 && line[detect_len] == '\\'){
+				connect_flag = 1 ;
+				connect_pos = detect_len ;
+			}
+			if (connect_flag == 1 && line[detect_len] == '='){
+				equal_flag =1 ;
+				break;
+				
+			}
+			detect_len--;
+		}
+		
+		
+		
         if (len < 0) { /* Line was entirely \n and/or spaces */
             len = 0;
         }
@@ -775,9 +797,14 @@ dictionary * iniparser_load(const char * ininame)
             /* Multi-line value */
             last=len ;
             continue ;
-        } else {
+        } 
+		else if (equal_flag & connect_flag & comment_flag){
+			last = connect_pos ;
+			continue ;
+		}else {
             last=0 ;
         }
+		
         switch (iniparser_line(line, section, key, val)) {
             case LINE_EMPTY:
             case LINE_COMMENT:
