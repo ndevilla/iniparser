@@ -33,3 +33,5 @@ clean veryclean:
 	rm -rf AllTests.c
 	rm -rf $(OBJ) AllTests.o
 	rm -rf testrun
+	rm -rf ./ressources/new.ini ./ressources/test.ini ./ressources/test.txt
+
