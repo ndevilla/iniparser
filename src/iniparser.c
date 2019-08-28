@@ -700,21 +700,19 @@ static line_status iniparser_line(
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Parse an ini file and return an allocated dictionary object
-  @param    ininame Name of the ini file to read.
+  @param    in File to read.
+  @param    ininame Name of the ini file to read (only used for nicer error messages)
   @return   Pointer to newly allocated dictionary
 
   This is the parser for ini files. This function is called, providing
-  the name of the file to be read. It returns a dictionary object that
-  should not be accessed directly, but through accessor functions
-  instead.
+  the file to be read. It returns a dictionary object that should not
+  be accessed directly, but through accessor functions instead.
 
   The returned dictionary must be freed using iniparser_freedict().
  */
 /*--------------------------------------------------------------------------*/
-dictionary * iniparser_load(const char * ininame)
+dictionary * iniparser_load_file(FILE * in, const char * ininame)
 {
-    FILE * in ;
-
     char line    [ASCIILINESZ+1] ;
     char section [ASCIILINESZ+1] ;
     char key     [ASCIILINESZ+1] ;
@@ -728,11 +726,6 @@ dictionary * iniparser_load(const char * ininame)
     int  mem_err=0;
 
     dictionary * dict ;
-
-    if ((in=fopen(ininame, "r"))==NULL) {
-        iniparser_error_callback("iniparser: cannot open %s\n", ininame);
-        return NULL ;
-    }
 
     dict = dictionary_new(0) ;
     if (!dict) {
@@ -818,6 +811,36 @@ dictionary * iniparser_load(const char * ininame)
     fclose(in);
     return dict ;
 }
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Parse an ini file and return an allocated dictionary object
+  @param    ininame Name of the ini file to read.
+  @return   Pointer to newly allocated dictionary
+
+  This is the parser for ini files. This function is called, providing
+  the name of the file to be read. It returns a dictionary object that
+  should not be accessed directly, but through accessor functions
+  instead.
+
+  The returned dictionary must be freed using iniparser_freedict().
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_load(const char * ininame)
+{
+    FILE * in ;
+    dictionary * dict ;
+
+    if ((in=fopen(ininame, "r"))==NULL) {
+        iniparser_error_callback("iniparser: cannot open %s\n", ininame);
+        return NULL ;
+    }
+
+    dict = iniparser_load_file(in, ininame);
+
+    return dict ;
+}
+
 
 /*-------------------------------------------------------------------------*/
 /**
