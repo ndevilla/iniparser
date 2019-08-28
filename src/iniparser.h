@@ -338,6 +338,8 @@ int iniparser_find_entry(const dictionary * ini, const char * entry) ;
 /*--------------------------------------------------------------------------*/
 dictionary * iniparser_load(const char * ininame);
 
+dictionary * iniparser_load_file(FILE * in, const char * ininame);
+
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Free all memory associated to an ini dictionary
