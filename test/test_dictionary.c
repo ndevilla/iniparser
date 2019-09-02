@@ -238,3 +238,52 @@ void Test_dictionary_dump(CuTest *tc)
 
     dictionary_del(dic);
 }
+
+void Test_dictionary_get(CuTest *tc)
+{
+    dictionary *dic;
+    int i, j;
+    char sec_name[32];
+    char key_name[64];
+
+    /*NULL test*/
+    CuAssertPtrEquals(tc, NULL, dictionary_get(NULL, NULL, NULL));
+    CuAssertPtrEquals(tc, NULL, dictionary_get(NULL, "string", NULL));
+
+    /*Check the def return element*/
+    dic = dictionary_new(DICTMINSZ);
+    CuAssertPtrNotNull(tc, dic);
+    CuAssertPtrEquals(tc, NULL, dictionary_get(dic, "dummy", NULL));
+    CuAssertStrEquals(tc, "def", dictionary_get(dic, NULL, "def"));
+    CuAssertStrEquals(tc, "def", dictionary_get(dic, "dummy", "def"));
+
+    /*Populate the dictionary*/
+    for (i = 1; i < 3; ++i)
+    {
+        sprintf(sec_name, "sec%d", i);
+        dictionary_set(dic, sec_name, "");
+        for (j = 1; j < 5; ++j)
+        {
+            sprintf(key_name, "%s:key%d", sec_name, j);
+            dictionary_set(dic, key_name, "dummy_value");
+            CuAssertStrEquals(tc, "dummy_value",
+                              dictionary_get(dic, key_name, "string"));
+        }
+    }
+
+    /*Test get dictionary section value*/
+    CuAssertStrEquals(tc, "",
+                      dictionary_get(dic, "sec1", NULL));
+    CuAssertStrEquals(tc, "",
+                      dictionary_get(dic, "sec1", "def"));
+
+    /*delete and set a key in a dictionary*/
+    dictionary_unset(dic, "sec1:key4");
+    CuAssertStrEquals(tc, "def",
+                      dictionary_get(dic, "sec1:key4", "def"));
+    dictionary_set(dic, "sec1:key4", "dummy_value");
+    CuAssertStrEquals(tc, "dummy_value",
+                      dictionary_get(dic, "sec1:key4", "def"));
+
+    dictionary_del(dic);
+}
