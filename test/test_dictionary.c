@@ -184,9 +184,6 @@ void Test_dictionary_unset(CuTest *tc)
     CuAssertStrEquals(tc, dic1_dump, dic2_dump);
     free(dic1_dump);
     free(dic2_dump);
-
-    dictionary_del(dic1);
-    dictionary_del(dic2);
 }
 
 void Test_dictionary_dump(CuTest *tc)
