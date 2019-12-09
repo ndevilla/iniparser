@@ -623,16 +623,16 @@ void iniparser_unset(dictionary * ini, const char * entry)
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Load a single line from an INI file
-  @param    input_line  Input line, may be concatenated multi-line input
-  @param    section     Output space to store section
-  @param    key         Output space to store key
-  @param    value       Output space to store value
-  @return   line_status value
+  @param    input_line   Input line, may be concatenated multi-line input
+  @param    section_name Output space to store section
+  @param    key          Output space to store key
+  @param    value        Output space to store value
+  @return   line_status  value
  */
 /*--------------------------------------------------------------------------*/
 static line_status iniparser_line(
     const char * input_line,
-    char * section,
+    char * section_name,
     char * key,
     char * value)
 {
@@ -652,9 +652,9 @@ static line_status iniparser_line(
         sta = LINE_COMMENT ;
     } else if (line[0]=='[' && line[len-1]==']') {
         /* Section name */
-        sscanf(line, "[%[^]]", section);
-        strstrip(section);
-        strlwc(section, section, len);
+        sscanf(line, "[%[^]]", section_name);
+        strstrip(section_name);
+        strlwc(section_name, section_name, len);
         sta = LINE_SECTION ;
     } else if (sscanf (line, "%[^=] = \"%[^\"]\"", key, value) == 2
            ||  sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2) {
@@ -715,11 +715,11 @@ dictionary * iniparser_load(const char * ininame)
 {
     FILE * in ;
 
-    char line    [ASCIILINESZ+1] ;
-    char section [ASCIILINESZ+1] ;
-    char key     [ASCIILINESZ+1] ;
-    char tmp     [(ASCIILINESZ * 2) + 2] ;
-    char val     [ASCIILINESZ+1] ;
+    char line         [ASCIILINESZ+1] ;
+    char section_name [ASCIILINESZ+1] ;
+    char key          [ASCIILINESZ+1] ;
+    char tmp          [(ASCIILINESZ * 2) + 2] ;
+    char val          [ASCIILINESZ+1] ;
 
     int  last=0 ;
     int  len ;
@@ -740,10 +740,10 @@ dictionary * iniparser_load(const char * ininame)
         return NULL ;
     }
 
-    memset(line,    0, ASCIILINESZ);
-    memset(section, 0, ASCIILINESZ);
-    memset(key,     0, ASCIILINESZ);
-    memset(val,     0, ASCIILINESZ);
+    memset(line,         0, ASCIILINESZ);
+    memset(section_name, 0, ASCIILINESZ);
+    memset(key,          0, ASCIILINESZ);
+    memset(val,          0, ASCIILINESZ);
     last=0 ;
 
     while (fgets(line+last, ASCIILINESZ-last, in)!=NULL) {
@@ -778,17 +778,17 @@ dictionary * iniparser_load(const char * ininame)
         } else {
             last=0 ;
         }
-        switch (iniparser_line(line, section, key, val)) {
+        switch (iniparser_line(line, section_name, key, val)) {
             case LINE_EMPTY:
             case LINE_COMMENT:
             break ;
 
             case LINE_SECTION:
-            mem_err = dictionary_set(dict, section, NULL);
+            mem_err = dictionary_set(dict, section_name, NULL);
             break ;
 
             case LINE_VALUE:
-            sprintf(tmp, "%s:%s", section, key);
+            sprintf(tmp, "%s:%s", section_name, key);
             mem_err = dictionary_set(dict, tmp, val);
             break ;
 
