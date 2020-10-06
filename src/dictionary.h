@@ -73,7 +73,7 @@ unsigned dictionary_hash(const char * key);
 /**
   @brief    Create a new dictionary object.
   @param    size    Optional initial size of the dictionary.
-  @return   1 newly allocated dictionary objet.
+  @return   1 newly allocated dictionary object.
 
   This function allocates a new dictionary object of given size and returns
   it. If you do not know in advance (roughly) the number of entries in the
