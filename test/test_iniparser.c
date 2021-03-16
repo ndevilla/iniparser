@@ -1,9 +1,11 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "CuTest.h"
 #include "dictionary.h"
@@ -343,18 +345,20 @@ void Test_iniparser_getlongint(CuTest *tc)
     unsigned i;
     char key_name[64];
     dictionary *dic;
-    const struct { long int num; const char *value; } good_val[] = {
+    struct { long int num; const char *value; } good_val[] = {
         { 0, "0" },
         { 1, "1" },
         { -1, "-1" },
         { 1000, "1000" },
         { 077, "077" },
         { -01000, "-01000" },
-        { 0x7FFFFFFFFFFFFFFF, "0x7FFFFFFFFFFFFFFF" },
-        { -0x7FFFFFFFFFFFFFFF, "-0x7FFFFFFFFFFFFFFF" },
+        { LONG_MAX, 0 },
+        { LONG_MIN, 0 },
         { 0x4242, "0x4242" },
         { 0, NULL} /* must be last */
     };
+    (void)asprintf(&good_val[6].value, "%ld", LONG_MAX);
+    (void)asprintf(&good_val[7].value, "%ld", LONG_MIN);
     const char *bad_val[] = {
         "",
         "notanumber",
@@ -370,8 +374,8 @@ void Test_iniparser_getlongint(CuTest *tc)
     /* Check the def return element */
     dic = dictionary_new(10);
     CuAssertLongIntEquals(tc, 42, iniparser_getlongint(dic, "dummy", 42));
-    CuAssertLongIntEquals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, NULL, 0x7FFFFFFFFFFFFFFF));
-    CuAssertLongIntEquals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
+    CuAssertLongIntEquals(tc, LONG_MAX, iniparser_getlongint(dic, NULL, LONG_MAX));
+    CuAssertLongIntEquals(tc, LONG_MIN, iniparser_getlongint(dic, "dummy", LONG_MIN));
     dictionary_del(dic);
 
     /* Generic dictionary */
