@@ -35,3 +35,10 @@ See the docs: iniparser is a C library. C++ is quite a different language,
 despite the promises of compatibility. You will have to modify iniparser
 quite heavily to make it work with a C++ compiler. Good luck!
 
+## iniparser uses unistd.h, which is absent on Windows!
+
+iniparser uses ssize_t type as part of its public interface. Since adding
+special #ifdef _WIN32 checks would damage the maintainability of the code,
+special unistd.h with just the ssize_t definition is provided in src/win32
+directory. You can either add it to the include path or just comment out the
+offending line and typedef your own ssize_t instead.

@@ -21,6 +21,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+/*
+  On WIN32, add src/win32 to the include path or comment this out and
+  typedef your own ssize_t.
+*/
 #include <unistd.h>
 
 #ifdef __cplusplus

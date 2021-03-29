@@ -6,6 +6,7 @@
 /* We need to directly insert the .c file in order to test the */
 /* static functions as well */
 #include "dictionary.c"
+#include "iniparser.h"
 
 void Test_xstrdup(CuTest *tc)
 {
@@ -53,6 +54,7 @@ void Test_dictionary_grow(CuTest *tc)
         CuAssertIntEquals(tc, 0, dic->n);
         CuAssertIntEquals(tc, (1 << i) * DICTMINSZ, dic->size);
     }
+    iniparser_freedict(dic);
 }
 
 void Test_dictionary_hash(CuTest *tc)
@@ -184,6 +186,9 @@ void Test_dictionary_unset(CuTest *tc)
     CuAssertStrEquals(tc, dic1_dump, dic2_dump);
     free(dic1_dump);
     free(dic2_dump);
+
+    iniparser_freedict(dic1);
+    iniparser_freedict(dic2);
 }
 
 void Test_dictionary_dump(CuTest *tc)
