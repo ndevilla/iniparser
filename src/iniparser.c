@@ -18,17 +18,6 @@
 /*---------------------------------------------------------------------------
                         Private to this module
  ---------------------------------------------------------------------------*/
-/**
- * This enum stores the status for each parsed line (internal use only).
- */
-typedef enum _line_status_ {
-    LINE_UNPROCESSED,
-    LINE_ERROR,
-    LINE_EMPTY,
-    LINE_COMMENT,
-    LINE_SECTION,
-    LINE_VALUE
-} line_status ;
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -817,6 +806,88 @@ dictionary * iniparser_load(const char * ininame)
     }
     fclose(in);
     return dict ;
+}
+
+int iniparser_parse(const char * ininame, int (*lineback)(line_status lineStatus, const char * line, const char * section, const char * key, const char * val))
+{
+    FILE * in ;
+
+    char line    [ASCIILINESZ+1] ;
+    char section [ASCIILINESZ+1] ;
+    char key     [ASCIILINESZ+1] ;
+    char val     [ASCIILINESZ+1] ;
+
+    int  last=0 ;
+    int  len ;
+    int  lineno=0 ;
+
+    line_status lineStatus = LINE_UNPROCESSED;
+
+    if (lineback == NULL) {
+        iniparser_error_callback("iniparser: no parse callback defined\n");
+        return -1;
+    }
+
+    if ((in=fopen(ininame, "r"))==NULL) {
+        iniparser_error_callback("iniparser: cannot open %s\n", ininame);
+        return -1 ;
+    }
+
+    memset(line,    0, ASCIILINESZ);
+    memset(section, 0, ASCIILINESZ);
+    memset(key,     0, ASCIILINESZ);
+    memset(val,     0, ASCIILINESZ);
+    last=0 ;
+
+    while (fgets(line+last, ASCIILINESZ-last, in)!=NULL) {
+        lineno++ ;
+        len = (int)strlen(line)-1;
+        if (len<=0)
+            continue;
+        /* Safety check against buffer overflows */
+        if (line[len]!='\n' && !feof(in)) {
+            iniparser_error_callback(
+              "iniparser: input line too long in %s (%d)\n",
+              ininame,
+              lineno);
+
+            fclose(in);
+            return -1 ;
+        }
+        /* Get rid of \n and spaces at end of line */
+        while ((len>=0) &&
+                ((line[len]=='\n') || (isspace(line[len])))) {
+            line[len]=0 ;
+            len-- ;
+        }
+        if (len < 0) { /* Line was entirely \n and/or spaces */
+            len = 0;
+        }
+        /* Detect multi-line */
+        if (line[len]=='\\') {
+            /* Multi-line value */
+            last=len ;
+            continue ;
+        } else {
+            last=0 ;
+        }
+
+        /* Parse line */
+        lineStatus = iniparser_line(line, section, key, val);
+
+        /* Call provided callback function */
+        lineback(lineStatus, line, section, key, val);
+
+        memset(line, 0, ASCIILINESZ);
+        memset(section, 0, ASCIILINESZ);
+        memset(key, 0, ASCIILINESZ);
+        memset(val, 0, ASCIILINESZ);
+
+        last=0;
+    }
+
+    fclose(in);
+    return 0 ;
 }
 
 /*-------------------------------------------------------------------------*/

@@ -31,6 +31,18 @@
 extern "C" {
 #endif
 
+/**
+ * This enum stores the status for each parsed line (internal use only).
+ */
+typedef enum _line_status_ {
+    LINE_UNPROCESSED,
+    LINE_ERROR,
+    LINE_EMPTY,
+    LINE_COMMENT,
+    LINE_SECTION,
+    LINE_VALUE
+} line_status ;
+
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Configure a function to receive the error messages.
@@ -337,6 +349,20 @@ int iniparser_find_entry(const dictionary * ini, const char * entry) ;
  */
 /*--------------------------------------------------------------------------*/
 dictionary * iniparser_load(const char * ininame);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Parse an ini file line by line.
+  @param    ininame Name of the ini file to read.
+  @param    lineback Function to call for each line
+  @return   integer
+
+  This is the line by line parser for ini files. This function is called,
+  providing the name of the file to be read and the callback function for
+  each parsed line to be called.
+ */
+/*--------------------------------------------------------------------------*/
+int iniparser_parse(const char * ininame, int (*lineback)(line_status lineStatus, const char * line, const char * section, const char * key, const char * val));
 
 /*-------------------------------------------------------------------------*/
 /**
