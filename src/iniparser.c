@@ -651,7 +651,7 @@ static line_status iniparser_line(
         /* Comment line */
         sta = LINE_COMMENT ;
     } else if (line[0]=='[' && line[len-1]==']') {
-        /* Section name */
+        /* Section name, no comments allowed */
         sscanf(line, "[%[^]]", section);
         strstrip(section);
         strlwc(section, section, len);
@@ -817,6 +817,135 @@ dictionary * iniparser_load(const char * ininame)
     }
     fclose(in);
     return dict ;
+}
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Parse an ini file and superimpose its records to the already
+	     allocated dictionary object
+  @param    ininame Name of the ini file to read.
+  @param    Pointer to dictionary to overlay. If NULL, will be created.
+  @return   Pointer to resulting dictionary.
+
+  This is the same as iniparser_load(), but dictionary object already exists.
+  It returns a dictionary object either created or the same as the second
+  parameter.
+
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_impose(const char * ininame, dictionary * overlay)
+{
+    FILE * in ;
+
+    char line    [ASCIILINESZ+1] ;
+    char section [ASCIILINESZ+1] ;
+    char key     [ASCIILINESZ+1] ;
+    char tmp     [(ASCIILINESZ * 2) + 2] ;
+    char val     [ASCIILINESZ+1] ;
+
+    int  last=0 ;
+    int  len ;
+    int  lineno=0 ;
+    int  errs=0;
+    int  mem_err=0;
+    int  new = 0;
+
+    if ((in=fopen(ininame, "r"))==NULL) {
+        iniparser_error_callback("iniparser: cannot open %s\n", ininame);
+        return overlay ;
+    }
+
+    if (overlay == NULL) {
+     overlay = dictionary_new(0) ;
+     if (!overlay) {
+        fclose(in);
+        return NULL ;
+     }
+     new = 1 ; /* New dictionary created */
+    }
+
+    memset(line,    0, ASCIILINESZ);
+    memset(section, 0, ASCIILINESZ);
+    memset(key,     0, ASCIILINESZ);
+    memset(val,     0, ASCIILINESZ);
+    last=0 ;
+
+    while (fgets(line+last, ASCIILINESZ-last, in)!=NULL) {
+        lineno++ ;
+        len = (int)strlen(line)-1;
+        if (len<=0)
+            continue;
+        /* Safety check against buffer overflows */
+        if (line[len]!='\n' && !feof(in)) {
+            iniparser_error_callback(
+              "iniparser: input line too long in %s (%d)\n",
+              ininame,
+              lineno);
+            fclose(in);
+            if (new) {
+              dictionary_del(overlay);
+              return NULL ;
+            /* remove dictionary if it was created here */
+            } else {
+              return overlay ;
+            }
+        }
+        /* Get rid of \n and spaces at end of line */
+        while ((len>=0) &&
+                ((line[len]=='\n') || (isspace(line[len])))) {
+            line[len]=0 ;
+            len-- ;
+        }
+        if (len < 0) { /* Line was entirely \n and/or spaces */
+            len = 0;
+        }
+        /* Detect multi-line */
+        if (line[len]=='\\') {
+            /* Multi-line value */
+            last=len ;
+            continue ;
+        } else {
+            last=0 ;
+        }
+        switch (iniparser_line(line, section, key, val)) {
+            case LINE_EMPTY:
+            case LINE_COMMENT:
+            break ;
+
+            case LINE_SECTION:
+            mem_err = dictionary_set(overlay, section, NULL);
+            break ;
+
+            case LINE_VALUE:
+            sprintf(tmp, "%s:%s", section, key);
+            mem_err = dictionary_set(overlay, tmp, val);
+            break ;
+
+            case LINE_ERROR:
+            iniparser_error_callback(
+              "iniparser: syntax error in %s (%d):\n-> %s\n",
+              ininame,
+              lineno,
+              line);
+            errs++ ;
+            break;
+
+            default:
+            break ;
+        }
+        memset(line, 0, ASCIILINESZ);
+        last=0;
+        if (mem_err<0) {
+            iniparser_error_callback("iniparser: memory allocation failure\n");
+            break ;
+        }
+    }
+    if (errs && new) {
+        dictionary_del(overlay);
+        overlay = NULL ;
+    }
+    fclose(in);
+    return overlay ;
 }
 
 /*-------------------------------------------------------------------------*/
