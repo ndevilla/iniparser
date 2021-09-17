@@ -109,8 +109,8 @@ static int dictionary_grow(dictionary * d)
   @param    key     Character string to use for key.
   @return   1 unsigned int on at least 32 bits.
 
-  This hash function has been taken from an Article in Dr Dobbs Journal.
-  This is normally a collision-free function, distributing keys evenly.
+  This is Bob Jenkins's "one_at_a_time" hash function
+  It's normally a collision-free function, distributing keys evenly.
   The key is stored anyway in the struct so that collision can be avoided
   by comparing the key itself in last resort.
  */
@@ -269,8 +269,10 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
             if (hash==d->hash[i]) { /* Same hash value */
                 if (!strcmp(key, d->key[i])) {   /* Same key */
                     /* Found a value: modify and return */
-                    if (d->val[i]!=NULL)
-                        free(d->val[i]);
+                    if (d->val[i]!=NULL) {
+			free(d->val[i]);
+                    } else if(val == NULL) return 0;
+                        /* Do not modify section */
                     d->val[i] = (val ? xstrdup(val) : NULL);
                     /* Value has been modified: return */
                     return 0 ;
