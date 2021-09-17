@@ -340,6 +340,22 @@ dictionary * iniparser_load(const char * ininame);
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Parse an ini file and superimpose its records to the already
+	     allocated dictionary object
+  @param    ininame Name of the ini file to read.
+  @param    Pointer to dictionary. If NULL, dictionary will be created.
+  @return   Pointer to resulting dictionary.
+
+  This is the same as iniparser_load(), but dictionary object already exists.
+  It returns a dictionary object either created or the same as the second
+  parameter.
+
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_impose(const char * ininame, dictionary * overlay);
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Free all memory associated to an ini dictionary
   @param    d Dictionary to free
   @return   void
