@@ -96,7 +96,7 @@ void Test_iniparser_strstrip(CuTest *tc)
     };
     const char *test_with_spaces = "I am a test with\tspaces.";
     char stripped[ASCIILINESZ+1];
-    char error_msg[128];
+    char error_msg[1060];
     unsigned i;
 
     /* NULL ptr as input */
@@ -595,7 +595,7 @@ void Test_iniparser_load(CuTest *tc)
     struct dirent *curr;
     struct stat curr_stat;
     dictionary *dic;
-    char ini_path[256];
+    char ini_path[276];
 
     /* Dummy tests */
     dic = iniparser_load("/you/shall/not/path");
