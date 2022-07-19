@@ -421,7 +421,7 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
 
     lc_key = strlwc(key, tmp_str, sizeof(tmp_str));
     sval = dictionary_get(d, lc_key, def);
-    return sval ;
+    return sval ? sval : def ;
 }
 
 /*-------------------------------------------------------------------------*/
