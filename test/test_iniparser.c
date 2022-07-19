@@ -645,13 +645,13 @@ void Test_dictionary_wrapper(CuTest *tc)
     CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
     /* reset the key's value*/
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
-    CuAssertStrEquals(tc, "dummy", iniparser_getstring(dic, "section:key", "dummy"));
+    CuAssertStrEquals(tc, "(null)", iniparser_getstring(dic, "section:key", "dummy"));
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", "value"));
     CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
 
     iniparser_unset(dic, "section:key");
     CuAssertStrEquals(tc, "dummy", iniparser_getstring(dic, "section:key", "dummy"));
-    CuAssertStrEquals(tc, "dummy", iniparser_getstring(dic, "section", "dummy"));
+    CuAssertStrEquals(tc, "(null)", iniparser_getstring(dic, "section", "dummy"));
 
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key1", NULL));
