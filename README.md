@@ -1,12 +1,3 @@
-[![Build Status](https://travis-ci.org/ndevilla/iniparser.svg?branch=master)](https://travis-ci.org/ndevilla/iniparser)
-
-# Iniparser 4 #
-
-*Sept 2023: We are looking for volunteers to help us maintain this library!*
-
-Maintaining open-source projects takes time we cannot always easily find. If you feel up to the task and already know this library well, please get in touch by email (ndevilla AT gmail) and let's figure it out!
-
-
 ## I - Overview
 
 This modules offers parsing of ini files from the C level.
