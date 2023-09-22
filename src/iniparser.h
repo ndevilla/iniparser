@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 /*
  * The following #include is necessary on many Unixes but not Linux.
@@ -294,6 +295,8 @@ int iniparser_getboolean(const dictionary * d, const char * key, int notfound);
  */
 /*--------------------------------------------------------------------------*/
 int iniparser_set(dictionary * ini, const char * entry, const char * val);
+
+int iniparser_chk_set(dictionary * ini, const char * entry, const char * val);
 
 
 /*-------------------------------------------------------------------------*/

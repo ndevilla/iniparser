@@ -9,6 +9,7 @@
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -602,6 +603,141 @@ int iniparser_set(dictionary * ini, const char * entry, const char * val)
 {
     char tmp_str[ASCIILINESZ+1];
     return dictionary_set(ini, strlwc(entry, tmp_str, sizeof(tmp_str)), val) ;
+}
+
+static bool iniparser_is_displayed_ascii_str(const char * str)
+{
+    unsigned int index_str = 0;
+    bool valid = true;
+
+    for (index_str = 0; index_str < strlen(str); index_str++)
+    {
+        if (str[index_str] < 32 || str[index_str] > 126)
+        {
+            valid = false;
+            break;
+        }
+    }
+
+    return valid;
+}
+
+/* Reserved characters are '[',  ']',  '=' */
+static bool iniparser_has_revd_char(const char *str)
+{
+    bool has_any = false;
+    unsigned int index_str = 0;
+
+    for (index_str = 0; index_str < strlen(str); index_str++)
+    {
+        if (str[index_str] == '[' || str[index_str] == ']' || str[index_str] == '=')
+        {
+            has_any = true;
+            break;
+        }
+    }
+
+    return has_any;
+}
+
+static bool iniparser_is_valid_entry(const char *str)
+{
+    bool valid = true;
+    char tmp_str1[ASCIILINESZ + 1];
+    char tmp_str2[ASCIILINESZ + 1];
+    unsigned int cnt_colon = 0;
+    unsigned int index = 0;
+
+    do
+    {
+        if (!iniparser_is_displayed_ascii_str(str) ||
+            iniparser_has_revd_char(str) ||
+            strlen(str) == 0)
+        {
+            valid = false;
+            break;
+        }
+
+        /* Count the number of colon */
+        for (index = 0; index < strlen(str); index++)
+        {
+            if (str[index] == ':')
+                cnt_colon++;
+        }
+
+        if (cnt_colon == 0)
+        {
+            /* Valid, do nothing at the moment */
+        }
+        else if (cnt_colon == 1)
+        {
+            sscanf(str, "%[^:]:%s", tmp_str1, tmp_str2);
+            if (strlen(tmp_str1) == 0 || strlen(tmp_str2) == 0)
+            {
+                valid = false;
+                break;
+            }
+        }
+        else /* cnt_colon > 1 */
+        {
+            valid = false;
+            break;
+        }
+    } while(0);
+        
+    return valid;
+}
+
+static bool iniparser_is_valid_val(const char *str)
+{
+    bool valid = true;
+    
+    do
+    {
+        if (str == NULL)    /* NULL is valid for value pointer */
+        {
+            break; 
+        }
+        
+        if (iniparser_has_revd_char(str))
+        {
+            valid = false;
+            break;
+        }
+        
+    } while (0);
+
+    return valid;
+}
+
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Set an entry in a dictionary.
+  @param    ini     Dictionary to modify.
+
+  If the given entry can be found in the dictionary, it is modified to
+  contain the provided value. If it cannot be found, the entry is created.
+  It is Ok to set val to NULL.
+ */
+/*--------------------------------------------------------------------------*/
+int iniparser_chk_set(dictionary * ini, const char * entry, const char * val)
+{
+    char tmp_str[ASCIILINESZ+1];
+    int result = -1;
+
+    if (entry == NULL || 
+        !iniparser_is_valid_entry(entry) ||
+        !iniparser_is_valid_val(val))
+    {
+        /* Keep result as -1 */
+    }
+    else
+    {
+        result = dictionary_set(ini, strlwc(entry, tmp_str, sizeof(tmp_str)), val);
+    }
+
+    return result;
 }
 
 /*-------------------------------------------------------------------------*/
