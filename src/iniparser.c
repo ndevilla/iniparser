@@ -460,6 +460,16 @@ long int iniparser_getlongint(const dictionary * d, const char * key, long int n
     return strtol(str, NULL, 0);
 }
 
+long long int iniparser_getlonglongint(const dictionary * d, const char * key, long long int notfound)
+{
+    const char * str ;
+
+    str = iniparser_getstring(d, key, INI_INVALID_KEY);
+    if (str==NULL || str==INI_INVALID_KEY) return notfound ;
+    return strtoll(str, NULL, 0);
+}
+
+
 
 /*-------------------------------------------------------------------------*/
 /**
