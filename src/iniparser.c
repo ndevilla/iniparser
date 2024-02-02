@@ -470,6 +470,15 @@ int64_t iniparser_getint64(const dictionary * d, const char * key, int64_t notfo
     return strtoimax(str, NULL, 0);
 }
 
+uint64_t iniparser_getuint64(const dictionary * d, const char * key, uint64_t notfound)
+{
+    const char * str ;
+
+    str = iniparser_getstring(d, key, INI_INVALID_KEY);
+    if (str==NULL || str==INI_INVALID_KEY) return notfound ;
+    return strtoumax(str, NULL, 0);
+}
+
 
 
 /*-------------------------------------------------------------------------*/
