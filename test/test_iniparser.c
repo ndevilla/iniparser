@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "CuTest.h"
 #include "dictionary.h"
@@ -15,6 +16,8 @@
 #define GOOD_INI_PATH "ressources/good_ini"
 #define BAD_INI_PATH "ressources/bad_ini"
 
+#define stringify_2(x...)     #x
+#define stringify(x...)       stringify_2(x)
 
 /* Tool function to create and populate a generic non-empty dictionary */
 static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_section)
@@ -350,8 +353,8 @@ void Test_iniparser_getlongint(CuTest *tc)
         { 1000, "1000" },
         { 077, "077" },
         { -01000, "-01000" },
-        { 0x7FFFFFFFFFFFFFFF, "0x7FFFFFFFFFFFFFFF" },
-        { -0x7FFFFFFFFFFFFFFF, "-0x7FFFFFFFFFFFFFFF" },
+        { LONG_MAX, stringify(LONG_MAX) },
+        { -LONG_MAX, stringify(-LONG_MAX) },
         { 0x4242, "0x4242" },
         { 0, NULL} /* must be last */
     };
@@ -370,8 +373,8 @@ void Test_iniparser_getlongint(CuTest *tc)
     /* Check the def return element */
     dic = dictionary_new(10);
     CuAssertLongIntEquals(tc, 42, iniparser_getlongint(dic, "dummy", 42));
-    CuAssertLongIntEquals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, NULL, 0x7FFFFFFFFFFFFFFF));
-    CuAssertLongIntEquals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
+    CuAssertLongIntEquals(tc, LONG_MAX, iniparser_getlongint(dic, NULL, LONG_MAX));
+    CuAssertLongIntEquals(tc, -LONG_MAX, iniparser_getlongint(dic, "dummy", -LONG_MAX));
     dictionary_del(dic);
 
     /* Generic dictionary */
