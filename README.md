@@ -2,6 +2,10 @@
 
 # Iniparser 4 #
 
+*Sept 2023: We are looking for volunteers to help us maintain this library!*
+
+Maintaining open-source projects takes time we cannot always easily find. If you feel up to the task and already know this library well, please get in touch by email (ndevilla AT gmail) and let's figure it out!
+
 
 ## I - Overview
 
@@ -23,7 +27,8 @@ A simple `make` at the root of the project should be enough to get the static
 
 You should consider trying the following rules too :
 
- - `make check` : run the unit tests
+
+ - `make check` : run unit tests
  - `make example` : compile the example, run it with `./example/iniexample`
 
 ## III - License
@@ -35,7 +40,6 @@ See LICENSE for more details
 
 Current version is 4.1. Version 4.0 introduces breaking changes in the api.
 Older versions 3.1 and 3.2 with the legacy api are available as tags.
-
 
 ## V - FAQ
 

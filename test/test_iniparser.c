@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include "CuTest.h"
 #include "dictionary.h"
@@ -15,6 +16,8 @@
 #define GOOD_INI_PATH "ressources/good_ini"
 #define BAD_INI_PATH "ressources/bad_ini"
 
+#define stringify_2(x)     #x
+#define stringify(x)       stringify_2(x)
 
 /* Tool function to create and populate a generic non-empty dictionary */
 static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_section)
@@ -96,7 +99,7 @@ void Test_iniparser_strstrip(CuTest *tc)
     };
     const char *test_with_spaces = "I am a test with\tspaces.";
     char stripped[ASCIILINESZ+1];
-    char error_msg[128];
+    char error_msg[1060];
     unsigned i;
 
     /* NULL ptr as input */
@@ -350,8 +353,8 @@ void Test_iniparser_getlongint(CuTest *tc)
         { 1000, "1000" },
         { 077, "077" },
         { -01000, "-01000" },
-        { 0x7FFFFFFFFFFFFFFF, "0x7FFFFFFFFFFFFFFF" },
-        { -0x7FFFFFFFFFFFFFFF, "-0x7FFFFFFFFFFFFFFF" },
+        { LONG_MAX, stringify(LONG_MAX) },
+        { -LONG_MAX, stringify(-LONG_MAX) },
         { 0x4242, "0x4242" },
         { 0, NULL} /* must be last */
     };
@@ -370,8 +373,8 @@ void Test_iniparser_getlongint(CuTest *tc)
     /* Check the def return element */
     dic = dictionary_new(10);
     CuAssertLongIntEquals(tc, 42, iniparser_getlongint(dic, "dummy", 42));
-    CuAssertLongIntEquals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, NULL, 0x7FFFFFFFFFFFFFFF));
-    CuAssertLongIntEquals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getlongint(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
+    CuAssertLongIntEquals(tc, LONG_MAX, iniparser_getlongint(dic, NULL, LONG_MAX));
+    CuAssertLongIntEquals(tc, -LONG_MAX, iniparser_getlongint(dic, "dummy", -LONG_MAX));
     dictionary_del(dic);
 
     /* Generic dictionary */
@@ -397,6 +400,132 @@ void Test_iniparser_getlongint(CuTest *tc)
         sprintf(key_name, "longint:bad%d", i);
         CuAssertLongIntEquals(tc, 0,
                           iniparser_getlongint(dic, key_name, 0));
+    }
+    dictionary_del(dic);
+}
+
+void Test_iniparser_getint64(CuTest *tc)
+{
+    unsigned i;
+    char key_name[64];
+    dictionary *dic;
+    const struct { int64_t num; const char *value; } good_val[] = {
+        { 0, "0" },
+        { 1, "1" },
+        { -1, "-1" },
+        { 1000, "1000" },
+        { 077, "077" },
+        { -01000, "-01000" },
+        { 0x7FFFFFFFFFFFFFFF, "0x7FFFFFFFFFFFFFFF" },
+        { -0x7FFFFFFFFFFFFFFF, "-0x7FFFFFFFFFFFFFFF" },
+        { 0x4242, "0x4242" },
+        { 0, NULL} /* must be last */
+    };
+    const char *bad_val[] = {
+        "",
+        "notanumber",
+        "0x",
+        "k2000",
+        " ",
+        "0xG1"
+    };
+    /* NULL test */
+    CuAssertInt64Equals(tc, -42, iniparser_getint64(NULL, NULL, -42));
+    CuAssertInt64Equals(tc, -42, iniparser_getint64(NULL, "dummy", -42));
+
+    /* Check the def return element */
+    dic = dictionary_new(10);
+    CuAssertInt64Equals(tc, 42, iniparser_getint64(dic, "dummy", 42));
+    CuAssertInt64Equals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getint64(dic, NULL, 0x7FFFFFFFFFFFFFFF));
+    CuAssertInt64Equals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getint64(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
+    dictionary_del(dic);
+
+    /* Generic dictionary */
+    dic = dictionary_new(10);
+    for (i = 0; good_val[i].value != NULL; ++i) {
+        sprintf(key_name, "longint:value%d", i);
+        dictionary_set(dic, key_name, good_val[i].value);
+    }
+    for (i = 0; good_val[i].value != NULL; ++i) {
+        sprintf(key_name, "longint:value%d", i);
+        CuAssertInt64Equals(tc, good_val[i].num,
+                          iniparser_getint64(dic, key_name, 0));
+    }
+    dictionary_del(dic);
+
+    /* Test bad names */
+    dic = dictionary_new(10);
+    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+        sprintf(key_name, "longint:bad%d", i);
+        dictionary_set(dic, key_name, bad_val[i]);
+    }
+    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+        sprintf(key_name, "longint:bad%d", i);
+        CuAssertInt64Equals(tc, 0,
+                          iniparser_getint64(dic, key_name, 0));
+    }
+    dictionary_del(dic);
+}
+
+void Test_iniparser_getuint64(CuTest *tc)
+{
+    unsigned i;
+    char key_name[64];
+    dictionary *dic;
+    const struct { uint64_t num; const char *value; } good_val[] = {
+        { 0, "0" },
+        { 1, "1" },
+        { -1, "-1" },
+        { 1000, "1000" },
+        { 077, "077" },
+        { -01000, "-01000" },
+        { 0xFFFFFFFFFFFFFFFF, "0xFFFFFFFFFFFFFFFF" },
+        { -0xFFFFFFFFFFFFFFFF, "-0xFFFFFFFFFFFFFFFF" },
+        { 0x4242, "0x4242" },
+        { 0, NULL} /* must be last */
+    };
+    const char *bad_val[] = {
+        "",
+        "notanumber",
+        "0x",
+        "k2000",
+        " ",
+        "0xG1"
+    };
+    /* NULL test */
+    CuAssertUInt64Equals(tc, -42, iniparser_getuint64(NULL, NULL, -42));
+    CuAssertUInt64Equals(tc, -42, iniparser_getuint64(NULL, "dummy", -42));
+
+    /* Check the def return element */
+    dic = dictionary_new(10);
+    CuAssertUInt64Equals(tc, 42, iniparser_getuint64(dic, "dummy", 42));
+    CuAssertUInt64Equals(tc, 0xFFFFFFFFFFFFFFFF, iniparser_getuint64(dic, NULL, 0xFFFFFFFFFFFFFFFF));
+    CuAssertUInt64Equals(tc, -0xFFFFFFFFFFFFFFFF, iniparser_getuint64(dic, "dummy", -0xFFFFFFFFFFFFFFFF));
+    dictionary_del(dic);
+
+    /* Generic dictionary */
+    dic = dictionary_new(10);
+    for (i = 0; good_val[i].value != NULL; ++i) {
+        sprintf(key_name, "longint:value%d", i);
+        dictionary_set(dic, key_name, good_val[i].value);
+    }
+    for (i = 0; good_val[i].value != NULL; ++i) {
+        sprintf(key_name, "longint:value%d", i);
+        CuAssertUInt64Equals(tc, good_val[i].num,
+                          iniparser_getuint64(dic, key_name, 0));
+    }
+    dictionary_del(dic);
+
+    /* Test bad names */
+    dic = dictionary_new(10);
+    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+        sprintf(key_name, "longint:bad%d", i);
+        dictionary_set(dic, key_name, bad_val[i]);
+    }
+    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+        sprintf(key_name, "longint:bad%d", i);
+        CuAssertUInt64Equals(tc, 0,
+                          iniparser_getuint64(dic, key_name, 0));
     }
     dictionary_del(dic);
 }
@@ -595,7 +724,7 @@ void Test_iniparser_load(CuTest *tc)
     struct dirent *curr;
     struct stat curr_stat;
     dictionary *dic;
-    char ini_path[256];
+    char ini_path[276];
 
     /* Dummy tests */
     dic = iniparser_load("/you/shall/not/path");
