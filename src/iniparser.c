@@ -9,6 +9,7 @@
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
 #include <stdarg.h>
+#include <inttypes.h>
 #include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
@@ -460,13 +461,13 @@ long int iniparser_getlongint(const dictionary * d, const char * key, long int n
     return strtol(str, NULL, 0);
 }
 
-long long int iniparser_getlonglongint(const dictionary * d, const char * key, long long int notfound)
+int64_t iniparser_getint64(const dictionary * d, const char * key, int64_t notfound)
 {
     const char * str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==NULL || str==INI_INVALID_KEY) return notfound ;
-    return strtoll(str, NULL, 0);
+    return strtoimax(str, NULL, 0);
 }
 
 

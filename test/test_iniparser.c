@@ -343,7 +343,7 @@ void Test_iniparser_getlongint(CuTest *tc)
     unsigned i;
     char key_name[64];
     dictionary *dic;
-    const struct { long long int num; const char *value; } good_val[] = {
+    const struct { int64_t num; const char *value; } good_val[] = {
         { 0, "0" },
         { 1, "1" },
         { -1, "-1" },
@@ -364,14 +364,14 @@ void Test_iniparser_getlongint(CuTest *tc)
         "0xG1"
     };
     /* NULL test */
-    CuAssertLongIntEquals(tc, -42, iniparser_getlonglongint(NULL, NULL, -42));
-    CuAssertLongIntEquals(tc, -42, iniparser_getlonglongint(NULL, "dummy", -42));
+    CuAssertLongIntEquals(tc, -42, iniparser_getint64(NULL, NULL, -42));
+    CuAssertLongIntEquals(tc, -42, iniparser_getint64(NULL, "dummy", -42));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertLongIntEquals(tc, 42, iniparser_getlonglongint(dic, "dummy", 42));
-    CuAssertLongIntEquals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getlonglongint(dic, NULL, 0x7FFFFFFFFFFFFFFF));
-    CuAssertLongIntEquals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getlonglongint(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
+    CuAssertLongIntEquals(tc, 42, iniparser_getint64(dic, "dummy", 42));
+    CuAssertLongIntEquals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getint64(dic, NULL, 0x7FFFFFFFFFFFFFFF));
+    CuAssertLongIntEquals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getint64(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
     dictionary_del(dic);
 
     /* Generic dictionary */
@@ -383,7 +383,7 @@ void Test_iniparser_getlongint(CuTest *tc)
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         CuAssertLongIntEquals(tc, good_val[i].num,
-                          iniparser_getlonglongint(dic, key_name, 0));
+                          iniparser_getint64(dic, key_name, 0));
     }
     dictionary_del(dic);
 
@@ -396,7 +396,7 @@ void Test_iniparser_getlongint(CuTest *tc)
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
         CuAssertLongIntEquals(tc, 0,
-                          iniparser_getlonglongint(dic, key_name, 0));
+                          iniparser_getint64(dic, key_name, 0));
     }
     dictionary_del(dic);
 }
