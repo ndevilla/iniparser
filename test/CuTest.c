@@ -225,6 +225,13 @@ void CuAssertInt64Equals_LineMsg(CuTest *tc, const char *file, int line, const c
 {
 	char buf[STRING_MAX];
 	if (expected == actual) return;
+	/* This should be:
+	 *
+	 * sprintf(buf, "expected <%"PRIi64"> but was <%"PRIi64">", expected, actual);
+	 *
+	 * But ANSI does not allow %lld and thus on 32bit platforms this would
+	 * fail to compile
+	 */
 	sprintf(buf, "expected <%ld> but was <%ld>", (long)expected, (long)actual);
 	CuFail_Line(tc, file, line, message, buf);
 }
