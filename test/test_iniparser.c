@@ -16,8 +16,8 @@
 #define GOOD_INI_PATH "ressources/good_ini"
 #define BAD_INI_PATH "ressources/bad_ini"
 
-#define stringify_2(x...)     #x
-#define stringify(x...)       stringify_2(x)
+#define stringify_2(x)     #x
+#define stringify(x)       stringify_2(x)
 
 /* Tool function to create and populate a generic non-empty dictionary */
 static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_section)
