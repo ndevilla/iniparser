@@ -584,7 +584,7 @@ void Test_iniparser_getboolean(CuTest *tc)
         "T",
         "yes",
         "y",
-        "YES"
+        "YES",
         "Y",
         NULL
     };
