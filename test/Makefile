@@ -18,6 +18,7 @@ all: check
 
 check: testrun
 	@./testrun
+	@ ! command -v valgrind || valgrind --error-exitcode=1 --track-origins=yes --leak-check=full ./testrun
 
 testrun: AllTests.o $(OBJ)
 	$(QUIET_CC)$(CC) -o $@ AllTests.o $(OBJ) $(LDFLAGS)
