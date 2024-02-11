@@ -31,6 +31,8 @@ You should consider trying the following rules too :
  - `make check` : run unit tests
  - `make example` : compile the example, run it with `./example/iniexample`
 
+For installation and packaging see [iniparser-meta](https://gitlab.com/iniparser/iniparser-meta).
+
 ## III - License
 
 This software is released under MIT License.
