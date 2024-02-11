@@ -53,6 +53,7 @@ void Test_dictionary_grow(CuTest *tc)
         CuAssertIntEquals(tc, 0, dic->n);
         CuAssertIntEquals(tc, (1 << i) * DICTMINSZ, dic->size);
     }
+    dictionary_del(dic);
 }
 
 void Test_dictionary_hash(CuTest *tc)
