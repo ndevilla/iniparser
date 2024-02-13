@@ -20,14 +20,8 @@
 #include <string.h>
 #include <unistd.h>
 
-/** Maximum value size for integers and doubles. */
-#define MAXVALSZ    1024
-
 /** Minimal allocated number of entries in a dictionary */
 #define DICTMINSZ   128
-
-/** Invalid key token */
-#define DICT_INVALID_KEY    ((char*)-1)
 
 /*---------------------------------------------------------------------------
                             Private functions
