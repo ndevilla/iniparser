@@ -19,9 +19,6 @@
  ---------------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,8 +40,8 @@ extern "C" {
  */
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
-    int             n ;     /** Number of entries in dictionary */
-    ssize_t         size ;  /** Storage size */
+    unsigned        n ;     /** Number of entries in dictionary */
+    size_t          size ;  /** Storage size */
     char        **  val ;   /** List of string values */
     char        **  key ;   /** List of string keys */
     unsigned     *  hash ;  /** List of hash values for keys */
