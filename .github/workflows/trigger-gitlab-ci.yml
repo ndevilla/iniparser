@@ -5,7 +5,9 @@ on: [push]
 
 jobs:
   trigger-gitlab-ci:
-      runs-on: ubuntu-latest
-      steps:
-          - name: Trigger CI
-            run: curl -X POST --fail -F token=${{ secrets.trigger_gitlab_ci }} -F ref=main https://gitlab.com/api/v4/projects/54782732/trigger/pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger CI
+        env:
+          TRIGGER_GITLAB_CI: ${{ secrets.trigger_gitlab_ci }}
+        run: curl -X POST --fail -F token=${{ TRIGGER_GITLAB_CI }} -F ref=main https://gitlab.com/api/v4/projects/54782732/trigger/pipeline
