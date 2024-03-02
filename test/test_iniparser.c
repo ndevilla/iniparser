@@ -14,10 +14,10 @@
 
 #define GOOD_INI_PATH "ressources/good_ini"
 #define BAD_INI_PATH "ressources/bad_ini"
-#define INI_PATH "ressources/old.ini"
-#define INI_PATH_1 "ressources/new.ini"
-#define INI_PATH_2 "ressources/test.ini"
-#define INI_PATH_3 "ressources/test.txt"
+#define OLD_INI_PATH "ressources/old.ini"
+#define NEW_INI_PATH "ressources/new.ini"
+#define TEST_INI_PATH "ressources/test.ini"
+#define TEST_TXT_PATH "ressources/test.txt"
 
 #define stringify_2(x)     #x
 #define stringify(x)       stringify_2(x)
@@ -836,7 +836,7 @@ void Test_iniparser_dump(CuTest *tc)
     char buff[255];
 
     /*loading old.ini*/
-    dic = iniparser_load(INI_PATH);
+    dic = iniparser_load(OLD_INI_PATH);
     if(dic ==NULL)
        {
         printf("error: old.ini is not exist");
@@ -846,7 +846,7 @@ void Test_iniparser_dump(CuTest *tc)
     CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
     CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
     /*open test.txt*/
-    fp = fopen(INI_PATH_3,"w");
+    fp = fopen(TEST_TXT_PATH,"w");
     if(fp == NULL)
        {
         printf("error: test.txt is not exist");
@@ -857,7 +857,7 @@ void Test_iniparser_dump(CuTest *tc)
     fclose(fp);
     iniparser_freedict(dic);
     /*read the data of test.txt*/
-    fp = fopen(INI_PATH_3,"r");
+    fp = fopen(TEST_TXT_PATH,"r");
     if(fp == NULL)
        {
         printf("error: test.txt is not exist");
@@ -891,7 +891,7 @@ void Test_iniparser_dump_ini(CuTest *tc)
     FILE *fp = NULL;
 
     /*loading old.ini*/
-    dic = iniparser_load(INI_PATH);
+    dic = iniparser_load(OLD_INI_PATH);
     if(dic ==NULL)
        {
         printf("error: old.ini is not exist");
@@ -901,7 +901,7 @@ void Test_iniparser_dump_ini(CuTest *tc)
     CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
     CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
     /*open new.ini*/
-    fp = fopen(INI_PATH_1,"w");
+    fp = fopen(NEW_INI_PATH,"w");
     if(fp == NULL)
        {
         printf("error: new.ini is not exist");
@@ -912,7 +912,7 @@ void Test_iniparser_dump_ini(CuTest *tc)
     fclose(fp);
     iniparser_freedict(dic);
     /*loading new.ini*/
-    dic = iniparser_load(INI_PATH_1);
+    dic = iniparser_load(NEW_INI_PATH);
     if(dic ==NULL)
        {
         printf("error: new.ini is not exist");
@@ -930,7 +930,7 @@ void Test_iniparser_dumpsection_ini(CuTest *tc)
     FILE *fp = NULL;
 
     /*loading old.ini*/
-    dic = iniparser_load(INI_PATH);
+    dic = iniparser_load(OLD_INI_PATH);
     if(dic ==NULL)
        {
         printf("error: old.ini is not exist");
@@ -940,7 +940,7 @@ void Test_iniparser_dumpsection_ini(CuTest *tc)
     CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
     CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
     /*open test.ini*/
-    fp = fopen(INI_PATH_2,"w");
+    fp = fopen(TEST_INI_PATH,"w");
     if(fp == NULL)
        {
         printf("error: test.ini is not exist");
@@ -951,7 +951,7 @@ void Test_iniparser_dumpsection_ini(CuTest *tc)
     fclose(fp);
     iniparser_freedict(dic);
     /*loading test.ini*/
-    dic = iniparser_load(INI_PATH_2);
+    dic = iniparser_load(TEST_INI_PATH);
     if(dic ==NULL)
        {
         printf("error: test.ini is not exist");
