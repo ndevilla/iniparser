@@ -18,7 +18,7 @@ int write_to_ini(const char *ini_name)
     FILE *ini_file;
     int ret = 0;
 
-    if (!ini_name || !dictionary) {
+    if (!ini_name) {
         fprintf(stderr, "Invalid argurment\n");
         return -1;
     }
