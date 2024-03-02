@@ -6,6 +6,8 @@
 *.so.*
 /example/iniexample
 /example/parse
+/example/iniwrite
+/example/example.ini
 # Autogenerate source file
 /test/AllTests.c
 /test/testrun
