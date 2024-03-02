@@ -12,10 +12,13 @@ RM      ?= rm -f
 
 default: all
 
-all: iniexample parse
+all: iniexample iniwrite parse
 
 iniexample: iniexample.c
 	$(CC) $(CFLAGS) -o iniexample iniexample.c -I../src -L.. -liniparser
+
+iniwrite: iniwrite.c
+	$(CC) $(CFLAGS) -o iniwrite iniwrite.c -I../src -L.. -liniparser
 
 parse: parse.c
 	$(CC) $(CFLAGS) -o parse parse.c -I../src -L.. -liniparser
