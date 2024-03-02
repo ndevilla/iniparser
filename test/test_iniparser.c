@@ -962,3 +962,30 @@ void Test_iniparser_dumpsection_ini(CuTest *tc)
     CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
     iniparser_freedict(dic);
 }
+
+void Test_iniparser_find_entry(CuTest *tc)
+{
+    dictionary *dic;
+    int i;
+    /* NULL test */
+    CuAssertIntEquals(tc, 0, iniparser_find_entry(NULL, NULL));
+    CuAssertIntEquals(tc, 0, iniparser_find_entry(NULL, "dummy"));
+
+    /* Empty dictionary test*/
+    dic = dictionary_new(10);
+    CuAssertPtrNotNull(tc, dic);
+    CuAssertIntEquals(tc, 0, iniparser_find_entry(dic, NULL));
+    CuAssertIntEquals(tc, 0, iniparser_find_entry(dic, "dummy"));
+    dictionary_del(dic);
+
+    /*Regular dictionary */
+    dic = generate_dictionary(1, 8);
+    CuAssertPtrNotNull(tc, dic);
+    for (i = 1; i < 8; i++)
+    {
+        CuAssertIntEquals(tc, 1, iniparser_find_entry(dic, dic->key[i]));
+    }
+    CuAssertIntEquals(tc, 0, iniparser_find_entry(dic, "dummy"));
+
+    iniparser_freedict(dic);
+}
