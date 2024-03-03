@@ -204,6 +204,9 @@ const char * dictionary_get(const dictionary * d, const char * key, const char *
     unsigned    hash ;
     size_t      i ;
 
+    if(d == NULL || key == NULL)
+       return def ;
+
     hash = dictionary_hash(key);
     for (i=0 ; i<d->size ; i++) {
         if (d->key[i]==NULL)
