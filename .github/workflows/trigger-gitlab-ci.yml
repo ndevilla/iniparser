@@ -1,9 +1,10 @@
 name: trigger-gitlab-ci
 run-name: ${{ github.event_name }} triggered by ${{ github.actor }}
 
-on: [push]
-  branches:
-    - master
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   trigger-gitlab-ci:
