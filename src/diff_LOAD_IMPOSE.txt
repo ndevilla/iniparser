@@ -1,0 +1,34 @@
+#diff -bBd load.c impose.c
+
+1c1
+< dictionary * iniparser_load(const char * ininame)
+---
+> dictionary * iniparser_impose(const char * ininame, dictionary * dict)
+16,17c16
+< 
+<     dictionary * dict ;
+---
+>     int  new = 0;
+21c20
+<         return NULL ;
+---
+>         return dict ;
+23a23
+>     if (dict == NULL) {
+28a29,30
+>      new = 1 ; /* New dictionary created */
+>     }
+47d48
+<             dictionary_del(dict);
+48a50,51
+>             if (new) {
+>               dictionary_del(dict);
+49a53,56
+>             /* remove dictionary if it was created here */
+>             } else {
+>               return dict ;
+>             }
+101c108
+<     if (errs) {
+---
+>     if (errs && new) {
