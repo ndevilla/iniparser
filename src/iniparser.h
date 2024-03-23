@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+static const char iniparser_empty_string[] = "";
+
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Configure a function to receive the error messages.

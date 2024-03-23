@@ -33,8 +33,6 @@ typedef enum _line_status_ {
     LINE_VALUE
 } line_status ;
 
-static const char * INI_NULL_STRING = "(null)";
-
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Convert a string to lowercase.
@@ -427,7 +425,7 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
     lc_key = strlwc(key, tmp_str, sizeof(tmp_str));
     sval = dictionary_get(d, lc_key, INI_INVALID_KEY);
     if (sval==INI_INVALID_KEY) return def ;
-    return sval ? sval : INI_NULL_STRING ;
+    return sval ? sval : iniparser_empty_string ;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -462,7 +460,7 @@ long int iniparser_getlongint(const dictionary * d, const char * key, long int n
     const char * str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (str==INI_INVALID_KEY || str==INI_NULL_STRING) return notfound ;
+    if (str==INI_INVALID_KEY || str==iniparser_empty_string) return notfound ;
     return strtol(str, NULL, 0);
 }
 
@@ -536,7 +534,7 @@ double iniparser_getdouble(const dictionary * d, const char * key, double notfou
     const char * str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (str==INI_INVALID_KEY || str==INI_NULL_STRING) return notfound ;
+    if (str==INI_INVALID_KEY || str==iniparser_empty_string) return notfound ;
     return atof(str);
 }
 
@@ -578,7 +576,7 @@ int iniparser_getboolean(const dictionary * d, const char * key, int notfound)
     const char * c ;
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (c==INI_INVALID_KEY || c==INI_NULL_STRING) return notfound ;
+    if (c==INI_INVALID_KEY || c==iniparser_empty_string) return notfound ;
     if (c[0]=='y' || c[0]=='Y' || c[0]=='1' || c[0]=='t' || c[0]=='T') {
         ret = 1 ;
     } else if (c[0]=='n' || c[0]=='N' || c[0]=='0' || c[0]=='f' || c[0]=='F') {

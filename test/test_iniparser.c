@@ -767,6 +767,7 @@ void Test_iniparser_load(CuTest *tc)
 void Test_dictionary_wrapper(CuTest *tc)
 {
     dictionary *dic;
+    const char *actual;
 
     dic = dictionary_new(10);
 
@@ -779,13 +780,17 @@ void Test_dictionary_wrapper(CuTest *tc)
     CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
     /* reset the key's value*/
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
-    CuAssertStrEquals(tc, "(null)", iniparser_getstring(dic, "section:key", "dummy"));
+    actual = iniparser_getstring(dic, "section:key", "dummy");
+    CuAssertStrEquals(tc, "", actual);
+    CuAssertPtrEquals(tc, iniparser_empty_string, actual);
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", "value"));
     CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
 
     iniparser_unset(dic, "section:key");
     CuAssertStrEquals(tc, "dummy", iniparser_getstring(dic, "section:key", "dummy"));
-    CuAssertStrEquals(tc, "(null)", iniparser_getstring(dic, "section", "dummy"));
+    actual = iniparser_getstring(dic, "section", "dummy");
+    CuAssertStrEquals(tc, "", actual);
+    CuAssertPtrEquals(tc, iniparser_empty_string, actual);
 
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
     CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key1", NULL));
