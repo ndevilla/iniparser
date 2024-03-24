@@ -2,9 +2,11 @@
 
 # Iniparser 4 #
 
-*Sept 2023: We are looking for volunteers to help us maintain this library!*
+Changes in March 2024:
+@lmoellendorf is taking over maintenance for this project. The objective is to get all known issues fixed and released as v4.2.
+After that, this project will be frozen here as v4.2 and development should continue as v5, probably on gitlab. Pointers will be updated then.
 
-Maintaining open-source projects takes time we cannot always easily find. If you feel up to the task and already know this library well, please get in touch by email (ndevilla AT gmail) and let's figure it out!
+Thanks a million times to Lars for his tremendous work and help in keeping this library alive!
 
 
 ## I - Overview
