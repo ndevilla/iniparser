@@ -751,7 +751,6 @@ dictionary * iniparser_load_file(FILE * in, const char * ininame)
 
     dict = dictionary_new(0) ;
     if (!dict) {
-        fclose(in);
         return NULL ;
     }
 
@@ -773,7 +772,6 @@ dictionary * iniparser_load_file(FILE * in, const char * ininame)
               ininame,
               lineno);
             dictionary_del(dict);
-            fclose(in);
             return NULL ;
         }
         /* Get rid of \n and spaces at end of line */
@@ -830,7 +828,6 @@ dictionary * iniparser_load_file(FILE * in, const char * ininame)
         dictionary_del(dict);
         dict = NULL ;
     }
-    fclose(in);
     return dict ;
 }
 
@@ -859,6 +856,7 @@ dictionary * iniparser_load(const char * ininame)
     }
 
     dict = iniparser_load_file(in, ininame);
+    fclose(in);
 
     return dict ;
 }
