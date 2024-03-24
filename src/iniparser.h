@@ -389,6 +389,22 @@ dictionary * iniparser_load(const char * ininame);
 
 /*-------------------------------------------------------------------------*/
 /**
+  @brief    Parse an ini file and return an allocated dictionary object
+  @param    ininame File to read.
+  @param    ininame Name of the ini file to read (only used for nicer error messages)
+  @return   Pointer to newly allocated dictionary
+
+  This is the parser for ini files. This function is called, providing
+  the file to be read. It returns a dictionary object that should not 
+  be accessed directly, but through accessor functions instead.
+
+  The returned dictionary must be freed using iniparser_freedict().
+ */
+/*--------------------------------------------------------------------------*/
+dictionary * iniparser_load_file(FILE * in, const char * ininame);
+
+/*-------------------------------------------------------------------------*/
+/**
   @brief    Free all memory associated to an ini dictionary
   @param    d Dictionary to free
   @return   void
