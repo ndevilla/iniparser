@@ -18,16 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-
-/** Maximum value size for integers and doubles. */
-#define MAXVALSZ    1024
 
 /** Minimal allocated number of entries in a dictionary */
 #define DICTMINSZ   128
-
-/** Invalid key token */
-#define DICT_INVALID_KEY    ((char*)-1)
 
 /*---------------------------------------------------------------------------
                             Private functions
@@ -140,7 +133,7 @@ unsigned dictionary_hash(const char * key)
 /**
   @brief    Create a new dictionary object.
   @param    size    Optional initial size of the dictionary.
-  @return   1 newly allocated dictionary objet.
+  @return   1 newly allocated dictionary object.
 
   This function allocates a new dictionary object of given size and returns
   it. If you do not know in advance (roughly) the number of entries in the
@@ -176,7 +169,7 @@ dictionary * dictionary_new(size_t size)
 /*--------------------------------------------------------------------------*/
 void dictionary_del(dictionary * d)
 {
-    ssize_t  i ;
+    size_t  i ;
 
     if (d==NULL) return ;
     for (i=0 ; i<d->size ; i++) {
@@ -209,7 +202,10 @@ void dictionary_del(dictionary * d)
 const char * dictionary_get(const dictionary * d, const char * key, const char * def)
 {
     unsigned    hash ;
-    ssize_t      i ;
+    size_t      i ;
+
+    if(d == NULL || key == NULL)
+       return def ;
 
     hash = dictionary_hash(key);
     for (i=0 ; i<d->size ; i++) {
@@ -254,7 +250,7 @@ const char * dictionary_get(const dictionary * d, const char * key, const char *
 /*--------------------------------------------------------------------------*/
 int dictionary_set(dictionary * d, const char * key, const char * val)
 {
-    ssize_t         i ;
+    size_t         i ;
     unsigned       hash ;
 
     if (d==NULL || key==NULL) return -1 ;
@@ -314,7 +310,7 @@ int dictionary_set(dictionary * d, const char * key, const char * val)
 void dictionary_unset(dictionary * d, const char * key)
 {
     unsigned    hash ;
-    ssize_t      i ;
+    size_t      i ;
 
     if (key == NULL || d == NULL) {
         return;
@@ -362,7 +358,7 @@ void dictionary_unset(dictionary * d, const char * key)
 /*--------------------------------------------------------------------------*/
 void dictionary_dump(const dictionary * d, FILE * out)
 {
-    ssize_t  i ;
+    size_t  i ;
 
     if (d==NULL || out==NULL) return ;
     if (d->n<1) {

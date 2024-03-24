@@ -2,18 +2,22 @@
 
 # Iniparser 4 #
 
+*Sept 2023: We are looking for volunteers to help us maintain this library!*
+
+Maintaining open-source projects takes time we cannot always easily find. If you feel up to the task and already know this library well, please get in touch by email (ndevilla AT gmail) and let's figure it out!
+
 
 ## I - Overview
 
-This modules offers parsing of ini files from the C level.
-See a complete documentation in HTML format, from this directory
-open the file html/index.html with any HTML-capable browser.
+This modules offers parsing of ini files from C.
+See the complete documentation in HTML format: from this directory,
+open the file `html/index.html` with any HTML-capable browser.
 
-Key features :
+Key features:
 
  - Small : around 1500 sloc inside 4 files (2 .c and 2 .h)
  - Portable : no dependancies, written in `-ansi -pedantic` C89
- - Fully reintrant : easy to make it thread-safe (just surround
+ - Fully re-entrant : easy to make it thread-safe (just surround
    library calls by mutex)
 
 ## II - Building project
@@ -23,19 +27,21 @@ A simple `make` at the root of the project should be enough to get the static
 
 You should consider trying the following rules too :
 
- - `make check` : run the unitary tests
+
+ - `make check` : run unit tests
  - `make example` : compile the example, run it with `./example/iniexample`
+
+For installation and packaging see [iniparser-meta](https://gitlab.com/iniparser/iniparser-meta).
 
 ## III - License
 
 This software is released under MIT License.
-See LICENSE for full informations
+See LICENSE for more details
 
 ## IV - Versions
 
 Current version is 4.1. Version 4.0 introduces breaking changes in the api.
 Older versions 3.1 and 3.2 with the legacy api are available as tags.
-
 
 ## V - FAQ
 

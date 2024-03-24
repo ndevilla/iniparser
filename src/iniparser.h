@@ -14,18 +14,8 @@
                                 Includes
  ---------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-/*
- * The following #include is necessary on many Unixes but not Linux.
- * It is not needed for Windows platforms.
- * Uncomment it if needed.
- */
-/* #include <unistd.h> */
-
 #include "dictionary.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -229,6 +219,65 @@ int iniparser_getint(const dictionary * d, const char * key, int notfound);
 /*--------------------------------------------------------------------------*/
 long int iniparser_getlongint(const dictionary * d, const char * key, long int notfound);
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to an int64_t
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value to return in case of error
+  @return   integer
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  the notfound value is returned.
+
+  Supported values for integers include the usual C notation
+  so decimal, octal (starting with 0) and hexadecimal (starting with 0x)
+  are supported. Examples:
+
+  - "42"      ->  42
+  - "042"     ->  34 (octal -> decimal)
+  - "0x42"    ->  66 (hexa  -> decimal)
+
+  Warning: the conversion may overflow in various ways. Conversion is
+  totally outsourced to strtoimax(), see the associated man page for overflow
+  handling.
+
+  This function is usefull on 32bit architectures where `long int` is only
+  32bit.
+ */
+/*--------------------------------------------------------------------------*/
+int64_t iniparser_getint64(const dictionary * d, const char * key, int64_t notfound);
+
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Get the string associated to a key, convert to an uint64_t
+  @param    d Dictionary to search
+  @param    key Key string to look for
+  @param    notfound Value to return in case of error
+  @return   integer
+
+  This function queries a dictionary for a key. A key as read from an
+  ini file is given as "section:key". If the key cannot be found,
+  the notfound value is returned.
+
+  Supported values for integers include the usual C notation
+  so decimal, octal (starting with 0) and hexadecimal (starting with 0x)
+  are supported. Examples:
+
+  - "42"      ->  42
+  - "042"     ->  34 (octal -> decimal)
+  - "0x42"    ->  66 (hexa  -> decimal)
+
+  Warning: the conversion may overflow in various ways. Conversion is
+  totally outsourced to strtoumax(), see the associated man page for overflow
+  handling.
+
+  This function is usefull on 32bit architectures where `long int` is only
+  32bit.
+ */
+/*--------------------------------------------------------------------------*/
+uint64_t iniparser_getuint64(const dictionary * d, const char * key, uint64_t notfound);
 
 /*-------------------------------------------------------------------------*/
 /**
