@@ -7,6 +7,12 @@
 CC      ?= gcc
 
 CFLAGS  += -fPIC -Wall -Wextra -ansi -pedantic
+#Enable more thorough check of parsing overflows and errors.
+#It will check for trailing junk characters in number strings.
+#Whitespace characters are allowed (isspace()), anything else will result
+#in a parsing error.
+CFLAGS  += -DINIPARSER_STRICT_PARSER
+
 ifndef DEBUG
 ADDITIONAL_CFLAGS  ?= -O2
 else

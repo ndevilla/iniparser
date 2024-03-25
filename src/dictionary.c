@@ -152,8 +152,23 @@ dictionary * dictionary_new(size_t size)
     if (d) {
         d->size = size ;
         d->val  = (char**) calloc(size, sizeof *d->val);
+        if(d->val == NULL) {
+        	free(d);
+        	return NULL;
+        }
         d->key  = (char**) calloc(size, sizeof *d->key);
+        if(d->key == NULL) {
+        	free(d->val);
+        	free(d);
+        	return NULL;
+        }
         d->hash = (unsigned*) calloc(size, sizeof *d->hash);
+        if(d->hash == NULL) {
+        	free(d->key);
+        	free(d->val);
+        	free(d);
+        	return NULL;
+        }
     }
     return d ;
 }
