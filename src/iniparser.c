@@ -549,21 +549,19 @@ double iniparser_getdouble(const dictionary * d, const char * key, double notfou
   ini file is given as "section:key". If the key cannot be found,
   the notfound value is returned.
 
-  A true boolean is found if one of the following is matched:
+  A true boolean is found if one of the following is matched (case insensitive):
 
   - A string starting with 'y'
-  - A string starting with 'Y'
   - A string starting with 't'
-  - A string starting with 'T'
   - A string starting with '1'
+  - A string starting with 'on'
 
-  A false boolean is found if one of the following is matched:
+  A false boolean is found if one of the following is matched (case insensitive):
 
   - A string starting with 'n'
-  - A string starting with 'N'
   - A string starting with 'f'
-  - A string starting with 'F'
   - A string starting with '0'
+  - A string starting with 'off'
 
   The notfound value returned if no boolean is identified, does not
   necessarily have to be 0 or 1.
@@ -571,17 +569,29 @@ double iniparser_getdouble(const dictionary * d, const char * key, double notfou
 /*--------------------------------------------------------------------------*/
 int iniparser_getboolean(const dictionary * d, const char * key, int notfound)
 {
-    int          ret ;
+    int          ret = notfound;
     const char * c ;
+    char         ch;
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (c==NULL || c==INI_INVALID_KEY) return notfound ;
-    if (c[0]=='y' || c[0]=='Y' || c[0]=='1' || c[0]=='t' || c[0]=='T') {
+    ch = tolower(c[0]);
+    if (ch=='y' || ch=='t' || ch=='1') {
         ret = 1 ;
-    } else if (c[0]=='n' || c[0]=='N' || c[0]=='0' || c[0]=='f' || c[0]=='F') {
+    } else if (ch=='n' || ch=='f' || ch=='0') {
         ret = 0 ;
     } else {
-        ret = notfound ;
+        /* allow 'on' and 'off' */
+        if (ch=='o') {
+            /* strings are null-terminated so c[1] exists at this point */
+            if (tolower(c[1])=='n') {
+                ret = 1;
+            } else if (strlen(c)>2) {
+                if (tolower(c[1])=='f' && tolower(c[2])=='f') {
+                  ret =0;
+               }
+            }
+        }
     }
     return ret;
 }
