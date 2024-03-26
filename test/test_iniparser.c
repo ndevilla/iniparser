@@ -18,6 +18,8 @@
 #define NEW_INI_PATH "ressources/new.ini"
 #define TEST_INI_PATH "ressources/test.ini"
 #define TEST_TXT_PATH "ressources/test.txt"
+#define GRUEZI_INI_PATH "ressources/gruezi.ini"
+#define UTF8_INI_PATH "ressources/utf8.ini"
 
 #define stringify_2(x)     #x
 #define stringify(x)       stringify_2(x)
@@ -988,4 +990,37 @@ void Test_iniparser_find_entry(CuTest *tc)
     CuAssertIntEquals(tc, 0, iniparser_find_entry(dic, "dummy"));
 
     iniparser_freedict(dic);
+}
+
+void Test_iniparser_utf8(CuTest *tc)
+{
+    dictionary *dic;
+
+    dic = iniparser_load(GRUEZI_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", GRUEZI_INI_PATH);
+        return;
+    }
+
+    /* Generic dictionary */
+    CuAssertStrEquals(tc, "example",
+                      iniparser_getstring(dic, "Chuchichäschtli:10.123", NULL));
+    CuAssertStrEquals(tc, "Grüzi",
+                      iniparser_getstring(dic, "Chuchichäschtli:Gruss", NULL));
+    dictionary_del(dic);
+    dic = iniparser_load(UTF8_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", UTF8_INI_PATH);
+        return;
+    }
+
+    /* Generic dictionary */
+    CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, "拉麺:叉焼", -1));
+    CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, "拉麺:味噌", -1));
+    CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, "拉麺:海苔", -1));
+    CuAssertStrEquals(tc, "そうだね",
+                      iniparser_getstring(dic, "拉麺:メンマ", NULL));
+    dictionary_del(dic);
 }
