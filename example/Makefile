@@ -17,6 +17,9 @@ all: iniexample iniwrite parse
 iniexample: iniexample.c
 	$(CC) $(CFLAGS) -o iniexample iniexample.c -I../src -L.. -liniparser
 
+iniexample: superimposeexample.c
+	$(CC) $(CFLAGS) -o superimposeexample superimposeexample.c -I../src -L.. -liniparser
+
 iniwrite: iniwrite.c
 	$(CC) $(CFLAGS) -o iniwrite iniwrite.c -I../src -L.. -liniparser
 
