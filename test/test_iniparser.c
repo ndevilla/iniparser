@@ -23,9 +23,7 @@
 #define MISFORMED_INI_PATH "ressources/misformed.ini"
 #define MISFORMED_INI_SEC0 "[12345"
 #define MISFORMED_INI_SEC1 "12345]"
-#define MISFORMED_INI_SEC1_ "12345"
 #define MISFORMED_INI_SEC2 "123]45"
-#define MISFORMED_INI_SEC2_ "123"
 #define MISFORMED_INI_ATTR "1111"
 
 #define stringify_2(x)     #x
@@ -1136,24 +1134,8 @@ void Test_iniparser_misformed(CuTest *tc)
         return;
     }
 
-    /*
-     * This test proofs an inconsistency in iniparser_set():
-     *
-     * The section "12345]" (MISFORMED_INI_SEC1) is readable from dictionary
-     * directly after iniparser_set().
-     *
-     * The section is also written to file by iniparser_dump_ini() as
-     * "[12345]]" ("[" MISFOREMD_INI_SEC1 "]").
-     *
-     * But if the file is parsed by iniparser_load() it is read as "12345"
-     * (MISFORMED_INI_SEC).
-     *
-     * The reason is that iniparser_load() considers a section name to be
-     * enclosed by "[" and "]". If it find a line enclosed by square brackets
-     * it takes the characters enclosed by and excluding those brackets
-     */
     CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC1_ ":" MISFORMED_INI_ATTR, -1));
+                      MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1));
     dictionary_del(dic);
     ret = remove(MISFORMED_INI_PATH);
 
@@ -1200,14 +1182,8 @@ void Test_iniparser_misformed(CuTest *tc)
         return;
     }
 
-    /*
-     * This test again proofs the inconsistency in iniparser_set() explained
-     * above.
-     *
-     * This time the section name is "123]45" (MISFORMED_INI_SEC2).
-     */
     CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC2_ ":" MISFORMED_INI_ATTR, -1));
+                      MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1));
 del_dic:
     dictionary_del(dic);
 rm_ini:
