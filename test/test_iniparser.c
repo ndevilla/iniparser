@@ -26,6 +26,9 @@
 #define QUOTES_INI_ATTR0 "string0"
 #define QUOTES_INI_ATTR1 "string1"
 #define QUOTES_INI_ATTR2 "string2"
+#define QUOTES_INI_ATTR3 "string3"
+#define QUOTES_INI_ATTR4 "string4"
+#define QUOTES_INI_ATTR5 "string5"
 #define QUOTES_INI_VAL0 "str\"ing"
 #define QUOTES_INI_VAL1 "str;ing"
 #define QUOTES_INI_VAL2 "str#ing"
@@ -1060,13 +1063,26 @@ void Test_iniparser_quotes(CuTest *tc)
         goto rm_ini;
     }
 
-    /* iniparser_load() does not support escaping quotes in INI files */
+    /*
+     * iniparser_load() does not support escaped quotes in values if they are
+     * quoted
+     */
     CuAssertStrEquals(tc, "str\\", iniparser_getstring(dic,
                       QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    /*
+     * iniparser_load() supports semicolon and hash in values if they are
+     * quoted
+     */
     CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
                       QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
     CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
                       QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
+    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
+    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
     /*
      * test escaping
      */
