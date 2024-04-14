@@ -1055,6 +1055,9 @@ void Test_iniparser_quotes(CuTest *tc)
     FILE *ini;
     int ret;
 
+    /**
+     * Test iniparser_load()
+     */
     /* check if section has been written as expected */
     dic = iniparser_load(QUOTES_INI_PATH);
 
@@ -1084,7 +1087,24 @@ void Test_iniparser_quotes(CuTest *tc)
     CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
                       QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
     /*
-     * test escaping
+     * iniparser_load() supports quotes in attributes
+     */
+    CuAssertStrEquals(tc, "str\\", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str\"ing", NULL));
+    /*
+     * iniparser_load() does not support semicolon or hash in attributes
+     */
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str;ing", NULL));
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str#ing", NULL));
+    /*
+     * iniparser_load() does support colon in attributes
+     */
+    CuAssertStrEquals(tc, "str\\", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str:ing", NULL));
+    /**
+     * test iniparser_set()
      */
     create_empty_ini_file(TMP_INI_PATH);
     dic = iniparser_load(TMP_INI_PATH);
