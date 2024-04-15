@@ -16,6 +16,8 @@
 #define ASCIILINESZ         (1024)
 #define INI_INVALID_KEY     ((char*)-1)
 
+const char iniparser_null_string[] = "(null)";
+
 /*---------------------------------------------------------------------------
                         Private to this module
  ---------------------------------------------------------------------------*/
@@ -30,8 +32,6 @@ typedef enum _line_status_ {
     LINE_SECTION,
     LINE_VALUE
 } line_status ;
-
-static const char * INI_NULL_STRING = "(null)";
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -408,7 +408,8 @@ const char ** iniparser_getseckeys(const dictionary * d, const char * s, const c
 
   This function queries a dictionary for a key. A key as read from an
   ini file is given as "section:key". If the key cannot be found,
-  the pointer passed as 'def' is returned.
+  the pointer passed as 'def' is returned. If value is `NULL`,
+  `iniparser_null_string[] = "(null)"` will be returned instead.
   The returned char pointer is pointing to a string allocated in
   the dictionary, do not free or modify it.
  */
@@ -425,7 +426,7 @@ const char * iniparser_getstring(const dictionary * d, const char * key, const c
     lc_key = strlwc(key, tmp_str, sizeof(tmp_str));
     sval = dictionary_get(d, lc_key, INI_INVALID_KEY);
     if (sval==INI_INVALID_KEY) return def ;
-    return sval ? sval : INI_NULL_STRING ;
+    return sval ? sval : iniparser_null_string ;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -460,7 +461,7 @@ long int iniparser_getlongint(const dictionary * d, const char * key, long int n
     const char * str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (str==INI_INVALID_KEY || str==INI_NULL_STRING) return notfound ;
+    if (str==NULL || str==INI_INVALID_KEY || str==iniparser_null_string) return notfound ;
     return strtol(str, NULL, 0);
 }
 
@@ -469,7 +470,7 @@ int64_t iniparser_getint64(const dictionary * d, const char * key, int64_t notfo
     const char * str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (str==NULL || str==INI_INVALID_KEY) return notfound ;
+    if (str==NULL || str==INI_INVALID_KEY || str==iniparser_null_string) return notfound ;
     return strtoimax(str, NULL, 0);
 }
 
@@ -478,7 +479,7 @@ uint64_t iniparser_getuint64(const dictionary * d, const char * key, uint64_t no
     const char * str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (str==NULL || str==INI_INVALID_KEY) return notfound ;
+    if (str==NULL || str==INI_INVALID_KEY || str==iniparser_null_string) return notfound ;
     return strtoumax(str, NULL, 0);
 }
 
@@ -534,7 +535,7 @@ double iniparser_getdouble(const dictionary * d, const char * key, double notfou
     const char * str ;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (str==INI_INVALID_KEY || str==INI_NULL_STRING) return notfound ;
+    if (str==NULL || str==INI_INVALID_KEY || str==iniparser_null_string) return notfound ;
     return atof(str);
 }
 
@@ -576,7 +577,7 @@ int iniparser_getboolean(const dictionary * d, const char * key, int notfound)
     const char * c ;
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
-    if (c==INI_INVALID_KEY || c==INI_NULL_STRING) return notfound ;
+    if (c==NULL || c==INI_INVALID_KEY || c==iniparser_null_string) return notfound ;
     if (c[0]=='y' || c[0]=='Y' || c[0]=='1' || c[0]=='t' || c[0]=='T') {
         ret = 1 ;
     } else if (c[0]=='n' || c[0]=='N' || c[0]=='0' || c[0]=='f' || c[0]=='F') {
