@@ -247,6 +247,26 @@ void iniparser_dump(const dictionary * d, FILE * f)
     return ;
 }
 
+static void escape_value(char *escaped, char *value) {
+    char c;
+    int v = 0;
+    int e = 0;
+
+    if(!escaped || !value)
+        return;
+
+    while((c = value[v]) != '\0') {
+        if(c == '\\' || c == '"') {
+            escaped[e] = '\\';
+            e++;
+        }
+        escaped[e] = c;
+        v++;
+        e++;
+    }
+    escaped[e] = '\0';
+}
+
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Save a dictionary to a loadable ini file
@@ -263,6 +283,7 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
     size_t       i ;
     size_t       nsec ;
     const char * secname ;
+    char escaped[ASCIILINESZ+1] = "";
 
     if (d==NULL || f==NULL) return ;
 
@@ -272,7 +293,8 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
         for (i=0 ; i<d->size ; i++) {
             if (d->key[i]==NULL)
                 continue ;
-            fprintf(f, "%s = %s\n", d->key[i], d->val[i]);
+            escape_value(escaped, d->val[i]);
+            fprintf(f, "%s = \"%s\"\n", d->key[i], escaped);
         }
         return ;
     }
@@ -301,6 +323,7 @@ void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f)
     size_t  j ;
     char    keym[ASCIILINESZ+1];
     int     seclen ;
+    char escaped[ASCIILINESZ+1] = "";
 
     if (d==NULL || f==NULL) return ;
     if (! iniparser_find_entry(d, s)) return ;
@@ -312,10 +335,8 @@ void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f)
         if (d->key[j]==NULL)
             continue ;
         if (!strncmp(d->key[j], keym, seclen+1)) {
-            fprintf(f,
-                    "%-30s = %s\n",
-                    d->key[j]+seclen+1,
-                    d->val[j] ? d->val[j] : "");
+            escape_value(escaped, d->val[j]);
+            fprintf(f, "%-30s = \"%s\"\n", d->key[j]+seclen+1, escaped);
         }
     }
     fprintf(f, "\n");
@@ -642,6 +663,44 @@ void iniparser_unset(dictionary * ini, const char * entry)
     dictionary_unset(ini, strlwc(entry, tmp_str, sizeof(tmp_str)));
 }
 
+static void parse_quoted_value(char *value, char quote) {
+    char c;
+    char *quoted;
+    int q = 0, v = 0;
+    int esc = 0;
+
+    if(!value)
+        return;
+
+    quoted = xstrdup(value);
+
+    if(!quoted) {
+        iniparser_error_callback("iniparser: memory allocation failure\n");
+        goto end_of_value;
+    }
+
+    while((c = quoted[q]) != '\0') {
+        if(!esc) {
+            if(c == '\\') {
+                esc = 1;
+                q++;
+                continue;
+            }
+
+            if(c == quote) {
+                goto end_of_value;
+            }
+        }
+        esc = 0;
+        value[v] = c;
+        v++;
+        q++;
+    }
+end_of_value:
+    value[v] = '\0';
+    free(quoted);
+}
+
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Load a single line from an INI file
@@ -661,6 +720,7 @@ static line_status iniparser_line(
     line_status sta ;
     char * line = NULL;
     size_t      len ;
+    int d_quote;
 
     line = xstrdup(input_line);
     len = strstrip(line);
@@ -678,11 +738,15 @@ static line_status iniparser_line(
         strstrip(section);
         strlwc(section, section, len);
         sta = LINE_SECTION ;
-    } else if (sscanf (line, "%[^=] = \"%[^\"]\"", key, value) == 2
-           ||  sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2) {
+    } else if ((d_quote = sscanf (line, "%[^=] = \"%[^\n]\"", key, value)) == 2
+               ||  sscanf (line, "%[^=] = '%[^\n]'",   key, value) == 2) {
         /* Usual key=value with quotes, with or without comments */
         strstrip(key);
         strlwc(key, key, len);
+        if(d_quote == 2)
+            parse_quoted_value(value, '"');
+        else
+            parse_quoted_value(value, '\'');
         /* Don't strip spaces from values surrounded with quotes */
         sta = LINE_VALUE ;
     } else if (sscanf (line, "%[^=] = %[^;#]", key, value) == 2) {

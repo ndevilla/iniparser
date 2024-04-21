@@ -82,6 +82,13 @@ const char * iniparser_getsecname(const dictionary * d, int n);
 
   This function dumps a given dictionary into a loadable ini file.
   It is Ok to specify @c stderr or @c stdout as output files.
+
+  All values are quoted these charecters are escaped:
+
+  ” - the quote character (e.g. “String with ”Quotes””)
+
+  \ - the backslash character (e.g. “C:\tmp”)
+
  */
 /*--------------------------------------------------------------------------*/
 
@@ -381,6 +388,17 @@ int iniparser_find_entry(const dictionary * ini, const char * entry) ;
   the name of the file to be read. It returns a dictionary object that
   should not be accessed directly, but through accessor functions
   instead.
+
+  Iff the value is a quoted string it supports some escape sequences:
+
+  ” - the quote character (e.g. “String with ”Quotes””)
+
+  \ - the backslash character (e.g. “C:\tmp”)
+
+  Escape sequences always start with a backslash. Additional escape sequences
+  might be added in the future. Backslash characters must be escaped. Any other
+  sequence then those outlined above is invalid and may lead to unpredictable
+  results.
 
   The returned dictionary must be freed using iniparser_freedict().
  */
