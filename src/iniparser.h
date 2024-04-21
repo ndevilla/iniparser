@@ -78,16 +78,14 @@ const char * iniparser_getsecname(const dictionary * d, int n);
   @brief    Save a dictionary to a loadable ini file
   @param    d   Dictionary to dump
   @param    f   Opened file pointer to dump to
-  @return   void
 
   This function dumps a given dictionary into a loadable ini file.
   It is Ok to specify @c stderr or @c stdout as output files.
 
-  All values are quoted these charecters are escaped:
+  All values are quoted, these charecters are escaped:
 
-  ” - the quote character (e.g. “String with ”Quotes””)
-
-  \ - the backslash character (e.g. “C:\tmp”)
+  - ' : the quote character (e.g. "String with \"Quotes\"")
+  - \ : the backslash character (e.g. "C:\\tmp")
 
  */
 /*--------------------------------------------------------------------------*/
@@ -100,7 +98,6 @@ void iniparser_dump_ini(const dictionary * d, FILE * f);
   @param    d   Dictionary to dump
   @param    s   Section name of dictionary to dump
   @param    f   Opened file pointer to dump to
-  @return   void
 
   This function dumps a given section of a given dictionary into a loadable ini
   file.  It is Ok to specify @c stderr or @c stdout as output files.
@@ -114,7 +111,6 @@ void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f);
   @brief    Dump a dictionary to an opened file pointer.
   @param    d   Dictionary to dump.
   @param    f   Opened file pointer to dump to.
-  @return   void
 
   This function prints out the contents of a dictionary, one element by
   line, onto the provided file pointer. It is OK to specify @c stderr
@@ -357,7 +353,6 @@ int iniparser_set(dictionary * ini, const char * entry, const char * val);
   @brief    Delete an entry in a dictionary
   @param    ini     Dictionary to modify
   @param    entry   Entry to delete (entry name)
-  @return   void
 
   If the given entry can be found, it is deleted from the dictionary.
  */
@@ -391,9 +386,9 @@ int iniparser_find_entry(const dictionary * ini, const char * entry) ;
 
   Iff the value is a quoted string it supports some escape sequences:
 
-  ” - the quote character (e.g. “String with ”Quotes””)
-
-  \ - the backslash character (e.g. “C:\tmp”)
+  - \" or ' : the quote character
+  (e.g. 'String with "Quotes"' or "String with 'Quotes'")
+  - \ : the backslash character (e.g. "C:\tmp")
 
   Escape sequences always start with a backslash. Additional escape sequences
   might be added in the future. Backslash characters must be escaped. Any other
@@ -408,13 +403,24 @@ dictionary * iniparser_load(const char * ininame);
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Parse an ini file and return an allocated dictionary object
-  @param    ininame File to read.
+  @param    in File to read.
   @param    ininame Name of the ini file to read (only used for nicer error messages)
   @return   Pointer to newly allocated dictionary
 
   This is the parser for ini files. This function is called, providing
-  the file to be read. It returns a dictionary object that should not 
+  the file to be read. It returns a dictionary object that should not
   be accessed directly, but through accessor functions instead.
+
+  Iff the value is a quoted string it supports some escape sequences:
+
+  - \" or ' : the quote character
+  (e.g. 'String with "Quotes"' or "String with 'Quotes'")
+  - \ : the backslash character (e.g. "C:\tmp")
+
+  Escape sequences always start with a backslash. Additional escape sequences
+  might be added in the future. Backslash characters must be escaped. Any other
+  sequence then those outlined above is invalid and may lead to unpredictable
+  results.
 
   The returned dictionary must be freed using iniparser_freedict().
  */
@@ -425,7 +431,6 @@ dictionary * iniparser_load_file(FILE * in, const char * ininame);
 /**
   @brief    Free all memory associated to an ini dictionary
   @param    d Dictionary to free
-  @return   void
 
   Free all memory associated to an ini dictionary.
   It is mandatory to call this function before the dictionary object

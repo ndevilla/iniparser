@@ -16,3 +16,4 @@ CMakeLists.txt
 config.cmake.in
 # CMake build directories
 build*/
+html/
