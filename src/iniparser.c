@@ -733,8 +733,11 @@ static line_status iniparser_line(
         /* Comment line */
         sta = LINE_COMMENT ;
     } else if (line[0]=='[' && line[len-1]==']') {
-        /* Section name */
-        sscanf(line, "[%[^]]", section);
+        /* Section name without opening square bracket */
+        sscanf(line, "[%s", section);
+        /* Section name without closing square bracket */
+        section[len] = '\0';
+        len--;
         strstrip(section);
         strlwc(section, section, len);
         sta = LINE_SECTION ;
