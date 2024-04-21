@@ -20,12 +20,11 @@
 #define TEST_TXT_PATH "ressources/test.txt"
 #define GRUEZI_INI_PATH "ressources/gruezi.ini"
 #define UTF8_INI_PATH "ressources/utf8.ini"
-#define MISFORMED_INI_PATH "ressources/misformed.ini"
+#define TMP_INI_PATH "ressources/tmp.ini"
 #define MISFORMED_INI_SEC0 "[12345"
 #define MISFORMED_INI_SEC1 "12345]"
 #define MISFORMED_INI_SEC2 "123]45"
 #define MISFORMED_INI_ATTR "1111"
-#define TMP_INI_PATH "ressources/tmp.ini"
 #define QUOTES_INI_PATH "ressources/quotes.ini"
 #define QUOTES_INI_SEC "quotes"
 #define QUOTES_INI_ATTR0 "string0"
@@ -1060,11 +1059,11 @@ void Test_iniparser_misformed(CuTest *tc)
     FILE *ini;
     int ret;
 
-    create_empty_ini_file(MISFORMED_INI_PATH);
-    dic = iniparser_load(MISFORMED_INI_PATH);
+    create_empty_ini_file(TMP_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
 
     if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
         return;
     }
 
@@ -1072,7 +1071,7 @@ void Test_iniparser_misformed(CuTest *tc)
 
     if (ret < 0) {
         fprintf(stderr, "cannot set section %s in: %s\n", MISFORMED_INI_SEC0,
-                MISFORMED_INI_PATH);
+                TMP_INI_PATH);
         goto del_dic;
     }
 
@@ -1080,10 +1079,10 @@ void Test_iniparser_misformed(CuTest *tc)
     /* test dictionary */
     CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1));
-    ini = fopen(MISFORMED_INI_PATH, "w+");
+    ini = fopen(TMP_INI_PATH, "w+");
 
     if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
         goto del_dic;
     }
 
@@ -1091,28 +1090,28 @@ void Test_iniparser_misformed(CuTest *tc)
     fclose(ini);
     dictionary_del(dic);
     /* check if section has been written as expected */
-    dic = iniparser_load(MISFORMED_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
 
     if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
         goto rm_ini;
     }
 
     CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1));
     dictionary_del(dic);
-    ret = remove(MISFORMED_INI_PATH);
+    ret = remove(TMP_INI_PATH);
 
     if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
         return;
     }
 
-    create_empty_ini_file(MISFORMED_INI_PATH);
-    dic = iniparser_load(MISFORMED_INI_PATH);
+    create_empty_ini_file(TMP_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
 
     if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
         return;
     }
 
@@ -1120,7 +1119,7 @@ void Test_iniparser_misformed(CuTest *tc)
 
     if (ret < 0) {
         fprintf(stderr, "cannot set section %s in: %s\n", MISFORMED_INI_SEC1,
-                MISFORMED_INI_PATH);
+                TMP_INI_PATH);
         goto del_dic;
     }
 
@@ -1128,10 +1127,10 @@ void Test_iniparser_misformed(CuTest *tc)
     /* test dictionary */
     CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1));
-    ini = fopen(MISFORMED_INI_PATH, "w+");
+    ini = fopen(TMP_INI_PATH, "w+");
 
     if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
         goto del_dic;
     }
 
@@ -1139,28 +1138,28 @@ void Test_iniparser_misformed(CuTest *tc)
     fclose(ini);
     dictionary_del(dic);
     /* check if section has been written as expected */
-    dic = iniparser_load(MISFORMED_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
 
     if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
         return;
     }
 
     CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1));
     dictionary_del(dic);
-    ret = remove(MISFORMED_INI_PATH);
+    ret = remove(TMP_INI_PATH);
 
     if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
         return;
     }
 
-    create_empty_ini_file(MISFORMED_INI_PATH);
-    dic = iniparser_load(MISFORMED_INI_PATH);
+    create_empty_ini_file(TMP_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
 
     if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
         return;
     }
 
@@ -1168,7 +1167,7 @@ void Test_iniparser_misformed(CuTest *tc)
 
     if (ret < 0) {
         fprintf(stderr, "cannot set section %s in: %s\n", MISFORMED_INI_SEC2,
-                MISFORMED_INI_PATH);
+                TMP_INI_PATH);
         goto del_dic;
     }
 
@@ -1176,10 +1175,10 @@ void Test_iniparser_misformed(CuTest *tc)
     /* test dictionary */
     CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1));
-    ini = fopen(MISFORMED_INI_PATH, "w+");
+    ini = fopen(TMP_INI_PATH, "w+");
 
     if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
         goto del_dic;
     }
 
@@ -1187,10 +1186,10 @@ void Test_iniparser_misformed(CuTest *tc)
     fclose(ini);
     dictionary_del(dic);
     /* check if section has been written as expected */
-    dic = iniparser_load(MISFORMED_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
 
     if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
         return;
     }
 
@@ -1199,10 +1198,10 @@ void Test_iniparser_misformed(CuTest *tc)
 del_dic:
     dictionary_del(dic);
 rm_ini:
-    ret = remove(MISFORMED_INI_PATH);
+    ret = remove(TMP_INI_PATH);
 
     if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", MISFORMED_INI_PATH);
+        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
         return;
     }
 }
