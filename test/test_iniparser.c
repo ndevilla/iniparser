@@ -25,6 +25,18 @@
 #define MISFORMED_INI_SEC1 "12345]"
 #define MISFORMED_INI_SEC2 "123]45"
 #define MISFORMED_INI_ATTR "1111"
+#define TMP_INI_PATH "ressources/tmp.ini"
+#define QUOTES_INI_PATH "ressources/quotes.ini"
+#define QUOTES_INI_SEC "quotes"
+#define QUOTES_INI_ATTR0 "string0"
+#define QUOTES_INI_ATTR1 "string1"
+#define QUOTES_INI_ATTR2 "string2"
+#define QUOTES_INI_ATTR3 "string3"
+#define QUOTES_INI_ATTR4 "string4"
+#define QUOTES_INI_ATTR5 "string5"
+#define QUOTES_INI_VAL0 "str\"ing"
+#define QUOTES_INI_VAL1 "str;ing"
+#define QUOTES_INI_VAL2 "str#ing"
 
 #define stringify_2(x)     #x
 #define stringify(x)       stringify_2(x)
@@ -1191,6 +1203,257 @@ rm_ini:
 
     if (ret) {
         fprintf(stderr, "cannot remove file: %s\n", MISFORMED_INI_PATH);
+        return;
+    }
+}
+
+void Test_iniparser_quotes(CuTest *tc)
+{
+    dictionary *dic;
+    FILE *ini;
+    int ret;
+
+    /**
+     * Test iniparser_load()
+     */
+    /* check if section has been written as expected */
+    dic = iniparser_load(QUOTES_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", QUOTES_INI_PATH);
+        goto rm_ini;
+    }
+
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    /*
+     * iniparser_load() supports semicolon and hash in values if they are
+     * quoted
+     */
+    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
+    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
+    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
+    /*
+     * iniparser_load() supports quotes in attributes
+     */
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str\"ing", NULL));
+    /*
+     * iniparser_load() does not support semicolon or hash in attributes
+     */
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str;ing", NULL));
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str#ing", NULL));
+    /*
+     * iniparser_load() does support colon in attributes
+     */
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str:ing", NULL));
+    ini = fopen(TMP_INI_PATH, "w+");
+
+    if (!ini) {
+        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
+        goto del_dic;
+    }
+
+    /**
+     * Test iniparser_dump_ini()
+     */
+    iniparser_dump_ini(dic, ini);
+    fclose(ini);
+    dictionary_del(dic);
+    dic = iniparser_load(TMP_INI_PATH);
+
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
+    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
+    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str\"ing", NULL));
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str;ing", NULL));
+    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str#ing", NULL));
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" "str:ing", NULL));
+    dictionary_del(dic);
+    ret = remove(TMP_INI_PATH);
+
+    if (ret) {
+        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
+        return;
+    }
+    /**
+     * test iniparser_set()
+     */
+    create_empty_ini_file(TMP_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
+        return;
+    }
+
+    ret = iniparser_set(dic, QUOTES_INI_SEC, NULL);
+
+    if (ret < 0) {
+        fprintf(stderr, "cannot set section %s in: %s\n", QUOTES_INI_SEC,
+                TMP_INI_PATH);
+        goto del_dic;
+    }
+
+    /* test dictionary */
+    iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, QUOTES_INI_VAL0);
+    /* iniparser_set() supports quotes in values */
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    ini = fopen(TMP_INI_PATH, "w+");
+
+    if (!ini) {
+        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
+        goto del_dic;
+    }
+
+    iniparser_dump_ini(dic, ini);
+    fclose(ini);
+    dictionary_del(dic);
+    /* check if section has been written as expected */
+    dic = iniparser_load(TMP_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
+        goto rm_ini;
+    }
+
+    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    dictionary_del(dic);
+    ret = remove(TMP_INI_PATH);
+
+    if (ret) {
+        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
+        return;
+    }
+
+    /*
+     * test semicolon comment
+     */
+    create_empty_ini_file(TMP_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
+        return;
+    }
+
+    ret = iniparser_set(dic, QUOTES_INI_SEC, NULL);
+
+    if (ret < 0) {
+        fprintf(stderr, "cannot set section %s in: %s\n", QUOTES_INI_SEC,
+                TMP_INI_PATH);
+        goto del_dic;
+    }
+
+    /* test dictionary */
+    iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, QUOTES_INI_VAL1);
+    /* iniparser_set() supports ; in values */
+    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    ini = fopen(TMP_INI_PATH, "w+");
+
+    if (!ini) {
+        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
+        goto del_dic;
+    }
+
+    iniparser_dump_ini(dic, ini);
+    fclose(ini);
+    dictionary_del(dic);
+    /* check if section has been written as expected */
+    dic = iniparser_load(TMP_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
+        goto rm_ini;
+    }
+
+    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    dictionary_del(dic);
+    ret = remove(TMP_INI_PATH);
+
+    if (ret) {
+        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
+        return;
+    }
+
+    /*
+     * test hash comment
+     */
+    create_empty_ini_file(TMP_INI_PATH);
+    dic = iniparser_load(TMP_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
+        return;
+    }
+
+    ret = iniparser_set(dic, QUOTES_INI_SEC, NULL);
+
+    if (ret < 0) {
+        fprintf(stderr, "cannot set section %s in: %s\n", QUOTES_INI_SEC,
+                TMP_INI_PATH);
+        goto del_dic;
+    }
+
+    /* test dictionary */
+    iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, QUOTES_INI_VAL2);
+    /* iniparser_set() supports # in values */
+    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    ini = fopen(TMP_INI_PATH, "w+");
+
+    if (!ini) {
+        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
+        goto del_dic;
+    }
+
+    iniparser_dump_ini(dic, ini);
+    fclose(ini);
+    dictionary_del(dic);
+    /* check if section has been written as expected */
+    dic = iniparser_load(TMP_INI_PATH);
+
+    if (!dic) {
+        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
+        goto rm_ini;
+    }
+
+    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
+                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+del_dic:
+    dictionary_del(dic);
+rm_ini:
+    ret = remove(TMP_INI_PATH);
+
+    if (ret) {
+        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
         return;
     }
 }
