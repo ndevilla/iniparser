@@ -42,7 +42,7 @@ See LICENSE for more details
 
 ## IV - Versions
 
-Current version is 4.1. Version 4.0 introduces breaking changes in the api.
+Current version is 4.2. Version 4.0 introduces breaking changes in the api.
 Older versions 3.1 and 3.2 with the legacy api are available as tags.
 
 ## V - FAQ

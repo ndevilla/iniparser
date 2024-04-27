@@ -7,6 +7,6 @@ datadir=${datarootdir}
 
 Name: libiniparser
 Description: Iniparser library
-Version: 4.1
+Version: 4.2
 Libs: -L${libdir} -liniparser
 Cflags: -I${includedir}
