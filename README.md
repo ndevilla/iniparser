@@ -8,6 +8,7 @@ After that, this project will be frozen here as v4.2 and development should cont
 
 Thanks a million times to Lars for his tremendous work and help in keeping this library alive!
 
+Many thanks to @touilleman for his exceptional contributions and efforts for maintaining this project for a decade. Many, you rock!
 
 ## I - Overview
 
