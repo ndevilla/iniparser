@@ -13,8 +13,8 @@ Many thanks to @touilleman for his exceptional contributions and efforts for mai
 ## I - Overview
 
 This modules offers parsing of ini files from C.
-See the complete documentation in HTML format: from this directory,
-open the file `html/index.html` with any HTML-capable browser.
+See the [complete documentation](https://iniparser.gitlab.io/iniparser-meta/) in HTML format.
+
 
 Key features:
 
@@ -33,6 +33,7 @@ You should consider trying the following rules too :
 
  - `make check` : run unit tests
  - `make example` : compile the example, run it with `./example/iniexample`
+ - `make docs` : generate the documentation, open the file `html/index.html` with any HTML-capable browser.
 
 For installation and packaging see [iniparser-meta](https://gitlab.com/iniparser/iniparser-meta).
 
