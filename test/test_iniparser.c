@@ -678,6 +678,12 @@ void Test_iniparser_line(CuTest *tc)
     CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[s]", section, key, val));
     CuAssertStrEquals(tc, "s", section);
 
+    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[section 0]", section, key, val));
+    CuAssertStrEquals(tc, "section 0", section);
+
+    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[ section 0 ]", section, key, val));
+    CuAssertStrEquals(tc, "section 0", section);
+
     CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[ section ]", section, key, val));
     CuAssertStrEquals(tc, "section", section);
 
