@@ -9,7 +9,7 @@
     iniParser is a simple C library offering ini file parsing services.
     The library is pretty small (less than 1500 lines of C) and robust, and
     does not depend on any other external library to compile. It is written
-    in ANSI C and should compile on most platforms without difficulty.
+    in C and should compile on most platforms without difficulty.
 
 
     @section inidef     What is an ini file?
@@ -74,7 +74,7 @@
     @section install    Compiling/installing the library
 
     Edit the Makefile to indicate the C compiler you want to use, the
-    options to provide to compile ANSI C, and possibly the options to pass
+    options to provide to compile C, and possibly the options to pass
     to the ar program on your machine to build a library (.a) from a set
     of object (.o) files.
 
@@ -95,7 +95,7 @@
 
     See the file test/initest.c for an example.
 
-    iniparser is an ANSI C library. If you want to compile it
+    iniparser is an C library. If you want to compile it
     with a C++ compiler you will likely run into compatibility
     issues. Headers probably have to include the extern "C"
     hack and function prototypes will want to add some const
