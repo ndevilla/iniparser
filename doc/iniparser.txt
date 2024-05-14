@@ -53,7 +53,7 @@
     semicolon up to the end of the line.
 
     Multi-line values can be provided by ending the line with a
-    backslash (\).
+    backslash (`\`).
 
     @verbatim
     Multiple = Line 1 \
