@@ -858,6 +858,7 @@ void Test_iniparser_dump(CuTest *tc)
     dictionary *dic;
     FILE *fp = NULL;
     char buff[255];
+    char *ret;
 
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
@@ -887,20 +888,23 @@ void Test_iniparser_dump(CuTest *tc)
         printf("error: test.txt is not exist");
         exit(-1);
     }
-    fgets(buff,100,fp);
+    ret = fgets(buff,100,fp);
+    (void)ret;
     /*remove '\n'*/
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
     }
     CuAssertStrEquals(tc,"[section]=UNDEF",buff);
-    fgets(buff,100,fp);
+    ret = fgets(buff,100,fp);
+    (void)ret;
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
     }
     CuAssertStrEquals(tc,"[section:key_01]=[hello world]",buff);
-    fgets(buff,100,fp);
+    ret = fgets(buff,100,fp);
+    (void)ret;
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
