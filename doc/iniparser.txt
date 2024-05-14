@@ -198,10 +198,4 @@
     similar. There are otherwise many other dictionary implementations
     available on the net to replace this one.
 
-
-    @section authors    Authors
-
-    Nicolas Devillard (ndevilla AT free DOT fr).
-
-
 */
