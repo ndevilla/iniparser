@@ -2,6 +2,13 @@
 
 # Iniparser 4 #
 
+Changes in May 2024:
+We moved to [iniparser/iniparser](https://gitlab.com/iniparser/iniparser)!
+Go there for:
+
+- [New Issues](https://gitlab.com/iniparser/iniparser/-/issues/new)
+- [Merge Requests](https://gitlab.com/iniparser/iniparser/-/merge_requests/new)
+
 Changes in March 2024:
 @lmoellendorf is taking over maintenance for this project. The objective is to get all known issues fixed and released as v4.2.
 After that, this project will be frozen here as v4.2 and development should continue as v5, probably on gitlab. Pointers will be updated then.
