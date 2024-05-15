@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: New Issue
+    url: https://gitlab.com/iniparser/iniparser/-/issues/new
+    about: Please open new issues on https://gitlab.com/iniparser/iniparser.
+  - name: Pull Request
+    url: https://gitlab.com/iniparser/iniparser/-/merge_requests/new
+    about: Please open pull requests aka. merge requests on https://gitlab.com/iniparser/iniparser.
