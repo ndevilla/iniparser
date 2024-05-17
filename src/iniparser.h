@@ -148,7 +148,7 @@ int iniparser_getsecnkeys(const dictionary * d, const char * s);
 /*--------------------------------------------------------------------------*/
 const char ** iniparser_getseckeys(const dictionary * d, const char * s, const char ** keys);
 
-
+extern const char iniparser_null_string[];
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get the string associated to a key
@@ -159,7 +159,8 @@ const char ** iniparser_getseckeys(const dictionary * d, const char * s, const c
 
   This function queries a dictionary for a key. A key as read from an
   ini file is given as "section:key". If the key cannot be found,
-  the pointer passed as 'def' is returned.
+  the pointer passed as 'def' is returned. If value is `NULL`,
+  `iniparser_null_string[] = "(null)"` will be returned instead.
   The returned char pointer is pointing to a string allocated in
   the dictionary, do not free or modify it.
  */
