@@ -5,72 +5,81 @@ project(iniparser VERSION 4.2.1)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(INIPARSER_SRCS src/dictionary.c src/iniparser.c)
-set(INIPARSER_HDRS src/dictionary.h src/iniparser.h)
+option(
+  BUILD_SHARED_LIBS
+  "Build using shared libraries"
+  ON)
+option(
+  BUILD_STATIC_LIBS
+  "Build using static libraries"
+  ON)
+if(BUILD_SHARED_LIBS)
+  list(
+    APPEND
+    TARGET_TYPES
+    "shared")
+endif()
+if(BUILD_STATIC_LIBS)
+  list(
+    APPEND
+    TARGET_TYPES
+    "static")
+endif()
+set(CONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-add_library(iniparser-shared SHARED ${INIPARSER_SRCS} ${INIPARSER_HDRS})
-add_library(iniparser-static STATIC ${INIPARSER_SRCS} ${INIPARSER_HDRS})
+foreach(TARGET_TYPE ${TARGET_TYPES})
+  set(TARGET_NAME "${PROJECT_NAME}-${TARGET_TYPE}")
+  set(TARGETS_EXPORT_NAME "${TARGET_NAME}Targets")
+  string(TOUPPER ${TARGET_TYPE} UPPER_TARGET_TYPE)
+  message(DEBUG "TARGET_TYPE: ${TARGET_TYPE}")
+  message(DEBUG "UPPER_TARGET_TYPE: ${UPPER_TARGET_TYPE}")
+  message(DEBUG "TARGET_NAME: ${TARGET_NAME}")
+  add_library(
+    ${TARGET_NAME}
+    ${UPPER_TARGET_TYPE}
+    "src/iniparser.c"
+    "src/dictionary.c")
+  set(PUBLIC_HEADERS "src/iniparser.h" "src/dictionary.h")
+  set_target_properties(${TARGET_NAME} PROPERTIES PUBLIC_HEADER
+                                                  "${PUBLIC_HEADERS}")
 
-target_include_directories(
-  iniparser-shared
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
-target_include_directories(
-  iniparser-static
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
-
-set_target_properties(iniparser-shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-set_target_properties(iniparser-static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-set_target_properties(iniparser-shared PROPERTIES VERSION ${PROJECT_VERSION})
-set_target_properties(iniparser-static PROPERTIES VERSION ${PROJECT_VERSION})
-set_target_properties(iniparser-shared PROPERTIES SOVERSION
+  target_include_directories(
+    ${TARGET_NAME}
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
+  set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+  set_target_properties(${TARGET_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+  set_target_properties(${TARGET_NAME} PROPERTIES SOVERSION
                                                   ${PROJECT_VERSION_MAJOR})
 
-if(UNIX)
-  target_compile_options(
-    iniparser-shared
-    PRIVATE -fPIC
-            -Wall
-            -Wextra
-            -pedantic)
-  target_compile_options(
-    iniparser-static
-    PRIVATE -fPIC
-            -Wall
-            -Wextra
-            -pedantic)
-endif(UNIX)
+  if(UNIX)
+    target_compile_options(
+      ${TARGET_NAME}
+      PRIVATE -fPIC
+              -Wall
+              -Wextra
+              -pedantic)
+  endif(UNIX)
 
-# install targets
-install(
-  TARGETS iniparser-shared
-  EXPORT iniparser-sharedTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-install(
-  TARGETS iniparser-static
-  EXPORT iniparser-staticTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+  # install targets
+  install(
+    TARGETS ${TARGET_NAME}
+    EXPORT ${TARGETS_EXPORT_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
-# build directory package config
-export(
-  TARGETS iniparser-shared
-  APPEND
-  FILE "iniparser-sharedTargets.cmake")
-export(
-  TARGETS iniparser-static
-  APPEND
-  FILE "iniparser-staticTargets.cmake")
+  # build directory package config
+  export(
+    TARGETS ${TARGET_NAME}
+    APPEND
+    FILE "${TARGETS_EXPORT_NAME}.cmake")
 
-install(EXPORT iniparser-sharedTargets DESTINATION "${CONFIG_INSTALL_DIR}")
-install(EXPORT iniparser-staticTargets DESTINATION "${CONFIG_INSTALL_DIR}")
+  # installed package config
+  install(EXPORT ${TARGETS_EXPORT_NAME} DESTINATION "${CONFIG_INSTALL_DIR}")
+endforeach()
 
 # installed package config
-set(CONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 set(PROJECT_CONFIG_FILE
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake")
 set(PROJECT_VERSION_FILE
