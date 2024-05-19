@@ -98,22 +98,22 @@ file(COPY ${FIND_MODULES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 # add to CMake registry
 export(PACKAGE ${PROJECT_NAME})
 
-find_package(Doxygen)
-if(NOT DOXYGEN_FOUND)
-  message(
-    FATAL_ERROR
-      "Doxygen is needed to build the documentation. Please install it correctly"
-  )
+option(
+  BUILD_DOCS
+  "Build and install docs"
+  ON)
+if(BUILD_DOCS)
+  find_package(Doxygen REQUIRED)
+  set(DOXYGEN_STRIP_FROM_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+  doxygen_add_docs(
+    docs
+    ${CMAKE_CURRENT_SOURCE_DIR}/doc/iniparser.txt
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/iniparser.h
+    ALL
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
+          DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
-
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/iniparser.dox
-     "@INCLUDE = ${CMAKE_CURRENT_SOURCE_DIR}/doc/iniparser.dox\n"
-     "OUTPUT_DIRECTORY = ${CMAKE_CURRENT_BINARY_DIR}\n")
-
-add_custom_target(
-  doc ALL
-  COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/iniparser.dox
-  SOURCES doc/iniparser.dox)
 
 enable_testing()
 
@@ -121,6 +121,3 @@ add_test(
   NAME testsuite
   COMMAND make
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
-
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
-        DESTINATION ${CMAKE_INSTALL_DOCDIR})
