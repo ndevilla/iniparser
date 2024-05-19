@@ -107,6 +107,43 @@ file(COPY ${FIND_MODULES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 # add to CMake registry
 export(PACKAGE ${PROJECT_NAME})
 
+option(BUILD_TESTS "Build and install tests")
+if(BUILD_TESTS)
+  set(TEST_NAME testrun)
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dictionary.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/test/test_iniparser.c
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test/make-tests.sh >
+            ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test/)
+
+  add_executable(
+    ${TEST_NAME}
+    ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/CuTest.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dictionary.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_iniparser.c)
+
+  target_link_libraries(${TEST_NAME} "${PROJECT_NAME}-static")
+
+  target_include_directories(
+    ${TEST_NAME}
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test>
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
+
+  install(TARGETS ${TEST_NAME})
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test/ressources
+          DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+  enable_testing()
+  add_test(
+    NAME testsuite
+    COMMAND ${TEST_NAME}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
+endif()
+
 option(BUILD_EXAMPLES "Build and install examples")
 if(BUILD_EXAMPLES)
   add_executable(iniexample ${CMAKE_CURRENT_SOURCE_DIR}/example/iniexample.c)
@@ -144,10 +181,3 @@ if(BUILD_DOCS)
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
           DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
-
-enable_testing()
-
-add_test(
-  NAME testsuite
-  COMMAND make
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
