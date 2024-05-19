@@ -1,0 +1,30 @@
+#include(CMakeFindDependencyMacro)
+#find_dependency(<there are none>)
+set(_supported_components static shared)
+
+# if the targets files exist it is save to include them, even if they are not
+# demanded
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-sharedTargets.cmake" OPTIONAL)
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-staticTargets.cmake" OPTIONAL)
+
+# if a specific component is explicitly demanded...
+foreach(_comp ${@PROJECT_NAME@_FIND_COMPONENTS})
+  # ...check if it is supported and...
+  if(NOT
+     ";${_supported_components};"
+     MATCHES
+     ${_comp})
+    set(@PROJECT_NAME@_FOUND False)
+    set(@PROJECT_NAME@_NOT_FOUND_MESSAGE "Unsupported component: ${_comp}")
+    continue()
+  endif()
+  # ...check if it is installed...
+  include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-${_comp}Targets.cmake"
+          OPTIONAL RESULT_VARIABLE included)
+  if(NOT included)
+    # ...and fail verbosely
+    set(@PROJECT_NAME@_FOUND False)
+    set(@PROJECT_NAME@_NOT_FOUND_MESSAGE
+        "Requested component not installed: ${_comp}")
+  endif()
+endforeach()
