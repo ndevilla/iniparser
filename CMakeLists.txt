@@ -35,7 +35,7 @@ file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/iniparser.dox
   "OUTPUT_DIRECTORY = ${CMAKE_CURRENT_BINARY_DIR}\n"
   )
 
-add_custom_target (doc ALL 
+add_custom_target (doc ALL
   COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/iniparser.dox
   SOURCES doc/iniparser.dox)
 
