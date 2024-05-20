@@ -1,0 +1,105 @@
+image: registry.gitlab.com/iniparser/docker-cmake:latest
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    LD_LIBRARY_PATH: ${CI_BUILDS_DIR}/iniparser/iniparser/install/lib/
+
+
+stages:
+    - build
+    - doc
+    - test
+    - win
+
+build:
+    stage: build
+    script:
+        - mkdir build
+        - cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=../install -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON ..
+        - make install
+        - tree -a .
+    artifacts:
+        paths:
+            - install/*
+            - build/html/*
+
+pages:
+    stage: doc
+    dependencies:
+        - build
+    script:
+        - mv build/html/ public/
+    artifacts:
+        paths:
+            - public
+        #rules:
+            #- if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+test:
+    stage: test
+    script:
+        - pwd
+        - ls -l
+        - cd install/bin
+        - ./testrun
+    dependencies:
+        - build
+
+memcheck:
+    stage: test
+    script:
+        - pwd
+        - ls -l
+        - cd install/bin
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./testrun
+    dependencies:
+        - build
+
+iniexample-memcheck:
+    stage: test
+    script:
+        - pwd
+        - tree
+        - cd install/share/doc/iniparser/examples/
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./iniexample
+    dependencies:
+        - build
+
+iniwrite-memcheck:
+    stage: test
+    script:
+        - pwd
+        - tree
+        - cd install/share/doc/iniparser/examples/
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./iniwrite
+    dependencies:
+        - build
+
+parse-memcheck:
+    stage: test
+    script:
+        - pwd
+        - tree
+        - cd install/share/doc/iniparser/examples/
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./parse
+    dependencies:
+        - build
+
+.shared_windows_runners:
+    tags:
+        - saas-windows-medium-amd64
+
+win-build:
+    extends:
+        - .shared_windows_runners
+    stage: win
+    script:
+        - mkdir build
+        - cd build
+        - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=ON ..
+        - cmake --build .
+    artifacts:
+        paths:
+            - install
+    dependencies: []
