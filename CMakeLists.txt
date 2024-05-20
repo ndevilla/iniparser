@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(iniparser VERSION 4.2.1)
+project(iniparser VERSION 4.2.2)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
