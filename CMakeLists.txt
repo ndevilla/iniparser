@@ -106,6 +106,14 @@ install(FILES ${FIND_MODULES} DESTINATION ${CONFIG_INSTALL_DIR})
 file(COPY ${FIND_MODULES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 # add to CMake registry
 export(PACKAGE ${PROJECT_NAME})
+# generate pc-file
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+  @ONLY)
+# install pc-file
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 option(BUILD_TESTS "Build and install tests")
 if(BUILD_TESTS)
