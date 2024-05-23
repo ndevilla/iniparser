@@ -4,22 +4,23 @@ project(iniparser VERSION 4.2.2)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(CMakeDependentOption)
 
 option(
   BUILD_SHARED_LIBS
   "Build using shared libraries"
   ON)
-option(
-  BUILD_STATIC_LIBS
-  "Build using static libraries"
-  ON)
+# For packaging by tools like bitbake, shared and static libs should be build
+# at once
+CMAKE_DEPENDENT_OPTION(BUILD_STATIC_LIBS "Build static libs" ON
+                      "BUILD_SHARED_LIBS" OFF)
 if(BUILD_SHARED_LIBS)
   list(
     APPEND
     TARGET_TYPES
     "shared")
 endif()
-if(BUILD_STATIC_LIBS)
+if(BUILD_STATIC_LIBS OR NOT BUILD_SHARED_LIBS)
   list(
     APPEND
     TARGET_TYPES
@@ -132,7 +133,10 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dictionary.c
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_iniparser.c)
 
-  target_link_libraries(${TEST_NAME} "${PROJECT_NAME}-static")
+  foreach(TARGET_TYPE ${TARGET_TYPES})
+    # if BUILD_STATIC_LIBS=ON shared takes precedence
+    target_link_libraries(${TEST_NAME} "${PROJECT_NAME}-${TARGET_TYPE}")
+  endforeach()
 
   target_include_directories(
     ${TEST_NAME}
@@ -158,7 +162,7 @@ if(BUILD_EXAMPLES)
   add_executable(parse ${CMAKE_CURRENT_SOURCE_DIR}/example/parse.c)
 
   foreach(TARGET_TYPE ${TARGET_TYPES})
-    # if BUILD_STATIC_WITH_SHARED_LIBS=ON shared takes precedence
+    # if BUILD_STATIC_LIBS=ON shared takes precedence
     target_link_libraries(iniexample ${PROJECT_NAME}-${TARGET_TYPE})
     target_link_libraries(iniwrite ${PROJECT_NAME}-${TARGET_TYPE})
     target_link_libraries(parse ${PROJECT_NAME}-${TARGET_TYPE})
