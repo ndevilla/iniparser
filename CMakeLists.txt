@@ -117,6 +117,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 if(BUILD_TESTING)
+  add_subdirectory(test)
   set(TEST_NAME testrun)
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
