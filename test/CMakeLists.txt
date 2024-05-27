@@ -60,8 +60,3 @@ add_test(
   NAME test_dictionary
   COMMAND test_dictionary
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
-install(TARGETS test_${PROJECT_NAME} test_dictionary
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ressources
-        DESTINATION ${CMAKE_INSTALL_BINDIR})
