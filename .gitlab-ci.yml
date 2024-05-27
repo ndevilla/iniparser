@@ -21,8 +21,10 @@ build:
         - tree -a .
     artifacts:
         paths:
-            - install/*
-            - build/html/*
+            - install/
+            - test/ressources/
+            - build/
+            - build/html/
 
 pages:
     stage: doc
@@ -41,8 +43,8 @@ test:
     script:
         - pwd
         - ls -l
-        - cd install/bin
-        - ./testrun
+        - cd build/
+        - ctest --verbose
     dependencies:
         - build
 
@@ -51,8 +53,8 @@ memcheck:
     script:
         - pwd
         - ls -l
-        - cd install/bin
-        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./testrun
+        - cd build/
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ctest --verbose
     dependencies:
         - build
 

@@ -1,11 +1,7 @@
-#include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <sys/types.h>
-#include <stdarg.h>
-#include <limits.h>
 
-#include "CuTest.h"
+#include <unity.h>
 #include "dictionary.h"
 
 /* We need to directly insert the .c file in order to test the */
@@ -40,6 +36,27 @@
 #define stringify_2(x)     #x
 #define stringify(x)       stringify_2(x)
 
+static dictionary *dic = NULL;
+static FILE *ini;
+static DIR *dir;
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+    if(dic)
+        dictionary_del(dic);
+    dic = NULL;
+    if(ini)
+        fclose(ini);
+    ini = NULL;
+    if(dir)
+        closedir(dir);
+    dir = NULL;
+}
+
 /* Tool function to create and populate a generic non-empty dictionary */
 static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_section)
 {
@@ -68,37 +85,43 @@ static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_
     return dic;
 }
 
-void Test_iniparser_strlwc(CuTest *tc)
+void test_iniparser_strlwc(void)
 {
     char out_buffer[128];
 
     /* NULL ptr as input */
-    CuAssertPtrEquals(tc, NULL, strlwc(NULL, NULL, 0));
-    CuAssertPtrEquals(tc, NULL, strlwc(NULL, out_buffer, sizeof (out_buffer)));
-    CuAssertPtrEquals(tc, NULL, strlwc("", NULL, sizeof (out_buffer)));
-    CuAssertPtrEquals(tc, NULL, strlwc("", out_buffer, 0));
-    CuAssertPtrEquals(tc, NULL, strlwc(NULL, NULL, 0));
+    TEST_ASSERT_NULL(strlwc(NULL, NULL, 0));
+    TEST_ASSERT_NULL(strlwc(NULL, out_buffer, sizeof (out_buffer)));
+    TEST_ASSERT_NULL(strlwc("", NULL, sizeof (out_buffer)));
+    TEST_ASSERT_NULL(strlwc("", out_buffer, 0));
+    TEST_ASSERT_NULL(strlwc(NULL, NULL, 0));
 
     /* empty string */
-    CuAssertStrEquals(tc, "", strlwc("", out_buffer, sizeof (out_buffer)));
-
-    CuAssertStrEquals(tc, "  ", strlwc("  ", out_buffer, sizeof (out_buffer)));
-    CuAssertStrEquals(tc, "test", strlwc("test", out_buffer, sizeof (out_buffer)));
-    CuAssertStrEquals(tc, "test", strlwc("TEST", out_buffer, sizeof (out_buffer)));
-    CuAssertStrEquals(tc, "test", strlwc("TeSt", out_buffer, sizeof (out_buffer)));
-    CuAssertStrEquals(tc, "test test",
-                      strlwc("TEST TEST", out_buffer, sizeof (out_buffer)));
-    CuAssertStrEquals(tc, "very long string !!!!!!!",
-                      strlwc("very long string !!!!!!!", out_buffer, sizeof (out_buffer)));
-    CuAssertStrEquals(tc, "cutted string", strlwc("cutted string<---here", out_buffer, 14));
+    TEST_ASSERT_EQUAL_STRING("", strlwc("", out_buffer, sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("  ",
+                             strlwc("  ", out_buffer, sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("test",
+                             strlwc("test", out_buffer, sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("test",
+                             strlwc("TEST", out_buffer, sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("test",
+                             strlwc("TeSt", out_buffer, sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("test test",
+                             strlwc("TEST TEST", out_buffer,
+                                    sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("very long string !!!!!!!",
+                             strlwc("very long string !!!!!!!", out_buffer,
+                                    sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("cutted string",
+                             strlwc("cutted string<---here", out_buffer, 14));
 
     /* test using same buffer as input and output */
     strcpy(out_buffer, "OVERWRITE ME !");
-    CuAssertPtrNotNull(tc, strlwc(out_buffer, out_buffer, sizeof(out_buffer)));
-    CuAssertStrEquals(tc, "overwrite me !", out_buffer);
+    TEST_ASSERT_NOT_NULL(strlwc(out_buffer, out_buffer, sizeof(out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("overwrite me !", out_buffer);
 }
 
-void Test_iniparser_strstrip(CuTest *tc)
+void test_iniparser_strstrip(void)
 {
     /* First element in the array is the expected stripping result */
     const char *strings_empty[] = {
@@ -131,8 +154,8 @@ void Test_iniparser_strstrip(CuTest *tc)
         strcpy(stripped, strings_empty[i]);
         strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
-            strings_empty[i], stripped);
-        CuAssertStrEquals_Msg(tc, error_msg, stripped, strings_empty[0]);
+                strings_empty[i], stripped);
+        TEST_ASSERT_EQUAL_STRING_MESSAGE(stripped, strings_empty[0], error_msg);
     }
 
     /* test string */
@@ -140,111 +163,123 @@ void Test_iniparser_strstrip(CuTest *tc)
         strcpy(stripped, strings_test[i]);
         strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
-            strings_test[i], stripped);
-        CuAssertStrEquals_Msg(tc, error_msg, strings_test[0], stripped);
+                strings_test[i], stripped);
+        TEST_ASSERT_EQUAL_STRING_MESSAGE(strings_test[0], stripped, error_msg);
     }
     strcpy(stripped, ".");
     strstrip(stripped);
-    CuAssertStrEquals(tc, ".", stripped);
+    TEST_ASSERT_EQUAL_STRING(".", stripped);
 
     /* string containing spaces */
     strcpy(stripped, test_with_spaces);
     strstrip(stripped);
-    CuAssertStrEquals(tc, test_with_spaces, stripped);
+    TEST_ASSERT_EQUAL_STRING(test_with_spaces, stripped);
 }
 
-void Test_iniparser_getnsec(CuTest *tc)
+void test_iniparser_getnsec(void)
 {
     int i;
     char sec_name[32];
-    dictionary *dic;
 
     /* NULL test */
-    CuAssertIntEquals(tc, -1, iniparser_getnsec(NULL));
+    TEST_ASSERT_EQUAL(-1, iniparser_getnsec(NULL));
 
     /* Empty dictionary */
     dic = dictionary_new(10);
-    CuAssertIntEquals(tc, 0, iniparser_getnsec(dic));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(0, iniparser_getnsec(dic));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Regular dictionary */
     dic = generate_dictionary(512, 0);
-    CuAssertIntEquals(tc, 512, iniparser_getnsec(dic));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(512, iniparser_getnsec(dic));
 
     /* Check after removing sections */
     for (i = 1; i < 512; ++i) {
         sprintf(sec_name, "sec%d", i);
         dictionary_unset(dic, sec_name);
-        CuAssertIntEquals(tc, 512 - i, iniparser_getnsec(dic));
+        TEST_ASSERT_EQUAL(512 - i, iniparser_getnsec(dic));
     }
     dictionary_del(dic);
+    dic = NULL;
 
     /* Mix sections and regular keys */
     dic = generate_dictionary(10, 512);
-    CuAssertIntEquals(tc, 10, iniparser_getnsec(dic));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(10, iniparser_getnsec(dic));
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getsecname(CuTest *tc)
+void test_iniparser_getsecname(void)
 {
     unsigned i;
     char sec_name[32];
-    dictionary *dic;
     /* NULL test */
-    CuAssertTrue(tc, iniparser_getsecname(NULL, 0) == NULL);
+    TEST_ASSERT_NULL(iniparser_getsecname(NULL, 0));
 
     /* Empty dictionary */
     dic = dictionary_new(10);
-    CuAssertPtrEquals(tc, NULL, iniparser_getsecname(dic, 0));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_NULL(iniparser_getsecname(dic, 0));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Sections without entries dictionary */
     dic = generate_dictionary(100, 0);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; i < 100; ++i) {
         sprintf(sec_name, "sec%d", i);
-        CuAssertStrEquals(tc, sec_name, iniparser_getsecname(dic, i));
+        TEST_ASSERT_EQUAL_STRING(sec_name, iniparser_getsecname(dic, i));
     }
     dictionary_del(dic);
+    dic = NULL;
 
     /* Generic dictionary */
     dic = generate_dictionary(10, 100);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; i < 10; ++i) {
         sprintf(sec_name, "sec%d", i);
-        CuAssertStrEquals(tc, sec_name, iniparser_getsecname(dic, i));
+        TEST_ASSERT_EQUAL_STRING(sec_name, iniparser_getsecname(dic, i));
     }
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getseckeys(CuTest *tc)
+void test_iniparser_getseckeys(void)
 {
     unsigned i;
     char key_name[64];
-    dictionary *dic;
     int nkeys;
     const char * keys[10]; /* At most 10 elements per section */
     /* NULL test */
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, NULL, NULL));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, "dummy", NULL));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(NULL, "dummy", keys));
+    TEST_ASSERT_NULL(iniparser_getseckeys(NULL, NULL, NULL));
+    TEST_ASSERT_NULL(iniparser_getseckeys(NULL, "dummy", NULL));
+    TEST_ASSERT_NULL(iniparser_getseckeys(NULL, "dummy", keys));
 
     /* Empty dictionary */
     dic = dictionary_new(10);
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, NULL, keys));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "dummy", keys));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_NULL(iniparser_getseckeys(dic, NULL, keys));
+    TEST_ASSERT_NULL(iniparser_getseckeys(dic, "dummy", keys));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Generic dictionary */
 
     dic = generate_dictionary(100, 10);
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, NULL, keys));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "dummy", keys));
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "sec0", NULL));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_NULL(iniparser_getseckeys(dic, NULL, keys));
+    TEST_ASSERT_NULL(iniparser_getseckeys(dic, "dummy", keys));
+    TEST_ASSERT_NULL(iniparser_getseckeys(dic, "sec0", NULL));
     nkeys = iniparser_getsecnkeys(dic, "sec42");
-    CuAssertIntEquals(tc, nkeys, 10);
-    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "sec42", keys));
+    TEST_ASSERT_EQUAL(nkeys, 10);
+    TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "sec42", keys));
     for (i = 0; i < 10; ++i) {
         sprintf(key_name, "sec42:key%d", i);
-        CuAssertStrEquals(tc, key_name, keys[i]);
+        TEST_ASSERT_EQUAL_STRING(key_name, keys[i]);
     }
 
     /* Remove some keys to make the dictionary more real */
@@ -254,57 +289,63 @@ void Test_iniparser_getseckeys(CuTest *tc)
     dictionary_unset(dic, "sec0:key1");
     dictionary_unset(dic, "sec0:key2");
 
-    CuAssertPtrEquals(tc, NULL, iniparser_getseckeys(dic, "sec42", keys));
+    TEST_ASSERT_NULL(iniparser_getseckeys(dic, "sec42", keys));
     nkeys = iniparser_getsecnkeys(dic, "Sec99");
-    CuAssertIntEquals(tc, nkeys, 9);
-    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "Sec99", keys));
+    TEST_ASSERT_EQUAL(nkeys, 9);
+    TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "Sec99", keys));
     for (i = 0; i < 9; ++i) {
         sprintf(key_name, "sec99:key%d", i);
-        CuAssertStrEquals(tc, key_name, keys[i]);
+        TEST_ASSERT_EQUAL_STRING(key_name, keys[i]);
     }
 
     nkeys = iniparser_getsecnkeys(dic, "sec0");
-    CuAssertIntEquals(tc, nkeys, 7);
-    CuAssertPtrEquals(tc, keys, iniparser_getseckeys(dic, "sec0", keys));
+    TEST_ASSERT_EQUAL(nkeys, 7);
+    TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "sec0", keys));
     for (i = 0; i < 7; ++i) {
         sprintf(key_name, "sec0:key%d", i + 3);
-        CuAssertStrEquals(tc, key_name, keys[i]);
+        TEST_ASSERT_EQUAL_STRING(key_name, keys[i]);
     }
 
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getstring(CuTest *tc)
+void test_iniparser_getstring(void)
 {
-    dictionary *dic;
     /* NULL test */
-    CuAssertPtrEquals(tc, NULL, iniparser_getstring(NULL, NULL, NULL));
-    CuAssertPtrEquals(tc, NULL, iniparser_getstring(NULL, "dummy", NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(NULL, NULL, NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(NULL, "dummy", NULL));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertPtrEquals(tc, NULL, iniparser_getstring(dic, "dummy", NULL));
-    CuAssertStrEquals(tc, "def", iniparser_getstring(dic, NULL, "def"));
-    CuAssertStrEquals(tc, "def", iniparser_getstring(dic, "dummy", "def"));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_NULL(iniparser_getstring(dic, "dummy", NULL));
+    TEST_ASSERT_EQUAL_STRING("def", iniparser_getstring(dic, NULL, "def"));
+    TEST_ASSERT_EQUAL_STRING("def", iniparser_getstring(dic, "dummy", "def"));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Generic dictionary */
     dic = generate_dictionary(100, 10);
-    CuAssertStrEquals(tc, "value-0/0",
-                      iniparser_getstring(dic, "sec0:key0", NULL));
-    CuAssertStrEquals(tc, "value-42/5",
-                      iniparser_getstring(dic, "sec42:key5", NULL));
-    CuAssertStrEquals(tc, "value-99/9",
-                      iniparser_getstring(dic, "sec99:key9", NULL));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL_STRING("value-0/0",
+                             iniparser_getstring(dic, "sec0:key0", NULL));
+    TEST_ASSERT_EQUAL_STRING("value-42/5",
+                             iniparser_getstring(dic, "sec42:key5", NULL));
+    TEST_ASSERT_EQUAL_STRING("value-99/9",
+                             iniparser_getstring(dic, "sec99:key9", NULL));
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getint(CuTest *tc)
+void test_iniparser_getint(void)
 {
     unsigned i;
     char key_name[64];
-    dictionary *dic;
-    const struct { int num; const char *value; } good_val[] = {
+    const struct {
+        int num;
+        const char *value;
+    } good_val[] = {
         { 0, "0" },
         { 1, "1" },
         { -1, "-1" },
@@ -325,49 +366,57 @@ void Test_iniparser_getint(CuTest *tc)
         "0xG1"
     };
     /* NULL test */
-    CuAssertIntEquals(tc, -42, iniparser_getint(NULL, NULL, -42));
-    CuAssertIntEquals(tc, -42, iniparser_getint(NULL, "dummy", -42));
+    TEST_ASSERT_EQUAL(-42, iniparser_getint(NULL, NULL, -42));
+    TEST_ASSERT_EQUAL(-42, iniparser_getint(NULL, "dummy", -42));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertIntEquals(tc, 42, iniparser_getint(dic, "dummy", 42));
-    CuAssertIntEquals(tc, 0xFFFF, iniparser_getint(dic, NULL, 0xFFFF));
-    CuAssertIntEquals(tc, -0xFFFF, iniparser_getint(dic, "dummy", -0xFFFF));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(42, iniparser_getint(dic, "dummy", 42));
+    TEST_ASSERT_EQUAL_HEX(0xFFFF, iniparser_getint(dic, NULL, 0xFFFF));
+    TEST_ASSERT_EQUAL_HEX(-0xFFFF, iniparser_getint(dic, "dummy", -0xFFFF));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Generic dictionary */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "int:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "int:value%d", i);
-        CuAssertIntEquals(tc, good_val[i].num,
+        TEST_ASSERT_EQUAL(good_val[i].num,
                           iniparser_getint(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "int:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "int:bad%d", i);
-        CuAssertIntEquals(tc, 0,
+        TEST_ASSERT_EQUAL(0,
                           iniparser_getint(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getlongint(CuTest *tc)
+void test_iniparser_getlongint(void)
 {
     unsigned i;
     char key_name[64];
-    dictionary *dic;
-    const struct { long int num; const char *value; } good_val[] = {
+    const struct {
+        long int num;
+        const char *value;
+    } good_val[] = {
         { 0, "0" },
         { 1, "1" },
         { -1, "-1" },
@@ -388,49 +437,57 @@ void Test_iniparser_getlongint(CuTest *tc)
         "0xG1"
     };
     /* NULL test */
-    CuAssertLongIntEquals(tc, -42, iniparser_getlongint(NULL, NULL, -42));
-    CuAssertLongIntEquals(tc, -42, iniparser_getlongint(NULL, "dummy", -42));
+    TEST_ASSERT_EQUAL(-42, iniparser_getlongint(NULL, NULL, -42));
+    TEST_ASSERT_EQUAL(-42, iniparser_getlongint(NULL, "dummy", -42));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertLongIntEquals(tc, 42, iniparser_getlongint(dic, "dummy", 42));
-    CuAssertLongIntEquals(tc, LONG_MAX, iniparser_getlongint(dic, NULL, LONG_MAX));
-    CuAssertLongIntEquals(tc, -LONG_MAX, iniparser_getlongint(dic, "dummy", -LONG_MAX));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(42, iniparser_getlongint(dic, "dummy", 42));
+    TEST_ASSERT_EQUAL(LONG_MAX, iniparser_getlongint(dic, NULL, LONG_MAX));
+    TEST_ASSERT_EQUAL(-LONG_MAX, iniparser_getlongint(dic, "dummy", -LONG_MAX));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Generic dictionary */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
-        CuAssertLongIntEquals(tc, good_val[i].num,
+        TEST_ASSERT_EQUAL(good_val[i].num,
                           iniparser_getlongint(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        CuAssertLongIntEquals(tc, 0,
+        TEST_ASSERT_EQUAL(0,
                           iniparser_getlongint(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getint64(CuTest *tc)
+void test_iniparser_getint64(void)
 {
     unsigned i;
     char key_name[64];
-    dictionary *dic;
-    const struct { int64_t num; const char *value; } good_val[] = {
+    const struct {
+        int64_t num;
+        const char *value;
+    } good_val[] = {
         { 0, "0" },
         { 1, "1" },
         { -1, "-1" },
@@ -451,49 +508,60 @@ void Test_iniparser_getint64(CuTest *tc)
         "0xG1"
     };
     /* NULL test */
-    CuAssertInt64Equals(tc, -42, iniparser_getint64(NULL, NULL, -42));
-    CuAssertInt64Equals(tc, -42, iniparser_getint64(NULL, "dummy", -42));
+    TEST_ASSERT_EQUAL_INT64(-42, iniparser_getint64(NULL, NULL, -42));
+    TEST_ASSERT_EQUAL_INT64(-42, iniparser_getint64(NULL, "dummy", -42));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertInt64Equals(tc, 42, iniparser_getint64(dic, "dummy", 42));
-    CuAssertInt64Equals(tc, 0x7FFFFFFFFFFFFFFF, iniparser_getint64(dic, NULL, 0x7FFFFFFFFFFFFFFF));
-    CuAssertInt64Equals(tc, -0x7FFFFFFFFFFFFFFF, iniparser_getint64(dic, "dummy", -0x7FFFFFFFFFFFFFFF));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL_INT64(42, iniparser_getint64(dic, "dummy", 42));
+    TEST_ASSERT_EQUAL_HEX64(0x7FFFFFFFFFFFFFFF,
+                            iniparser_getint64(dic, NULL, 0x7FFFFFFFFFFFFFFF));
+    TEST_ASSERT_EQUAL_HEX64(-0x7FFFFFFFFFFFFFFF,
+                            iniparser_getint64(dic, "dummy",
+                                -0x7FFFFFFFFFFFFFFF));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Generic dictionary */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
-        CuAssertInt64Equals(tc, good_val[i].num,
-                          iniparser_getint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_INT64(good_val[i].num,
+                                iniparser_getint64(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        CuAssertInt64Equals(tc, 0,
-                          iniparser_getint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_INT64(0,
+                                iniparser_getint64(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getuint64(CuTest *tc)
+void test_iniparser_getuint64(void)
 {
     unsigned i;
     char key_name[64];
-    dictionary *dic;
-    const struct { uint64_t num; const char *value; } good_val[] = {
+    const struct {
+        uint64_t num;
+        const char *value;
+    } good_val[] = {
         { 0, "0" },
         { 1, "1" },
         { -1, "-1" },
@@ -514,56 +582,68 @@ void Test_iniparser_getuint64(CuTest *tc)
         "0xG1"
     };
     /* NULL test */
-    CuAssertUInt64Equals(tc, -42, iniparser_getuint64(NULL, NULL, -42));
-    CuAssertUInt64Equals(tc, -42, iniparser_getuint64(NULL, "dummy", -42));
+    TEST_ASSERT_EQUAL_UINT64(-42, iniparser_getuint64(NULL, NULL, -42));
+    TEST_ASSERT_EQUAL_UINT64(-42, iniparser_getuint64(NULL, "dummy", -42));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertUInt64Equals(tc, 42, iniparser_getuint64(dic, "dummy", 42));
-    CuAssertUInt64Equals(tc, 0xFFFFFFFFFFFFFFFF, iniparser_getuint64(dic, NULL, 0xFFFFFFFFFFFFFFFF));
-    CuAssertUInt64Equals(tc, -0xFFFFFFFFFFFFFFFF, iniparser_getuint64(dic, "dummy", -0xFFFFFFFFFFFFFFFF));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL_UINT64(42, iniparser_getuint64(dic, "dummy", 42));
+    TEST_ASSERT_EQUAL_HEX64(0xFFFFFFFFFFFFFFFF,
+                            iniparser_getuint64(dic, NULL, 0xFFFFFFFFFFFFFFFF));
+    TEST_ASSERT_EQUAL_HEX64(-0xFFFFFFFFFFFFFFFF,
+                            iniparser_getuint64(dic, "dummy",
+                                -0xFFFFFFFFFFFFFFFF));
     dictionary_del(dic);
+    dic = NULL;
 
     /* Generic dictionary */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
-        CuAssertUInt64Equals(tc, good_val[i].num,
-                          iniparser_getuint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_UINT64(good_val[i].num,
+                                 iniparser_getuint64(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
     for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        CuAssertUInt64Equals(tc, 0,
-                          iniparser_getuint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_UINT64(0,
+                                 iniparser_getuint64(dic, key_name, 0));
     }
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getdouble(CuTest *tc)
+void test_iniparser_getdouble(void)
 {
-    dictionary *dic;
 
     /* NULL test */
-    CuAssertDblEquals(tc, -42, iniparser_getdouble(NULL, NULL, -42), 0);
-    CuAssertDblEquals(tc, 4.2, iniparser_getdouble(NULL, "dummy", 4.2), 0);
+    TEST_ASSERT_EQUAL_DOUBLE(-42, iniparser_getdouble(NULL, NULL, -42));
+    TEST_ASSERT_EQUAL_DOUBLE(4.2, iniparser_getdouble(NULL, "dummy", 4.2));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertDblEquals(tc, 3.1415, iniparser_getdouble(dic, "dummy", 3.1415), 0);
-    CuAssertDblEquals(tc, 0xFFFFFFFF, iniparser_getdouble(dic, NULL, 0xFFFFFFFF), 0);
-    CuAssertDblEquals(tc, -0xFFFFFFFF, iniparser_getdouble(dic, "dummy", -0xFFFFFFFF), 0);
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL_DOUBLE(3.1415,
+                             iniparser_getdouble(dic, "dummy", 3.1415));
+    TEST_ASSERT_EQUAL_DOUBLE(0xFFFFFFFF,
+                             iniparser_getdouble(dic, NULL, 0xFFFFFFFF));
+    TEST_ASSERT_EQUAL_DOUBLE(-0xFFFFFFFF,
+                             iniparser_getdouble(dic, "dummy", -0xFFFFFFFF));
 
     /* Insert some values */
     dictionary_set(dic, "double", "");
@@ -578,25 +658,28 @@ void Test_iniparser_getdouble(CuTest *tc)
     dictionary_set(dic, "double:bad0", "foo");
 
     /* Get back the values */
-    CuAssertDblEquals(tc, 0, iniparser_getdouble(dic, "double:good0", 0xFF), 0);
-    CuAssertDblEquals(tc, 0, iniparser_getdouble(dic, "double:good1", 0xFF), 0);
-    CuAssertDblEquals(tc, 1.0, iniparser_getdouble(dic, "double:good2", 0xFF), 0);
-    CuAssertDblEquals(tc, 3.1415, iniparser_getdouble(dic, "double:good3", 0xFF), 0);
-    CuAssertDblEquals(tc, 6.6655957, iniparser_getdouble(dic, "double:good4", 0xFF), 0);
-    CuAssertDblEquals(tc, -123456789.123456789,
-                         iniparser_getdouble(dic, "double:good5", 0xFF), 0);
+    TEST_ASSERT_EQUAL_DOUBLE(0, iniparser_getdouble(dic, "double:good0", 0xFF));
+    TEST_ASSERT_EQUAL_DOUBLE(0, iniparser_getdouble(dic, "double:good1", 0xFF));
+    TEST_ASSERT_EQUAL_DOUBLE(1.0,
+                             iniparser_getdouble(dic, "double:good2", 0xFF));
+    TEST_ASSERT_EQUAL_DOUBLE(3.1415,
+                             iniparser_getdouble(dic, "double:good3", 0xFF));
+    TEST_ASSERT_EQUAL_DOUBLE(6.6655957,
+                             iniparser_getdouble(dic, "double:good4", 0xFF));
+    TEST_ASSERT_EQUAL_DOUBLE(-123456789.123456789,
+                             iniparser_getdouble(dic, "double:good5", 0xFF));
 
-    CuAssertDblEquals(tc, 0, iniparser_getdouble(dic, "double:bad0", 42.42), 0);
+    TEST_ASSERT_EQUAL_DOUBLE(0, iniparser_getdouble(dic, "double:bad0", 42.42));
 
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_getboolean(CuTest *tc)
+void test_iniparser_getboolean(void)
 {
     unsigned i;
     char key_name[64];
 
-    dictionary *dic;
     const char *token_true[] = {
         "1",
         "true",
@@ -623,14 +706,15 @@ void Test_iniparser_getboolean(CuTest *tc)
     };
 
     /* NULL test */
-    CuAssertIntEquals(tc, 1, iniparser_getboolean(NULL, NULL, 1));
-    CuAssertIntEquals(tc, 1, iniparser_getboolean(NULL, "dummy", 1));
+    TEST_ASSERT_EQUAL(1, iniparser_getboolean(NULL, NULL, 1));
+    TEST_ASSERT_EQUAL(1, iniparser_getboolean(NULL, "dummy", 1));
 
     /* Check the def return element */
     dic = dictionary_new(10);
-    CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, "dummy", 1));
-    CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, NULL, 0));
-    CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, "dummy", 1));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(1, iniparser_getboolean(dic, "dummy", 1));
+    TEST_ASSERT_EQUAL(0, iniparser_getboolean(dic, NULL, 0));
+    TEST_ASSERT_EQUAL(1, iniparser_getboolean(dic, "dummy", 1));
 
     for (i = 0; token_true[i] != NULL; ++i) {
         sprintf(key_name, "bool:true%d", i);
@@ -643,11 +727,11 @@ void Test_iniparser_getboolean(CuTest *tc)
 
     for (i = 0; token_true[i] != NULL; ++i) {
         sprintf(key_name, "bool:true%d", i);
-        CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, key_name, 0));
+        TEST_ASSERT_EQUAL(1, iniparser_getboolean(dic, key_name, 0));
     }
     for (i = 0; token_false[i] != NULL; ++i) {
         sprintf(key_name, "bool:false%d", i);
-        CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, key_name, 1));
+        TEST_ASSERT_EQUAL(0, iniparser_getboolean(dic, key_name, 1));
     }
 
     /* Test bad boolean */
@@ -655,168 +739,171 @@ void Test_iniparser_getboolean(CuTest *tc)
     iniparser_set(dic, "bool:bad1", "m'kay");
     iniparser_set(dic, "bool:bad2", "42");
     iniparser_set(dic, "bool:bad3", "_true");
-    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad0", 0xFF));
-    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad1", 0xFF));
-    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad2", 0xFF));
-    CuAssertIntEquals(tc, 0xFF, iniparser_getboolean(dic, "bool:bad3", 0xFF));
+    TEST_ASSERT_EQUAL_HEX(0xFF, iniparser_getboolean(dic, "bool:bad0", 0xFF));
+    TEST_ASSERT_EQUAL_HEX(0xFF, iniparser_getboolean(dic, "bool:bad1", 0xFF));
+    TEST_ASSERT_EQUAL_HEX(0xFF, iniparser_getboolean(dic, "bool:bad2", 0xFF));
+    TEST_ASSERT_EQUAL_HEX(0xFF, iniparser_getboolean(dic, "bool:bad3", 0xFF));
 
     dictionary_del(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_line(CuTest *tc)
+void test_iniparser_line(void)
 {
     char section [ASCIILINESZ+1] ;
     char key     [ASCIILINESZ+1] ;
     char val     [ASCIILINESZ+1] ;
 
     /* Test empty line */
-    CuAssertIntEquals(tc, LINE_EMPTY, iniparser_line("", section, key, val));
-    CuAssertIntEquals(tc, LINE_EMPTY, iniparser_line("    ", section, key, val));
-    CuAssertIntEquals(tc, LINE_EMPTY, iniparser_line("\t", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_EMPTY, iniparser_line("", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_EMPTY, iniparser_line("    ", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_EMPTY, iniparser_line("\t", section, key, val));
 
     /* Test valid syntax */
-    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[s]", section, key, val));
-    CuAssertStrEquals(tc, "s", section);
+    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[s]", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("s", section);
 
-    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[section 0]", section, key, val));
-    CuAssertStrEquals(tc, "section 0", section);
+    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[section 0]", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("section 0", section);
 
-    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[ section 0 ]", section, key, val));
-    CuAssertStrEquals(tc, "section 0", section);
+    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[ section 0 ]", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("section 0", section);
 
-    CuAssertIntEquals(tc, LINE_SECTION, iniparser_line("[ section ]", section, key, val));
-    CuAssertStrEquals(tc, "section", section);
+    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[ section ]", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("section", section);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("k=1", section, key, val));
-    CuAssertStrEquals(tc, "k", key);
-    CuAssertStrEquals(tc, "1", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("k=1", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("k", key);
+    TEST_ASSERT_EQUAL_STRING("1", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = 0x42", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "0x42", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = 0x42", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("0x42", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key= value with spaces", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "value with spaces", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key= value with spaces", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("value with spaces", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("k =_!<>''", section, key, val));
-    CuAssertStrEquals(tc, "k", key);
-    CuAssertStrEquals(tc, "_!<>''", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("k =_!<>''", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("k", key);
+    TEST_ASSERT_EQUAL_STRING("_!<>''", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("empty_value =", section, key, val));
-    CuAssertStrEquals(tc, "empty_value", key);
-    CuAssertStrEquals(tc, "", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("empty_value =", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("empty_value", key);
+    TEST_ASSERT_EQUAL_STRING("", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("empty_value =        \t\n", section, key, val));
-    CuAssertStrEquals(tc, "empty_value", key);
-    CuAssertStrEquals(tc, "", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("empty_value =        \t\n", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("empty_value", key);
+    TEST_ASSERT_EQUAL_STRING("", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key =\tval # comment", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "val", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key =\tval # comment", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("val", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key \n\n = \n val", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "val", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key \n\n = \n val", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("val", val);
 
-    CuAssertIntEquals(tc, LINE_COMMENT, iniparser_line(";comment", section, key, val));
-    CuAssertIntEquals(tc, LINE_COMMENT, iniparser_line(" # comment", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_COMMENT, iniparser_line(";comment", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_COMMENT, iniparser_line(" # comment", section, key, val));
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = \"  do_not_strip  \"", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "  do_not_strip  ", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = \"  do_not_strip  \"", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("  do_not_strip  ", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = '    '", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "    ", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = '    '", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("    ", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = \"\"", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = \"\"", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("", val);
 
-    CuAssertIntEquals(tc, LINE_VALUE, iniparser_line("key = ''", section, key, val));
-    CuAssertStrEquals(tc, "key", key);
-    CuAssertStrEquals(tc, "", val);
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = ''", section, key, val));
+    TEST_ASSERT_EQUAL_STRING("key", key);
+    TEST_ASSERT_EQUAL_STRING("", val);
 
     /* Test syntax error */
-    CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("empty_value", section, key, val));
-    CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("not finished\\", section, key, val));
-    CuAssertIntEquals(tc, LINE_ERROR, iniparser_line("0x42 / 0b101010", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("empty_value", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("not finished\\", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("0x42 / 0b101010", section, key, val));
 
 }
 
-void Test_iniparser_load(CuTest *tc)
+void test_iniparser_load(void)
 {
-    DIR *dir;
     struct dirent *curr;
     struct stat curr_stat;
-    dictionary *dic;
     char ini_path[276];
 
     /* Dummy tests */
     dic = iniparser_load("/you/shall/not/path");
-    CuAssertPtrEquals(tc, NULL, dic);
+    TEST_ASSERT_NULL(dic);
 
     /* Test all the good .ini files */
     dir = opendir(GOOD_INI_PATH);
-    CuAssertPtrNotNullMsg(tc, "Cannot open good .ini conf directory", dir);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dir, "cannot open " GOOD_INI_PATH);
     for (curr = readdir(dir); curr != NULL; curr = readdir(dir)) {
         sprintf(ini_path, "%s/%s", GOOD_INI_PATH, curr->d_name);
         stat(ini_path, &curr_stat);
         if (S_ISREG(curr_stat.st_mode)) {
             dic = iniparser_load(ini_path);
-            CuAssertPtrNotNullMsg(tc, ini_path, dic);
+            TEST_ASSERT_NOT_NULL_MESSAGE(dic, ini_path);
             dictionary_del(dic);
+            dic = NULL;
         }
     }
     closedir(dir);
+    dir = NULL;
 
     /* Test all the bad .ini files */
     dir = opendir(BAD_INI_PATH);
-    CuAssertPtrNotNullMsg(tc, "Cannot open bad .ini conf directory", dir);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dir, "cannot open " BAD_INI_PATH);
     for (curr = readdir(dir); curr != NULL; curr = readdir(dir)) {
         sprintf(ini_path, "%s/%s", BAD_INI_PATH, curr->d_name);
         stat(ini_path, &curr_stat);
         if (S_ISREG(curr_stat.st_mode)) {
             dic = iniparser_load(ini_path);
-            CuAssertPtrEquals_Msg(tc, ini_path, NULL, dic);
+            TEST_ASSERT_EQUAL_PTR_MESSAGE(NULL, dic, ini_path);
             dictionary_del(dic);
+            dic = NULL;
         }
     }
     closedir(dir);
+    dir = NULL;
 }
 
-void Test_dictionary_wrapper(CuTest *tc)
+void test_dictionary_wrapper(void)
 {
-    dictionary *dic;
-
     dic = dictionary_new(10);
+    TEST_ASSERT_NOT_NULL(dic);
 
-    CuAssertIntEquals(tc, -1, iniparser_set(dic, NULL, NULL));
-    CuAssertIntEquals(tc, -1, iniparser_set(NULL, "section", "value"));
+    TEST_ASSERT_EQUAL(-1, iniparser_set(dic, NULL, NULL));
+    TEST_ASSERT_EQUAL(-1, iniparser_set(NULL, "section", "value"));
 
-    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section", NULL));
-    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", "value"));
+    TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section", NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", "value"));
 
-    CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
+    TEST_ASSERT_EQUAL_STRING("value", iniparser_getstring(dic, "section:key", NULL));
     /* reset the key's value*/
-    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
-    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section:key", "dummy"));
-    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", "value"));
-    CuAssertStrEquals(tc, "value", iniparser_getstring(dic, "section:key", NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(dic, "section:key", "dummy"));
+    TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", "value"));
+    TEST_ASSERT_EQUAL_STRING("value", iniparser_getstring(dic, "section:key", NULL));
 
     iniparser_unset(dic, "section:key");
-    CuAssertStrEquals(tc, "dummy", iniparser_getstring(dic, "section:key", "dummy"));
-    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section", "dummy"));
+    TEST_ASSERT_EQUAL_STRING("dummy", iniparser_getstring(dic, "section:key", "dummy"));
+    TEST_ASSERT_NULL(iniparser_getstring(dic, "section", "dummy"));
 
-    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key", NULL));
-    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key1", NULL));
-    CuAssertIntEquals(tc, 0, iniparser_set(dic, "section:key2", NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key1", NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key2", NULL));
 
     iniparser_unset(dic, "section");
-    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic, "section", NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(dic, "section", NULL));
 
     iniparser_freedict(dic);
+    dic = NULL;
 }
 
 static char _last_error[1024];
@@ -831,17 +918,15 @@ static int _error_callback(const char *format, ...)
 
 }
 
-void Test_iniparser_error_callback(CuTest *tc)
+void test_iniparser_error_callback(void)
 {
-    dictionary *dic;
-
     /* Specify our custom error_callback */
     iniparser_set_error_callback(_error_callback);
 
     /* Trigger an error and check it was written on the right output */
     dic = iniparser_load("/path/to/nowhere.ini");
-    CuAssertPtrEquals(tc, NULL, dic);
-    CuAssertStrEquals(tc, "iniparser: cannot open /path/to/nowhere.ini\n", _last_error);
+    TEST_ASSERT_NULL(dic);
+    TEST_ASSERT_EQUAL_STRING("iniparser: cannot open /path/to/nowhere.ini\n", _last_error);
 
     /* Reset erro_callback */
     _last_error[0] = '\0';
@@ -849,377 +934,272 @@ void Test_iniparser_error_callback(CuTest *tc)
 
     /* Make sure custom callback is no more called */
     dic = iniparser_load("/path/to/nowhere.ini");
-    CuAssertPtrEquals(tc, NULL, dic);
-    CuAssertStrEquals(tc, "", _last_error);
+    TEST_ASSERT_NULL(dic);
+    TEST_ASSERT_EQUAL_STRING("", _last_error);
 }
 
-void Test_iniparser_dump(CuTest *tc)
+void test_iniparser_dump(void)
 {
-    dictionary *dic;
-    FILE *fp = NULL;
     char buff[255];
     char *ret;
 
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
-    if(dic == NULL)
-    {
-        printf("error: old.ini is not exist");
-        exit(-1);
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
+    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
+    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
     /*open test.txt*/
-    fp = fopen(TEST_TXT_PATH,"w");
-    if(fp == NULL)
-    {
-        printf("error: test.txt is not exist");
-        exit(-1);
-    }
+    ini = fopen(TEST_TXT_PATH,"w");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_TXT_PATH);
     /*dump the data of old.ini to new.ini*/
-    iniparser_dump(dic,fp);
-    fclose(fp);
+    iniparser_dump(dic,ini);
+    fclose(ini);
+    ini = NULL;
     iniparser_freedict(dic);
+    dic = NULL;
     /*read the data of test.txt*/
-    fp = fopen(TEST_TXT_PATH,"r");
-    if(fp == NULL)
-    {
-        printf("error: test.txt is not exist");
-        exit(-1);
-    }
-    ret = fgets(buff,100,fp);
+    ini = fopen(TEST_TXT_PATH,"r");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_TXT_PATH);
+    ret = fgets(buff,100,ini);
     (void)ret;
     /*remove '\n'*/
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
     }
-    CuAssertStrEquals(tc,"[section]=UNDEF",buff);
-    ret = fgets(buff,100,fp);
+    TEST_ASSERT_EQUAL_STRING("[section]=UNDEF",buff);
+    ret = fgets(buff,100,ini);
     (void)ret;
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
     }
-    CuAssertStrEquals(tc,"[section:key_01]=[hello world]",buff);
-    ret = fgets(buff,100,fp);
+    TEST_ASSERT_EQUAL_STRING("[section:key_01]=[hello world]",buff);
+    ret = fgets(buff,100,ini);
     (void)ret;
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
     }
-    CuAssertStrEquals(tc,"[section:key1]=[321abc]",buff);
-    fclose(fp);
+    TEST_ASSERT_EQUAL_STRING("[section:key1]=[321abc]",buff);
+    fclose(ini);
+    ini = NULL;
 }
 
-void Test_iniparser_dump_ini(CuTest *tc)
+void test_iniparser_dump_ini(void)
 {
-    dictionary *dic;
-    FILE *fp = NULL;
-
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
-    if(dic ==NULL)
-    {
-        printf("error: old.ini is not exist");
-        exit(-1);
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
+    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
+    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
     /*open new.ini*/
-    fp = fopen(NEW_INI_PATH,"w");
-    if(fp == NULL)
-    {
-        printf("error: new.ini is not exist");
-        exit(-1);
-    }
+    ini = fopen(NEW_INI_PATH,"w");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " NEW_INI_PATH);
     /*dump the data of old.ini to new.ini*/
-    iniparser_dump_ini(dic,fp);
-    fclose(fp);
+    iniparser_dump_ini(dic,ini);
+    fclose(ini);
+    ini = NULL;
     iniparser_freedict(dic);
+    dic = NULL;
     /*loading new.ini*/
     dic = iniparser_load(NEW_INI_PATH);
-    if(dic ==NULL)
-    {
-        printf("error: new.ini is not exist");
-        exit(-1);
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " NEW_INI_PATH);
     /*check the data of new.ini*/
-    CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
+    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
+    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
     iniparser_freedict(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_dumpsection_ini(CuTest *tc)
+void test_iniparser_dumpsection_ini(void)
 {
-    dictionary *dic;
-    FILE *fp = NULL;
-
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
-    if(dic ==NULL)
-    {
-        printf("error: old.ini is not exist");
-        exit(-1);
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
+    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
+    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
     /*open test.ini*/
-    fp = fopen(TEST_INI_PATH,"w");
-    if(fp == NULL)
-    {
-        printf("error: test.ini is not exist");
-        exit(-1);
-    }
+    ini = fopen(TEST_INI_PATH,"w");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_INI_PATH);
     /*dump the data of old.ini to test.ini*/
-    iniparser_dumpsection_ini(dic,"section",fp);
-    fclose(fp);
+    iniparser_dumpsection_ini(dic,"section",ini);
+    fclose(ini);
+    ini = NULL;
     iniparser_freedict(dic);
+    dic = NULL;
     /*loading test.ini*/
     dic = iniparser_load(TEST_INI_PATH);
-    if(dic ==NULL)
-    {
-        printf("error: test.ini is not exist");
-        exit(-1);
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TEST_INI_PATH);
     /*check the data of test.ini*/
-    CuAssertStrEquals(tc,"hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    CuAssertStrEquals(tc,"321abc",iniparser_getstring(dic,"section:key1",NULL));
+    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
+    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
     iniparser_freedict(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_find_entry(CuTest *tc)
+void test_iniparser_find_entry(void)
 {
-    dictionary *dic;
     int i;
     /* NULL test */
-    CuAssertIntEquals(tc, 0, iniparser_find_entry(NULL, NULL));
-    CuAssertIntEquals(tc, 0, iniparser_find_entry(NULL, "dummy"));
+    TEST_ASSERT_EQUAL(0, iniparser_find_entry(NULL, NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_find_entry(NULL, "dummy"));
 
     /* Empty dictionary test*/
     dic = dictionary_new(10);
-    CuAssertPtrNotNull(tc, dic);
-    CuAssertIntEquals(tc, 0, iniparser_find_entry(dic, NULL));
-    CuAssertIntEquals(tc, 0, iniparser_find_entry(dic, "dummy"));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(0, iniparser_find_entry(dic, NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_find_entry(dic, "dummy"));
     dictionary_del(dic);
+    dic = NULL;
 
     /*Regular dictionary */
     dic = generate_dictionary(1, 8);
-    CuAssertPtrNotNull(tc, dic);
+    TEST_ASSERT_NOT_NULL(dic);
     for (i = 1; i < 8; i++)
     {
-        CuAssertIntEquals(tc, 1, iniparser_find_entry(dic, dic->key[i]));
+        TEST_ASSERT_EQUAL(1, iniparser_find_entry(dic, dic->key[i]));
     }
-    CuAssertIntEquals(tc, 0, iniparser_find_entry(dic, "dummy"));
+    TEST_ASSERT_EQUAL(0, iniparser_find_entry(dic, "dummy"));
 
     iniparser_freedict(dic);
+    dic = NULL;
 }
 
-void Test_iniparser_utf8(CuTest *tc)
+void test_iniparser_utf8(void)
 {
-    dictionary *dic;
-
     dic = iniparser_load(GRUEZI_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", GRUEZI_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " GRUEZI_INI_PATH);
 
     /* Generic dictionary */
-    CuAssertStrEquals(tc, "example",
-                      iniparser_getstring(dic, "Chuchichäschtli:10.123", NULL));
-    CuAssertStrEquals(tc, "Grüzi",
-                      iniparser_getstring(dic, "Chuchichäschtli:Gruss", NULL));
+    TEST_ASSERT_EQUAL_STRING("example",
+                             iniparser_getstring(dic, "Chuchichäschtli:10.123", NULL));
+    TEST_ASSERT_EQUAL_STRING("Grüzi",
+                             iniparser_getstring(dic, "Chuchichäschtli:Gruss", NULL));
     dictionary_del(dic);
     dic = iniparser_load(UTF8_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", UTF8_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " UTF8_INI_PATH);
 
     /* Generic dictionary */
-    CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, "拉麺:叉焼", -1));
-    CuAssertIntEquals(tc, 1, iniparser_getboolean(dic, "拉麺:味噌", -1));
-    CuAssertIntEquals(tc, 0, iniparser_getboolean(dic, "拉麺:海苔", -1));
-    CuAssertStrEquals(tc, "そうだね",
-                      iniparser_getstring(dic, "拉麺:メンマ", NULL));
+    TEST_ASSERT_EQUAL(0, iniparser_getboolean(dic, "拉麺:叉焼", -1));
+    TEST_ASSERT_EQUAL(1, iniparser_getboolean(dic, "拉麺:味噌", -1));
+    TEST_ASSERT_EQUAL(0, iniparser_getboolean(dic, "拉麺:海苔", -1));
+    TEST_ASSERT_EQUAL_STRING("そうだね",
+                             iniparser_getstring(dic, "拉麺:メンマ", NULL));
     dictionary_del(dic);
+    dic = NULL;
 }
 
 static void create_empty_ini_file(const char *filename)
 {
-    FILE *ini;
-
-    if ((ini = fopen(filename, "w")) == NULL) {
-        fprintf(stderr, "iniparser: cannot create %s\n", filename);
-        return;
-    }
-
+    ini = fopen(filename, "w");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, filename);
     fclose(ini);
+    ini = NULL;
 }
 
-void Test_iniparser_misformed(CuTest *tc)
+void test_iniparser_misformed(void)
 {
-    dictionary *dic;
-    FILE *ini;
     int ret;
 
     create_empty_ini_file(TMP_INI_PATH);
     dic = iniparser_load(TMP_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
     ret = iniparser_set(dic, MISFORMED_INI_SEC0, NULL);
-
-    if (ret < 0) {
-        fprintf(stderr, "cannot set section %s in: %s\n", MISFORMED_INI_SEC0,
-                TMP_INI_PATH);
-        goto del_dic;
-    }
-
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot set section "
+                                         MISFORMED_INI_SEC0 " in: "
+                                         TMP_INI_PATH);
     iniparser_set(dic, MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, "2222");
     /* test dictionary */
-    CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
+    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1));
     ini = fopen(TMP_INI_PATH, "w+");
-
-    if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
     iniparser_dump_ini(dic, ini);
     fclose(ini);
+    ini = NULL;
     dictionary_del(dic);
     /* check if section has been written as expected */
     dic = iniparser_load(TMP_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        goto rm_ini;
-    }
-
-    CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
+    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1));
     dictionary_del(dic);
+    dic = NULL;
     ret = remove(TMP_INI_PATH);
-
-    if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 
     create_empty_ini_file(TMP_INI_PATH);
     dic = iniparser_load(TMP_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
     ret = iniparser_set(dic, MISFORMED_INI_SEC1, NULL);
-
-    if (ret < 0) {
-        fprintf(stderr, "cannot set section %s in: %s\n", MISFORMED_INI_SEC1,
-                TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot set section "
+                                         MISFORMED_INI_SEC1 " in: "
+                                         TMP_INI_PATH);
 
     iniparser_set(dic, MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, "2222");
     /* test dictionary */
-    CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
+    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1));
     ini = fopen(TMP_INI_PATH, "w+");
-
-    if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
     iniparser_dump_ini(dic, ini);
     fclose(ini);
+    ini = NULL;
     dictionary_del(dic);
     /* check if section has been written as expected */
     dic = iniparser_load(TMP_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
-
-    CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
+    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1));
     dictionary_del(dic);
+    dic = NULL;
     ret = remove(TMP_INI_PATH);
-
-    if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 
     create_empty_ini_file(TMP_INI_PATH);
     dic = iniparser_load(TMP_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
     ret = iniparser_set(dic, MISFORMED_INI_SEC2, NULL);
-
-    if (ret < 0) {
-        fprintf(stderr, "cannot set section %s in: %s\n", MISFORMED_INI_SEC2,
-                TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot set section "
+                                         MISFORMED_INI_SEC2 " in: "
+                                         TMP_INI_PATH);
 
     iniparser_set(dic, MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, "2222");
     /* test dictionary */
-    CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
+    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1));
     ini = fopen(TMP_INI_PATH, "w+");
-
-    if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
     iniparser_dump_ini(dic, ini);
     fclose(ini);
+    ini = NULL;
     dictionary_del(dic);
     /* check if section has been written as expected */
     dic = iniparser_load(TMP_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
-
-    CuAssertIntEquals(tc, 2222, iniparser_getint(dic,
+    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
                       MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1));
-del_dic:
     dictionary_del(dic);
-rm_ini:
+    dic = NULL;
     ret = remove(TMP_INI_PATH);
-
-    if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 }
 
-void Test_iniparser_quotes(CuTest *tc)
+void test_iniparser_quotes(void)
 {
-    dictionary *dic;
-    FILE *ini;
     int ret;
 
     /**
@@ -1227,242 +1207,176 @@ void Test_iniparser_quotes(CuTest *tc)
      */
     /* check if section has been written as expected */
     dic = iniparser_load(QUOTES_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load "  QUOTES_INI_PATH);
 
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", QUOTES_INI_PATH);
-        goto rm_ini;
-    }
-
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
     /*
      * iniparser_load() supports semicolon and hash in values if they are
      * quoted
      */
-    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
-    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
-    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
-    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
+    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
+    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
     /*
      * iniparser_load() supports quotes in attributes
      */
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str\"ing", NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" "str\"ing", NULL));
     /*
      * iniparser_load() does not support semicolon or hash in attributes
      */
-    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str;ing", NULL));
-    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str#ing", NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(dic,
+                                         QUOTES_INI_SEC ":" "str;ing", NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(dic,
+                                         QUOTES_INI_SEC ":" "str#ing", NULL));
     /*
      * iniparser_load() does support colon in attributes
      */
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str:ing", NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" "str:ing", NULL));
     ini = fopen(TMP_INI_PATH, "w+");
-
-    if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
     /**
      * Test iniparser_dump_ini()
      */
     iniparser_dump_ini(dic, ini);
     fclose(ini);
+    ini = NULL;
     dictionary_del(dic);
     dic = iniparser_load(TMP_INI_PATH);
 
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
-    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
-    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
-    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
-    CuAssertStrEquals(tc, "str", iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str\"ing", NULL));
-    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str;ing", NULL));
-    CuAssertStrEquals(tc, NULL, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str#ing", NULL));
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" "str:ing", NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
+    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
+    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" "str\"ing", NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(dic,
+                                         QUOTES_INI_SEC ":" "str;ing", NULL));
+    TEST_ASSERT_NULL(iniparser_getstring(dic,
+                                         QUOTES_INI_SEC ":" "str#ing", NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" "str:ing", NULL));
     dictionary_del(dic);
+    dic = NULL;
     ret = remove(TMP_INI_PATH);
-
-    if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
     /**
      * test iniparser_set()
      */
     create_empty_ini_file(TMP_INI_PATH);
     dic = iniparser_load(TMP_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
     ret = iniparser_set(dic, QUOTES_INI_SEC, NULL);
-
-    if (ret < 0) {
-        fprintf(stderr, "cannot set section %s in: %s\n", QUOTES_INI_SEC,
-                TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot set " QUOTES_INI_SEC
+                                         " in: " TMP_INI_PATH);
 
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, QUOTES_INI_VAL0);
     /* iniparser_set() supports quotes in values */
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
     ini = fopen(TMP_INI_PATH, "w+");
-
-    if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
     iniparser_dump_ini(dic, ini);
     fclose(ini);
+    ini = NULL;
     dictionary_del(dic);
     /* check if section has been written as expected */
     dic = iniparser_load(TMP_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        goto rm_ini;
-    }
-
-    CuAssertStrEquals(tc, QUOTES_INI_VAL0, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
     dictionary_del(dic);
+    dic = NULL;
     ret = remove(TMP_INI_PATH);
-
-    if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 
     /*
      * test semicolon comment
      */
     create_empty_ini_file(TMP_INI_PATH);
     dic = iniparser_load(TMP_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
     ret = iniparser_set(dic, QUOTES_INI_SEC, NULL);
-
-    if (ret < 0) {
-        fprintf(stderr, "cannot set section %s in: %s\n", QUOTES_INI_SEC,
-                TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot set " QUOTES_INI_SEC
+                                         " in: " TMP_INI_PATH);
 
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, QUOTES_INI_VAL1);
     /* iniparser_set() supports ; in values */
-    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
     ini = fopen(TMP_INI_PATH, "w+");
-
-    if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
     iniparser_dump_ini(dic, ini);
     fclose(ini);
+    ini = NULL;
     dictionary_del(dic);
     /* check if section has been written as expected */
     dic = iniparser_load(TMP_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        goto rm_ini;
-    }
-
-    CuAssertStrEquals(tc, QUOTES_INI_VAL1, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
     dictionary_del(dic);
+    dic = NULL;
     ret = remove(TMP_INI_PATH);
-
-    if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 
     /*
      * test hash comment
      */
     create_empty_ini_file(TMP_INI_PATH);
     dic = iniparser_load(TMP_INI_PATH);
-
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
     ret = iniparser_set(dic, QUOTES_INI_SEC, NULL);
-
-    if (ret < 0) {
-        fprintf(stderr, "cannot set section %s in: %s\n", QUOTES_INI_SEC,
-                TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot set " QUOTES_INI_SEC
+                                         " in: " TMP_INI_PATH);
 
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, QUOTES_INI_VAL2);
     /* iniparser_set() supports # in values */
-    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
     ini = fopen(TMP_INI_PATH, "w+");
-
-    if (!ini) {
-        fprintf(stderr, "iniparser: cannot open %s\n", TMP_INI_PATH);
-        goto del_dic;
-    }
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
     iniparser_dump_ini(dic, ini);
     fclose(ini);
+    ini = NULL;
     dictionary_del(dic);
     /* check if section has been written as expected */
     dic = iniparser_load(TMP_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    if (!dic) {
-        fprintf(stderr, "cannot parse file: %s\n", TMP_INI_PATH);
-        goto rm_ini;
-    }
-
-    CuAssertStrEquals(tc, QUOTES_INI_VAL2, iniparser_getstring(dic,
-                      QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
-del_dic:
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
+                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
     dictionary_del(dic);
-rm_ini:
+    dic = NULL;
     ret = remove(TMP_INI_PATH);
-
-    if (ret) {
-        fprintf(stderr, "cannot remove file: %s\n", TMP_INI_PATH);
-        return;
-    }
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 }
