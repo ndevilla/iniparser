@@ -1,4 +1,4 @@
-image: registry.gitlab.com/iniparser/docker-cmake:develop
+image: registry.gitlab.com/iniparser/docker-cmake:latest
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
