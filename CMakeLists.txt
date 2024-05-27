@@ -115,8 +115,7 @@ configure_file(
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-option(BUILD_TESTS "Build and install tests")
-if(BUILD_TESTS)
+if(BUILD_TESTING)
   set(TEST_NAME testrun)
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
