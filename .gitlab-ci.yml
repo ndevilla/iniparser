@@ -22,7 +22,6 @@ build:
     artifacts:
         paths:
             - install/
-            - test/ressources/
             - build/
             - build/html/
 

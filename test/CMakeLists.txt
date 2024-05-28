@@ -50,16 +50,18 @@ function(create_test_runner)
   endforeach()
 endfunction()
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ressources
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 create_test_runner(NAME ${PROJECT_NAME})
 message(STATUS "Adding test test_${PROJECT_NAME}")
 add_test(
   NAME test_${PROJECT_NAME}
   COMMAND test_${PROJECT_NAME}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 create_test_runner(NAME dictionary)
 message(STATUS "Adding test test_dictionary")
 add_test(
   NAME test_dictionary
   COMMAND test_dictionary
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
