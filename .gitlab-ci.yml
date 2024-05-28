@@ -9,7 +9,10 @@ stages:
     - build
     - doc
     - test
-    - win
+    # due to the long provisioning time, windows gets its own stages
+    - win-build
+    - win-test
+    - win-exe
 
 build:
     stage: build
@@ -93,13 +96,38 @@ parse-memcheck:
 win-build:
     extends:
         - .shared_windows_runners
-    stage: win
+    stage: win-build
     script:
         - mkdir build
         - cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=ON ..
+        - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
         - cmake --build .
     artifacts:
         paths:
-            - install
+            - install/
+            - build/
     dependencies: []
+
+win-test:
+    extends:
+        - .shared_windows_runners
+    stage: win-test
+    script:
+        - cd build/
+        - ctest --verbose
+    dependencies:
+        - win-build
+    artifacts:
+        paths:
+            - build/test/
+    dependencies: []
+
+win-exe:
+    stage: win-exe
+    script:
+        - cd install/share/doc/iniparser/examples/
+        - ./iniexample
+        - ./iniwrite
+        - ./parse
+    dependencies:
+        - win-build
