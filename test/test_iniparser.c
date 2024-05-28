@@ -926,7 +926,8 @@ void test_iniparser_error_callback(void)
     /* Trigger an error and check it was written on the right output */
     dic = iniparser_load("/path/to/nowhere.ini");
     TEST_ASSERT_NULL(dic);
-    TEST_ASSERT_EQUAL_STRING("iniparser: cannot open /path/to/nowhere.ini\n", _last_error);
+    TEST_ASSERT_EQUAL_STRING("iniparser: cannot open /path/to/nowhere.ini\n",
+                             _last_error);
 
     /* Reset erro_callback */
     _last_error[0] = '\0';
@@ -941,14 +942,16 @@ void test_iniparser_error_callback(void)
 void test_iniparser_dump(void)
 {
     char buff[255];
-    char *ret;
+    const char *str;
 
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
+    str = iniparser_getstring(dic,"section:key_01",NULL);
+    TEST_ASSERT_EQUAL_STRING("hello world", str);
+    str = iniparser_getstring(dic,"section:key1",NULL);
+    TEST_ASSERT_EQUAL_STRING("321abc", str);
     /*open test.txt*/
     ini = fopen(TEST_TXT_PATH,"w");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_TXT_PATH);
@@ -961,23 +964,23 @@ void test_iniparser_dump(void)
     /*read the data of test.txt*/
     ini = fopen(TEST_TXT_PATH,"r");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_TXT_PATH);
-    ret = fgets(buff,100,ini);
-    (void)ret;
+    str = fgets(buff,100,ini);
+    (void)str;
     /*remove '\n'*/
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
     }
     TEST_ASSERT_EQUAL_STRING("[section]=UNDEF",buff);
-    ret = fgets(buff,100,ini);
-    (void)ret;
+    str = fgets(buff,100,ini);
+    (void)str;
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
     }
     TEST_ASSERT_EQUAL_STRING("[section:key_01]=[hello world]",buff);
-    ret = fgets(buff,100,ini);
-    (void)ret;
+    str = fgets(buff,100,ini);
+    (void)str;
     if(buff[strlen(buff)-1] == '\n')
     {
         buff[strlen(buff)-1] = '\0';
@@ -989,12 +992,16 @@ void test_iniparser_dump(void)
 
 void test_iniparser_dump_ini(void)
 {
+    const char *str;
+
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
+    str = iniparser_getstring(dic,"section:key_01",NULL);
+    TEST_ASSERT_EQUAL_STRING("hello world", str);
+    str = iniparser_getstring(dic,"section:key1",NULL);
+    TEST_ASSERT_EQUAL_STRING("321abc", str);
     /*open new.ini*/
     ini = fopen(NEW_INI_PATH,"w");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " NEW_INI_PATH);
@@ -1008,20 +1015,26 @@ void test_iniparser_dump_ini(void)
     dic = iniparser_load(NEW_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " NEW_INI_PATH);
     /*check the data of new.ini*/
-    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
+    str = iniparser_getstring(dic,"section:key_01",NULL);
+    TEST_ASSERT_EQUAL_STRING("hello world", str);
+    str = iniparser_getstring(dic,"section:key1",NULL);
+    TEST_ASSERT_EQUAL_STRING("321abc", str);
     iniparser_freedict(dic);
     dic = NULL;
 }
 
 void test_iniparser_dumpsection_ini(void)
 {
+    const char *str;
+
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
+    str = iniparser_getstring(dic,"section:key_01",NULL);
+    TEST_ASSERT_EQUAL_STRING("hello world", str);
+    str = iniparser_getstring(dic,"section:key1",NULL);
+    TEST_ASSERT_EQUAL_STRING("321abc", str);
     /*open test.ini*/
     ini = fopen(TEST_INI_PATH,"w");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_INI_PATH);
@@ -1035,24 +1048,31 @@ void test_iniparser_dumpsection_ini(void)
     dic = iniparser_load(TEST_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TEST_INI_PATH);
     /*check the data of test.ini*/
-    TEST_ASSERT_EQUAL_STRING("hello world",iniparser_getstring(dic,"section:key_01",NULL));
-    TEST_ASSERT_EQUAL_STRING("321abc",iniparser_getstring(dic,"section:key1",NULL));
+    str = iniparser_getstring(dic,"section:key_01",NULL);
+    TEST_ASSERT_EQUAL_STRING("hello world", str);
+    str = iniparser_getstring(dic,"section:key1",NULL);
+    TEST_ASSERT_EQUAL_STRING("321abc", str);
     iniparser_freedict(dic);
     dic = NULL;
 }
 
 void test_iniparser_find_entry(void)
 {
-    int i;
+    int i, ret;
+
     /* NULL test */
-    TEST_ASSERT_EQUAL(0, iniparser_find_entry(NULL, NULL));
-    TEST_ASSERT_EQUAL(0, iniparser_find_entry(NULL, "dummy"));
+    ret = iniparser_find_entry(NULL, NULL);
+    TEST_ASSERT_EQUAL(0, ret);
+    ret = iniparser_find_entry(NULL, "dummy");
+    TEST_ASSERT_EQUAL(0, ret);
 
     /* Empty dictionary test*/
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
-    TEST_ASSERT_EQUAL(0, iniparser_find_entry(dic, NULL));
-    TEST_ASSERT_EQUAL(0, iniparser_find_entry(dic, "dummy"));
+    ret = iniparser_find_entry(dic, NULL);
+    TEST_ASSERT_EQUAL(0, ret);
+    ret = iniparser_find_entry(dic, "dummy");
+    TEST_ASSERT_EQUAL(0, ret);
     dictionary_del(dic);
     dic = NULL;
 
@@ -1061,9 +1081,11 @@ void test_iniparser_find_entry(void)
     TEST_ASSERT_NOT_NULL(dic);
     for (i = 1; i < 8; i++)
     {
-        TEST_ASSERT_EQUAL(1, iniparser_find_entry(dic, dic->key[i]));
+        ret = iniparser_find_entry(dic, dic->key[i]);
+        TEST_ASSERT_EQUAL(1, ret);
     }
-    TEST_ASSERT_EQUAL(0, iniparser_find_entry(dic, "dummy"));
+    ret = iniparser_find_entry(dic, "dummy");
+    TEST_ASSERT_EQUAL(0, ret);
 
     iniparser_freedict(dic);
     dic = NULL;
@@ -1071,24 +1093,30 @@ void test_iniparser_find_entry(void)
 
 void test_iniparser_utf8(void)
 {
+    const char *str;
+    int ret;
+
     dic = iniparser_load(GRUEZI_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " GRUEZI_INI_PATH);
 
     /* Generic dictionary */
-    TEST_ASSERT_EQUAL_STRING("example",
-                             iniparser_getstring(dic, "Chuchichäschtli:10.123", NULL));
-    TEST_ASSERT_EQUAL_STRING("Grüzi",
-                             iniparser_getstring(dic, "Chuchichäschtli:Gruss", NULL));
+    str = iniparser_getstring(dic, "Chuchichäschtli:10.123", NULL);
+    TEST_ASSERT_EQUAL_STRING("example", str);
+    str = iniparser_getstring(dic, "Chuchichäschtli:Gruss", NULL);
+    TEST_ASSERT_EQUAL_STRING("Grüzi", str);
     dictionary_del(dic);
     dic = iniparser_load(UTF8_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " UTF8_INI_PATH);
 
     /* Generic dictionary */
-    TEST_ASSERT_EQUAL(0, iniparser_getboolean(dic, "拉麺:叉焼", -1));
-    TEST_ASSERT_EQUAL(1, iniparser_getboolean(dic, "拉麺:味噌", -1));
-    TEST_ASSERT_EQUAL(0, iniparser_getboolean(dic, "拉麺:海苔", -1));
-    TEST_ASSERT_EQUAL_STRING("そうだね",
-                             iniparser_getstring(dic, "拉麺:メンマ", NULL));
+    ret = iniparser_getboolean(dic, "拉麺:叉焼", -1);
+    TEST_ASSERT_EQUAL(0, ret);
+    ret = iniparser_getboolean(dic, "拉麺:味噌", -1);
+    TEST_ASSERT_EQUAL(1, ret);
+    ret = iniparser_getboolean(dic, "拉麺:海苔", -1);
+    TEST_ASSERT_EQUAL(0, ret);
+    str = iniparser_getstring(dic, "拉麺:メンマ", NULL);
+    TEST_ASSERT_EQUAL_STRING("そうだね", str);
     dictionary_del(dic);
     dic = NULL;
 }
@@ -1115,8 +1143,8 @@ void test_iniparser_misformed(void)
                                          TMP_INI_PATH);
     iniparser_set(dic, MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, "2222");
     /* test dictionary */
-    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1));
+    ret = iniparser_getint(dic, MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1);
+    TEST_ASSERT_EQUAL(2222, ret);
     ini = fopen(TMP_INI_PATH, "w+");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
@@ -1128,8 +1156,8 @@ void test_iniparser_misformed(void)
     dic = iniparser_load(TMP_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1));
+    ret = iniparser_getint(dic, MISFORMED_INI_SEC0 ":" MISFORMED_INI_ATTR, -1);
+    TEST_ASSERT_EQUAL(2222, ret);
     dictionary_del(dic);
     dic = NULL;
     ret = remove(TMP_INI_PATH);
@@ -1146,8 +1174,8 @@ void test_iniparser_misformed(void)
 
     iniparser_set(dic, MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, "2222");
     /* test dictionary */
-    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1));
+    ret = iniparser_getint(dic, MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1);
+    TEST_ASSERT_EQUAL(2222, ret);
     ini = fopen(TMP_INI_PATH, "w+");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
@@ -1159,8 +1187,8 @@ void test_iniparser_misformed(void)
     dic = iniparser_load(TMP_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1));
+    ret = iniparser_getint(dic, MISFORMED_INI_SEC1 ":" MISFORMED_INI_ATTR, -1);
+    TEST_ASSERT_EQUAL(2222, ret);
     dictionary_del(dic);
     dic = NULL;
     ret = remove(TMP_INI_PATH);
@@ -1177,8 +1205,8 @@ void test_iniparser_misformed(void)
 
     iniparser_set(dic, MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, "2222");
     /* test dictionary */
-    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1));
+    ret = iniparser_getint(dic, MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1);
+    TEST_ASSERT_EQUAL(2222, ret);
     ini = fopen(TMP_INI_PATH, "w+");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
@@ -1190,8 +1218,8 @@ void test_iniparser_misformed(void)
     dic = iniparser_load(TMP_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    TEST_ASSERT_EQUAL(2222, iniparser_getint(dic,
-                      MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1));
+    ret = iniparser_getint(dic, MISFORMED_INI_SEC2 ":" MISFORMED_INI_ATTR, -1);
+    TEST_ASSERT_EQUAL(2222, ret);
     dictionary_del(dic);
     dic = NULL;
     ret = remove(TMP_INI_PATH);
@@ -1200,6 +1228,7 @@ void test_iniparser_misformed(void)
 
 void test_iniparser_quotes(void)
 {
+    const char *str;
     int ret;
 
     /**
@@ -1209,39 +1238,39 @@ void test_iniparser_quotes(void)
     dic = iniparser_load(QUOTES_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load "  QUOTES_INI_PATH);
 
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
     /*
      * iniparser_load() supports semicolon and hash in values if they are
      * quoted
      */
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
-    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
-    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL);
+    TEST_ASSERT_EQUAL_STRING("str", str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL);
+    TEST_ASSERT_EQUAL_STRING("str", str);
     /*
      * iniparser_load() supports quotes in attributes
      */
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" "str\"ing", NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str\"ing", NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
     /*
      * iniparser_load() does not support semicolon or hash in attributes
      */
-    TEST_ASSERT_NULL(iniparser_getstring(dic,
-                                         QUOTES_INI_SEC ":" "str;ing", NULL));
-    TEST_ASSERT_NULL(iniparser_getstring(dic,
-                                         QUOTES_INI_SEC ":" "str#ing", NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str;ing", NULL);
+    TEST_ASSERT_NULL(str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str#ing", NULL);
+    TEST_ASSERT_NULL(str);
     /*
      * iniparser_load() does support colon in attributes
      */
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" "str:ing", NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str:ing", NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
     ini = fopen(TMP_INI_PATH, "w+");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
@@ -1254,26 +1283,26 @@ void test_iniparser_quotes(void)
     dictionary_del(dic);
     dic = iniparser_load(TMP_INI_PATH);
 
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL));
-    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL));
-    TEST_ASSERT_EQUAL_STRING("str", iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL));
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" "str\"ing", NULL));
-    TEST_ASSERT_NULL(iniparser_getstring(dic,
-                                         QUOTES_INI_SEC ":" "str;ing", NULL));
-    TEST_ASSERT_NULL(iniparser_getstring(dic,
-                                         QUOTES_INI_SEC ":" "str#ing", NULL));
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" "str:ing", NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR3, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR4, NULL);
+    TEST_ASSERT_EQUAL_STRING("str", str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR5, NULL);
+    TEST_ASSERT_EQUAL_STRING("str", str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str\"ing", NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str;ing", NULL);
+    TEST_ASSERT_NULL(str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str#ing", NULL);
+    TEST_ASSERT_NULL(str);
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" "str:ing", NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
     dictionary_del(dic);
     dic = NULL;
     ret = remove(TMP_INI_PATH);
@@ -1292,8 +1321,8 @@ void test_iniparser_quotes(void)
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, QUOTES_INI_VAL0);
     /* iniparser_set() supports quotes in values */
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
     ini = fopen(TMP_INI_PATH, "w+");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
@@ -1305,8 +1334,8 @@ void test_iniparser_quotes(void)
     dic = iniparser_load(TMP_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR0, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL0, str);
     dictionary_del(dic);
     dic = NULL;
     ret = remove(TMP_INI_PATH);
@@ -1326,8 +1355,8 @@ void test_iniparser_quotes(void)
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, QUOTES_INI_VAL1);
     /* iniparser_set() supports ; in values */
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, str);
     ini = fopen(TMP_INI_PATH, "w+");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
@@ -1339,8 +1368,8 @@ void test_iniparser_quotes(void)
     dic = iniparser_load(TMP_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, str);
     dictionary_del(dic);
     dic = NULL;
     ret = remove(TMP_INI_PATH);
@@ -1360,8 +1389,8 @@ void test_iniparser_quotes(void)
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, QUOTES_INI_VAL2);
     /* iniparser_set() supports # in values */
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, str);
     ini = fopen(TMP_INI_PATH, "w+");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
 
@@ -1373,8 +1402,8 @@ void test_iniparser_quotes(void)
     dic = iniparser_load(TMP_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
 
-    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, iniparser_getstring(dic,
-                             QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL));
+    str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR2, NULL);
+    TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL2, str);
     dictionary_del(dic);
     dic = NULL;
     ret = remove(TMP_INI_PATH);
