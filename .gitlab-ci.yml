@@ -23,7 +23,6 @@ build:
         paths:
             - install/
             - build/
-            - build/html/
 
 pages:
     stage: doc
