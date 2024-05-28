@@ -11,7 +11,6 @@ stages:
     - test
     # due to the long provisioning time, windows gets its own stages
     - win-build
-    - win-test
     - win-exe
 
 build:
@@ -111,7 +110,7 @@ win-build:
 win-test:
     extends:
         - .shared_windows_runners
-    stage: win-test
+    stage: win-exe
     script:
         - cd build/
         - ctest --verbose
@@ -122,7 +121,7 @@ win-test:
             - build/test/
     dependencies: []
 
-win-exe:
+win-examples:
     stage: win-exe
     script:
         - cd install/share/doc/iniparser/examples/
