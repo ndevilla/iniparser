@@ -98,6 +98,7 @@ win-build:
     stage: win-build
     script:
         - Get-ChildItem C:\tools\Ruby31
+        - Get-ChildItem C:\tools\Ruby31\lib
         - mkdir build
         - cd build
         - cmake -DRuby_POSSIBLE_LIB_DIR="C:\tools\Ruby31\lib\" -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
