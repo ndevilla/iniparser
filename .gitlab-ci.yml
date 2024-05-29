@@ -97,6 +97,7 @@ win-build:
         - .shared_windows_runners
     stage: win-build
     script:
+        - Get-ChildItem C:\tools\Ruby31
         - mkdir build
         - cd build
         - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
