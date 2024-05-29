@@ -100,7 +100,7 @@ win-build:
         - Get-ChildItem C:\tools\Ruby31
         - mkdir build
         - cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
+        - cmake -DRuby_POSSIBLE_LIB_DIR="C:\tools\Ruby31\lib\" -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
         - cmake --build .
     artifacts:
         paths:
