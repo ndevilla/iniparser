@@ -97,6 +97,8 @@ win-build:
         - .shared_windows_runners
     stage: win-build
     script:
+        - wget https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.2.4-1/rubyinstaller-devkit-3.2.4-1-x64.exe
+        - rubyinstaller-devkit-3.2.4-1-x64.exe /verysilent
         - mkdir build
         - cd build
         - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
