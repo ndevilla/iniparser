@@ -99,6 +99,14 @@ win-build:
     script:
         - Get-ChildItem C:\tools\Ruby31
         - Get-ChildItem C:\tools\Ruby31\lib
+        - Get-ChildItem "$env:VSAPPIDDIR..\Tools\vsdevcmd\ext\"
+        - cd C:\tools\Ruby31\lib
+        - cmd /c call "%VSAPPIDDIR%..\Tools\vsdevcmd\ext\vcvars.bat"
+        - echo LIBRARY LIBX64-UCRT-RUBY310 > libx64-ucrt-ruby310.def
+        - echo EXPORTS >> libx64-ucrt-ruby310.def
+        - cmd /c for /f "skip=19 tokens=4" %A in $(cmd /c dumpbin /exports libx64-ucrt-ruby310.dll.a) do echo %A >> libx64-ucrt-ruby310.def
+        - cmd /c lib /def:libx64-ucrt-ruby310.def /out:libx64-ucrt-ruby310.lib /machine:x86
+        - cd C:/GitLab-Runner/builds/iniparser/iniparser/
         - mkdir build
         - cd build
         - cmake -DRuby_POSSIBLE_LIB_DIR="C:\tools\Ruby31\lib\" -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
