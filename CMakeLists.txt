@@ -117,42 +117,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 if(BUILD_TESTING)
-  set(TEST_NAME testrun)
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dictionary.c
-            ${CMAKE_CURRENT_SOURCE_DIR}/test/test_iniparser.c
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test/make-tests.sh >
-            ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test/)
-
-  add_executable(
-    ${TEST_NAME}
-    ${CMAKE_CURRENT_BINARY_DIR}/AllTests.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/CuTest.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dictionary.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_iniparser.c)
-
-  foreach(TARGET_TYPE ${TARGET_TYPES})
-    # if BUILD_STATIC_LIBS=ON shared takes precedence
-    target_link_libraries(${TEST_NAME} "${PROJECT_NAME}-${TARGET_TYPE}")
-  endforeach()
-
-  target_include_directories(
-    ${TEST_NAME}
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test>
-            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
-
-  install(TARGETS ${TEST_NAME})
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test/ressources
-          DESTINATION ${CMAKE_INSTALL_BINDIR})
-
   enable_testing()
-  add_test(
-    NAME testsuite
-    COMMAND ${TEST_NAME}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
+  add_subdirectory(test)
 endif()
 
 option(BUILD_EXAMPLES "Build and install examples")

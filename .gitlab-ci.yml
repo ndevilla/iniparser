@@ -21,8 +21,8 @@ build:
         - tree -a .
     artifacts:
         paths:
-            - install/*
-            - build/html/*
+            - install/
+            - build/
 
 pages:
     stage: doc
@@ -41,8 +41,8 @@ test:
     script:
         - pwd
         - ls -l
-        - cd install/bin
-        - ./testrun
+        - cd build/
+        - ctest --verbose
     dependencies:
         - build
 
@@ -51,8 +51,8 @@ memcheck:
     script:
         - pwd
         - ls -l
-        - cd install/bin
-        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./testrun
+        - cd build/
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ctest --verbose
     dependencies:
         - build
 
@@ -97,9 +97,11 @@ win-build:
     script:
         - mkdir build
         - cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=ON ..
+        - cmake -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=ON ..
         - cmake --build .
     artifacts:
         paths:
-            - install
+            - install/
+            - build/
     dependencies: []
+
