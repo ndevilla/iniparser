@@ -108,6 +108,8 @@ win-build:
     dependencies: []
 
 win-examples:
+    extends:
+        - .shared_windows_runners
     stage: win-exe
     script:
         - cd install/share/doc/iniparser/examples/
