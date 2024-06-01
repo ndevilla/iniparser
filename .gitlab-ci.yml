@@ -101,6 +101,7 @@ win-build:
         - cd build
         - cmake -DCMAKE_INSTALL_PREFIX=..\install -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=ON ..
         - cmake --build .
+        - cmake --install .
     artifacts:
         paths:
             - install/
