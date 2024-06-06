@@ -9,6 +9,11 @@ find_program(
         PATH
         REQUIRED)
 
+if(MSVC)
+    message(STATUS "MSVC environment")
+    message(STATUS "MSVC INCLUDE: $ENV{INCLUDE}")
+endif()
+
 set(FETCHCONTENT_QUIET OFF)
 
 FetchContent_Declare(
