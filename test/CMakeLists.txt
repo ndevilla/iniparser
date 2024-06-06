@@ -1,9 +1,13 @@
 include(FetchContent)
 include(CTest)
-find_package(
-  Ruby
-  2.0
-  REQUIRED)
+
+find_program(
+  RUBY_EXECUTABLE
+  NAME
+  ruby
+  PATHS ENV
+        PATH
+        REQUIRED)
 
 set(FETCHCONTENT_QUIET OFF)
 
