@@ -97,7 +97,7 @@ win-build:
     script:
         - mkdir build
         - cd build
-        - cmake -DBUILD_DOCS=OFF -DBUILD_EXAMPLES=ON ..
+        - cmake -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
         - cmake --build .
     artifacts:
         paths:
