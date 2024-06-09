@@ -11,37 +11,8 @@ find_program(
 
 if(MSVC)
   message(STATUS "MSVC environment")
-  find_program(
-    VSWHERE_EXECUTABLE
-    NAMES vswhere
-    DOC "Visual Studio Locator" REQUIRED)
-  message(STATUS "VSWHERE_EXECUTABLE: ${VSWHERE_EXECUTABLE}")
-  execute_process(
-    COMMAND "${VSWHERE_EXECUTABLE}" -nologo -nocolor -format json -products "*"
-            -utf8 -sort ENCODING UTF-8
-    OUTPUT_VARIABLE candidates
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  math(
-    EXPR
-    stop
-    "${candidates.length} - 1")
-  foreach(idx RANGE 0 ${stop})
-    string(
-      JSON
-      candidate.install.path
-      GET
-      "${candidates}"
-      ${idx}
-      "installationPath")
-  endforeach()
-  message(STATUS "candidate.install.path: ${candidate.install.path}")
-  cmake_path(
-    CONVERT
-    "${candidate.install.path}"
-    TO_CMAKE_PATH_LIST
-    candidate.install.path
-    NORMALIZE)
-  message(CHECK_PASS "found : ${candidate.install.path}")
+  find_file(MSVC_DIRENT msvc/dirent.h)
+  message(STATUS "MSVC_DIRENT: ${MSVC_DIRENT}")
 endif()
 
 set(FETCHCONTENT_QUIET OFF)
