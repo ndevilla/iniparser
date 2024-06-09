@@ -11,7 +11,7 @@ find_program(
 
 if(MSVC)
   message(STATUS "MSVC environment")
-  find_file(MSVC_DIRENT msvc/dirent.h)
+  find_file(MSVC_DIRENT "dirent.h")
   message(STATUS "MSVC_DIRENT: ${MSVC_DIRENT}")
 endif()
 
