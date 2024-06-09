@@ -102,7 +102,7 @@ win-build:
         - cmake --build .
         # due to the long provisioning time of the Windows runner, tests are
         # executed in the same stage as the build
-        - ctest --verbose
+        - ctest -C Debug --verbose
     artifacts:
         paths:
             - install/
