@@ -16,6 +16,12 @@ if(MSVC)
     "dirent.h"
     REQUIRED)
   message(STATUS "MSVC_DIRENT: ${MSVC_DIRENT}")
+  get_filename_component(
+    MSVC_DIRENT_INCLUDE_DIR
+    ${MSVC_DIRENT}
+    DIRECTORY)
+  message(STATUS "MSVC_DIRENT_INCLUDE_DIR: ${MSVC_DIRENT_INCLUDE_DIR}")
+  include_directories(${MSVC_DIRENT_INCLUDE_DIR})
 endif()
 
 set(FETCHCONTENT_QUIET OFF)
