@@ -9,6 +9,21 @@ find_program(
         PATH
         REQUIRED)
 
+if(MSVC)
+  message(STATUS "MSVC environment")
+  find_file(
+    MSVC_DIRENT
+    "dirent.h"
+    REQUIRED)
+  message(STATUS "MSVC_DIRENT: ${MSVC_DIRENT}")
+  get_filename_component(
+    MSVC_DIRENT_INCLUDE_DIR
+    ${MSVC_DIRENT}
+    DIRECTORY)
+  message(STATUS "MSVC_DIRENT_INCLUDE_DIR: ${MSVC_DIRENT_INCLUDE_DIR}")
+  include_directories(${MSVC_DIRENT_INCLUDE_DIR})
+endif()
+
 set(FETCHCONTENT_QUIET OFF)
 
 FetchContent_Declare(
@@ -45,6 +60,11 @@ function(create_test_runner)
 
   add_executable(test_${TEST_RUNNER_NAME} test_${TEST_RUNNER_NAME}.c
                                           test_${TEST_RUNNER_NAME}_runner.c)
+  # Prevent MSVC from creating Debug or Release subdirectories for test
+  # executables
+  set_target_properties(
+    test_${TEST_RUNNER_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                                        ${CMAKE_CURRENT_BINARY_DIR}/$<0:>)
   foreach(TARGET_TYPE ${TARGET_TYPES})
     # if BUILD_STATIC_LIBS=ON shared takes precedence
     target_link_libraries(
