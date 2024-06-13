@@ -1,10 +1,10 @@
-prefix=${pcfiledir}/../..
+prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}
-includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/@PROJECT_NAME@
 libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
 
 Name: @PROJECT_NAME@
-Description: @PROJECT_NAME@ library
+Description: Simple C library offering ini file parsing services
 Version: @PROJECT_VERSION@
 Libs: -L${libdir} -l@PROJECT_NAME@
 Cflags: -I${includedir}
