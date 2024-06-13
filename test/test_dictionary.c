@@ -1,13 +1,18 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "CuTest.h"
+#include <unity.h>
 
 /* We need to directly insert the .c file in order to test the */
 /* static functions as well */
 #include "dictionary.c"
 
-void Test_xstrdup(CuTest *tc)
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_xstrdup(void)
 {
     size_t i;
     char *dup_str;
@@ -19,11 +24,11 @@ void Test_xstrdup(CuTest *tc)
     char *string_very_long;
 
     /* NULL test */
-    CuAssertPtrEquals(tc, NULL, xstrdup(NULL));
+    TEST_ASSERT_NULL(xstrdup(NULL));
 
     for (i = 0 ; i < sizeof(strings) / sizeof(char *) ; ++i) {
         dup_str = xstrdup(strings[i]);
-        CuAssertStrEquals(tc, strings[i], dup_str);
+        TEST_ASSERT_EQUAL_STRING(strings[i], dup_str);
         free(dup_str);
     }
 
@@ -32,37 +37,37 @@ void Test_xstrdup(CuTest *tc)
     memset(string_very_long, '#', 10 * 1024);
     string_very_long[10 * 1024 - 1] = '\0';
     dup_str = xstrdup(string_very_long);
-    CuAssertStrEquals(tc, string_very_long, dup_str);
+    TEST_ASSERT_EQUAL_STRING(string_very_long, dup_str);
 
     free(string_very_long);
     free(dup_str);
 }
 
-void Test_dictionary_grow(CuTest *tc)
+void test_dictionary_grow(void)
 {
     unsigned i;
     dictionary *dic;
 
     dic = dictionary_new(DICTMINSZ);
-    CuAssertPtrNotNull(tc, dic);
-    CuAssertIntEquals(tc, 0, dic->n);
-    CuAssertIntEquals(tc, DICTMINSZ, dic->size);
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(0, dic->n);
+    TEST_ASSERT_EQUAL(DICTMINSZ, dic->size);
 
     for (i = 1 ; i < 10 ; ++i) {
-        CuAssertIntEquals(tc, 0, dictionary_grow(dic));
-        CuAssertIntEquals(tc, 0, dic->n);
-        CuAssertIntEquals(tc, (1 << i) * DICTMINSZ, dic->size);
+        TEST_ASSERT_EQUAL(0, dictionary_grow(dic));
+        TEST_ASSERT_EQUAL(0, dic->n);
+        TEST_ASSERT_EQUAL((1 << i) * DICTMINSZ, dic->size);
     }
     dictionary_del(dic);
 }
 
-void Test_dictionary_hash(CuTest *tc)
+void test_dictionary_hash(void)
 {
     /* NULL test */
-    CuAssertIntEquals(tc, 0, dictionary_hash(NULL));
+    TEST_ASSERT_EQUAL(0, dictionary_hash(NULL));
 }
 
-void Test_dictionary_growing(CuTest *tc)
+void test_dictionary_growing(void)
 {
     int i, j;
     char sec_name[32];
@@ -70,17 +75,17 @@ void Test_dictionary_growing(CuTest *tc)
     dictionary *dic;
 
     dic = dictionary_new(DICTMINSZ);
-    CuAssertPtrNotNull(tc, dic);
-    CuAssertIntEquals(tc, 0, dic->n);
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(0, dic->n);
 
     /* Makes the dictionary grow */
     for (i = 1 ; i < 101; ++i) {
         sprintf(sec_name, "sec%d", i);
-        CuAssertIntEquals(tc, 0, dictionary_set(dic, sec_name, ""));
+        TEST_ASSERT_EQUAL(0, dictionary_set(dic, sec_name, ""));
         for (j = 1 ; j < 11; ++j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
-            CuAssertIntEquals(tc, 0, dictionary_set(dic, key_name, "dummy_value"));
-            CuAssertIntEquals(tc, i + (i - 1) * 10 + j, dic->n);
+            TEST_ASSERT_EQUAL(0, dictionary_set(dic, key_name, "dummy_value"));
+            TEST_ASSERT_EQUAL(i + (i - 1) * 10 + j, dic->n);
         }
     }
 
@@ -92,7 +97,7 @@ void Test_dictionary_growing(CuTest *tc)
             dictionary_unset(dic, key_name);
         }
         dictionary_unset(dic, sec_name);
-        CuAssertIntEquals(tc, (i - 1) * (11), dic->n);
+        TEST_ASSERT_EQUAL((i - 1) * (11), dic->n);
     }
 
     dictionary_del(dic);
@@ -132,7 +137,7 @@ static char *get_dump(dictionary *d)
     return dump_buff;
 }
 
-void Test_dictionary_unset(CuTest *tc)
+void test_dictionary_unset(void)
 {
     int i, j;
     char sec_name[32];
@@ -148,7 +153,7 @@ void Test_dictionary_unset(CuTest *tc)
 
     /* Generate two similar dictionaries */
     dic1 = dictionary_new(DICTMINSZ);
-    CuAssertPtrNotNull(tc, dic1);
+    TEST_ASSERT_NOT_NULL(dic1);
     for (i = 1 ; i < 10; ++i) {
         sprintf(sec_name, "sec%d", i);
         dictionary_set(dic1, sec_name, "");
@@ -158,7 +163,7 @@ void Test_dictionary_unset(CuTest *tc)
         }
     }
     dic2 = dictionary_new(DICTMINSZ);
-    CuAssertPtrNotNull(tc, dic2);
+    TEST_ASSERT_NOT_NULL(dic2);
     for (i = 1 ; i < 10; ++i) {
         sprintf(sec_name, "sec%d", i);
         dictionary_set(dic2, sec_name, "");
@@ -171,7 +176,7 @@ void Test_dictionary_unset(CuTest *tc)
     /* Make sure the dictionaries are the same */
     dic1_dump = get_dump(dic1);
     dic2_dump = get_dump(dic2);
-    CuAssertStrEquals(tc, dic1_dump, dic2_dump);
+    TEST_ASSERT_EQUAL_STRING(dic1_dump, dic2_dump);
     free(dic1_dump);
     free(dic2_dump);
 
@@ -182,7 +187,7 @@ void Test_dictionary_unset(CuTest *tc)
     /* dic1 and dic2 must still be the same */
     dic1_dump = get_dump(dic1);
     dic2_dump = get_dump(dic2);
-    CuAssertStrEquals(tc, dic1_dump, dic2_dump);
+    TEST_ASSERT_EQUAL_STRING(dic1_dump, dic2_dump);
     free(dic1_dump);
     free(dic2_dump);
 
@@ -190,7 +195,7 @@ void Test_dictionary_unset(CuTest *tc)
     dictionary_del(dic2);
 }
 
-void Test_dictionary_dump(CuTest *tc)
+void test_dictionary_dump(void)
 {
     int i, j;
     char sec_name[32];
@@ -211,7 +216,7 @@ void Test_dictionary_dump(CuTest *tc)
 ";
 
     dic = dictionary_new(DICTMINSZ);
-    CuAssertPtrNotNull(tc, dic);
+    TEST_ASSERT_NOT_NULL(dic);
 
     /* Try dummy values */
     dictionary_dump(NULL, NULL);
@@ -219,7 +224,7 @@ void Test_dictionary_dump(CuTest *tc)
 
     /* Try with empty dictionary first */
     dump_buff = get_dump(dic);
-    CuAssertStrEquals(tc, "empty dictionary\n", dump_buff);
+    TEST_ASSERT_EQUAL_STRING("empty dictionary\n", dump_buff);
     free(dump_buff);
 
     /* Populate the dictionary */
@@ -234,13 +239,13 @@ void Test_dictionary_dump(CuTest *tc)
 
     /* Check the dump file */
     dump_buff = get_dump(dic);
-    CuAssertStrEquals(tc, dump_real, dump_buff);
+    TEST_ASSERT_EQUAL_STRING(dump_real, dump_buff);
     free(dump_buff);
 
     dictionary_del(dic);
 }
 
-void Test_dictionary_get(CuTest *tc)
+void test_dictionary_get(void)
 {
     dictionary *dic;
     int i, j;
@@ -248,15 +253,15 @@ void Test_dictionary_get(CuTest *tc)
     char key_name[64];
 
     /*NULL test*/
-    CuAssertPtrEquals(tc, NULL, dictionary_get(NULL, NULL, NULL));
-    CuAssertPtrEquals(tc, NULL, dictionary_get(NULL, "string", NULL));
+    TEST_ASSERT_NULL(dictionary_get(NULL, NULL, NULL));
+    TEST_ASSERT_NULL(dictionary_get(NULL, "string", NULL));
 
     /*Check the def return element*/
     dic = dictionary_new(DICTMINSZ);
-    CuAssertPtrNotNull(tc, dic);
-    CuAssertPtrEquals(tc, NULL, dictionary_get(dic, "dummy", NULL));
-    CuAssertStrEquals(tc, "def", dictionary_get(dic, NULL, "def"));
-    CuAssertStrEquals(tc, "def", dictionary_get(dic, "dummy", "def"));
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_NULL(dictionary_get(dic, "dummy", NULL));
+    TEST_ASSERT_EQUAL_STRING("def", dictionary_get(dic, NULL, "def"));
+    TEST_ASSERT_EQUAL_STRING("def", dictionary_get(dic, "dummy", "def"));
 
     /*Populate the dictionary*/
     for (i = 1; i < 3; ++i)
@@ -267,24 +272,24 @@ void Test_dictionary_get(CuTest *tc)
         {
             sprintf(key_name, "%s:key%d", sec_name, j);
             dictionary_set(dic, key_name, "dummy_value");
-            CuAssertStrEquals(tc, "dummy_value",
-                              dictionary_get(dic, key_name, "string"));
+            TEST_ASSERT_EQUAL_STRING("dummy_value",
+                                     dictionary_get(dic, key_name, "string"));
         }
     }
 
     /*Test get dictionary section value*/
-    CuAssertStrEquals(tc, "",
-                      dictionary_get(dic, "sec1", NULL));
-    CuAssertStrEquals(tc, "",
-                      dictionary_get(dic, "sec1", "def"));
+    TEST_ASSERT_EQUAL_STRING("",
+                             dictionary_get(dic, "sec1", NULL));
+    TEST_ASSERT_EQUAL_STRING("",
+                             dictionary_get(dic, "sec1", "def"));
 
     /*delete and set a key in a dictionary*/
     dictionary_unset(dic, "sec1:key4");
-    CuAssertStrEquals(tc, "def",
-                      dictionary_get(dic, "sec1:key4", "def"));
+    TEST_ASSERT_EQUAL_STRING("def",
+                             dictionary_get(dic, "sec1:key4", "def"));
     dictionary_set(dic, "sec1:key4", "dummy_value");
-    CuAssertStrEquals(tc, "dummy_value",
-                      dictionary_get(dic, "sec1:key4", "def"));
+    TEST_ASSERT_EQUAL_STRING("dummy_value",
+                             dictionary_get(dic, "sec1:key4", "def"));
 
     dictionary_del(dic);
 }
