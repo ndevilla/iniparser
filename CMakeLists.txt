@@ -6,6 +6,9 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(CMakeDependentOption)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 option(
   BUILD_SHARED_LIBS
   "Build using shared libraries"
@@ -108,6 +111,9 @@ file(COPY ${FIND_MODULES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 # add to CMake registry
 export(PACKAGE ${PROJECT_NAME})
 # generate pc-file
+include(JoinPaths)
+join_paths(libdir_for_pc_file "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
+join_paths(includedir_for_pc_file "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}" "${PROJECT_NAME}")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
