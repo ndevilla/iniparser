@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(iniparser VERSION 4.2.4)
+project(
+  iniparser
+  DESCRIPTION "C library for parsing INI-style files"
+  HOMEPAGE_URL https://gitlab.com/iniparser/iniparser/
+  LANGUAGES C
+  VERSION 4.2.4)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
