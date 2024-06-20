@@ -50,7 +50,7 @@ make all
 
 There are some CMake option which are `OFF` by default:
 
-- `BUILD_TESTS`
+- `BUILD_TESTING`
 - `BUILD_EXAMPLES`
 
 From within build directory execute `ccmake ..` to see all.
@@ -60,13 +60,35 @@ From within build directory execute `ccmake ..` to see all.
 ```
 mkdir build
 cd build
-cmake -DBUILD_TESTS ..
+cmake -DBUILD_TESTING ..
 make all
 ```
 
 While still in the build project you can run the tests by calling `ctest`.
 Test output can be found in build directory under
 `Testing/Temporary/LastTest.log`.
+
+Each time `cmake` is executed in an empty build directory it will try to clone
+the unit test framework [Unity](https://www.throwtheswitch.org/unity).
+To avoid unnecessary downloads you may place a copy outside your build
+directory and point cmake to it.
+
+To do so first clone Unity in a project of your choice:
+
+```
+git clone https://github.com/throwtheswitch/unity.git
+```
+Now change into your build directory and pass `FETCHCONTENT_SOURCE_DIR_UNITY`
+to `cmake` (adjust the path to unity to your local setup):
+```
+mkdir build
+cd build
+cmake -DBUILD_TESTING -DFETCHCONTENT_SOURCE_DIR_UNITY=../../3rparty/unity ..
+make all
+```
+Now CMake will try to use the sources in this directory and fall back to
+cloning if it cannot find them there.
+
 
 ## IV - Examples
 
