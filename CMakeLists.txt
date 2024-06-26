@@ -6,17 +6,20 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(CMakeDependentOption)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(
   BUILD_SHARED_LIBS
   "Build using shared libraries"
   ON)
-# For packaging by tools like bitbake, shared and static libs should be build
-# at once
-CMAKE_DEPENDENT_OPTION(BUILD_STATIC_LIBS "Build static libs" ON
-                      "BUILD_SHARED_LIBS" OFF)
+# For packaging by tools like bitbake, shared and static libs should be build at
+# once
+cmake_dependent_option(
+  BUILD_STATIC_LIBS
+  "Build static libs"
+  ON
+  "BUILD_SHARED_LIBS"
+  OFF)
 if(BUILD_SHARED_LIBS)
   list(
     APPEND
@@ -46,7 +49,6 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
   set(PUBLIC_HEADERS "src/iniparser.h" "src/dictionary.h")
   set_target_properties(${TARGET_NAME} PROPERTIES PUBLIC_HEADER
                                                   "${PUBLIC_HEADERS}")
-
   target_include_directories(
     ${TARGET_NAME}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
@@ -112,8 +114,15 @@ file(COPY ${FIND_MODULES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 export(PACKAGE ${PROJECT_NAME})
 # generate pc-file
 include(JoinPaths)
-join_paths(libdir_for_pc_file "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
-join_paths(includedir_for_pc_file "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}" "${PROJECT_NAME}")
+join_paths(
+  libdir_for_pc_file
+  "\${exec_prefix}"
+  "${CMAKE_INSTALL_LIBDIR}")
+join_paths(
+  includedir_for_pc_file
+  "\${prefix}"
+  "${CMAKE_INSTALL_INCLUDEDIR}"
+  "${PROJECT_NAME}")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
