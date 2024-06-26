@@ -58,7 +58,36 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
     ${TARGET_NAME}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
-  set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+  # If both shared and static libs are build at once with MSVC it generates a
+  # shared library consisting of
+  #
+  # * a DLL (that contains the actual code) with filename suffix `.dll`,
+  # * a correspoding import library (against which users should link) with
+  #   filename suffix `.lib`.
+  #
+  # and a static library with filename suffix `.lib`
+  #
+  # As both, the shared import library and the static library share the same
+  # basename and suffix one would overwrite the other.
+  #
+  # To solve this issue we set the PREFIX for *static* libs explicitely so MSVC
+  # will build:
+  #
+  # * shared: iniparser.dll
+  # * import: iniparser.lib
+  # * static: libiniparser.lib
+  #
+  # As all other platforms already set `PREFIX` for all lib types they remain
+  # unchanged. Therefore no `if(MSVC)` check is needed here.
+  #
+  if(TARGET_TYPE
+     MATCHES
+     "static")
+    set_target_properties(${TARGET_NAME}
+                          PROPERTIES OUTPUT_NAME "${PROJECT_NAME}" PREFIX "lib")
+  else()
+    set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+  endif()
   set_target_properties(${TARGET_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
   set_target_properties(${TARGET_NAME} PROPERTIES SOVERSION
                                                   ${PROJECT_VERSION_MAJOR})
