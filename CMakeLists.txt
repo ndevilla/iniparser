@@ -87,6 +87,9 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
                           PROPERTIES OUTPUT_NAME "${PROJECT_NAME}" PREFIX "lib")
   else()
     set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+    # automatically create a module definition (.def) file for MSVC so it will
+    # build an import library (.lib)
+    set_property(TARGET ${TARGET_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS 1)
   endif()
   set_target_properties(${TARGET_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
   set_target_properties(${TARGET_NAME} PROPERTIES SOVERSION
