@@ -90,6 +90,10 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
     # automatically create a module definition (.def) file for MSVC so it will
     # build an import library (.lib)
     set_property(TARGET ${TARGET_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS 1)
+    if(WIN32)
+      # Let MinGW as MSVC not prefix the DLL
+      set_property(TARGET ${TARGET_NAME} PROPERTY PREFIX "")
+    endif()
   endif()
   set_target_properties(${TARGET_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
   set_target_properties(${TARGET_NAME} PROPERTIES SOVERSION
