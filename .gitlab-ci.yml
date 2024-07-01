@@ -98,7 +98,7 @@ win-build:
         - git clone https://github.com/tronkko/dirent.git
         - mkdir build
         - cd build
-        - cmake -DCMAKE_INCLUDE_PATH="../dirent/include" -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD.Path ..
+        - cmake -DCMAKE_INCLUDE_PATH="../dirent/include" -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
         - cmake --build .
         # due to the long provisioning time of the Windows runner, tests are
         # executed in the same stage as the build
