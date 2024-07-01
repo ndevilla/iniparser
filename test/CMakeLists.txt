@@ -55,8 +55,7 @@ function(create_test_runner)
       ${CMAKE_CURRENT_SOURCE_DIR}/test_${TEST_RUNNER_NAME}.c
       test_${TEST_RUNNER_NAME}_runner.c
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test_${TEST_RUNNER_NAME}.c
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    BYPRODUCTS test_${TEST_RUNNER_NAME}_runner.c)
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
   add_executable(test_${TEST_RUNNER_NAME} test_${TEST_RUNNER_NAME}.c
                                           test_${TEST_RUNNER_NAME}_runner.c)
