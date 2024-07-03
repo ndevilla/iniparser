@@ -76,6 +76,12 @@ add_test(
   NAME test_${PROJECT_NAME}
   COMMAND test_${PROJECT_NAME}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(
+  TARGET test_${PROJECT_NAME}
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:test_${PROJECT_NAME}>
+          $<TARGET_RUNTIME_DLLS:test_${PROJECT_NAME}>
+  COMMAND_EXPAND_LISTS)
 
 create_test_runner(NAME dictionary)
 message(STATUS "Adding test test_dictionary")
@@ -83,3 +89,9 @@ add_test(
   NAME test_dictionary
   COMMAND test_dictionary
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(
+  TARGET test_dictionary
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:test_dictionary>
+          $<TARGET_RUNTIME_DLLS:test_dictionary>
+  COMMAND_EXPAND_LISTS)
