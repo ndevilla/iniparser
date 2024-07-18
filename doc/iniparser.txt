@@ -91,7 +91,7 @@
     @endcode
 
     And link your program with the iniparser library by adding
-    @c -liniparser.a to the compile line.
+    @c -liniparser to the compile line.
 
     See the file test/initest.c for an example.
 
