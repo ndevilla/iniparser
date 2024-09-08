@@ -199,10 +199,7 @@ if(BUILD_EXAMPLES)
           DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)
 endif()
 
-option(
-  BUILD_DOCS
-  "Build and install docs"
-  ON)
+option(BUILD_DOCS "Build and install docs")
 if(BUILD_DOCS)
   find_package(Doxygen REQUIRED)
   set(DOXYGEN_STRIP_FROM_PATH ${CMAKE_CURRENT_SOURCE_DIR})

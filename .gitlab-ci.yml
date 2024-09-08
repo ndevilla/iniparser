@@ -16,7 +16,7 @@ build:
     script:
         - mkdir build
         - cd build
-        - cmake -DCMAKE_INSTALL_PREFIX=../install -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
+        - cmake -DCMAKE_INSTALL_PREFIX=../install -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_DOCS=ON ..
         - make install
         - tree -a .
     artifacts:
@@ -98,7 +98,7 @@ win-build:
         - git clone https://github.com/tronkko/dirent.git
         - mkdir build
         - cd build
-        - cmake -DCMAKE_INCLUDE_PATH="../dirent/include" -DBUILD_DOCS=OFF -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
+        - cmake -DCMAKE_INCLUDE_PATH="../dirent/include" -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
         - cmake --build .
         - Get-Location
         - Get-ChildItem –Recurse
