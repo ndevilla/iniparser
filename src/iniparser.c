@@ -643,8 +643,17 @@ int iniparser_find_entry(const dictionary * ini, const char * entry)
 /*--------------------------------------------------------------------------*/
 int iniparser_set(dictionary * ini, const char * entry, const char * val)
 {
-    char tmp_str[ASCIILINESZ+1];
-    return dictionary_set(ini, strlwc(entry, tmp_str, sizeof(tmp_str)), val) ;
+    char tmp_key[ASCIILINESZ+1] = {0};
+    char tmp_val[ASCIILINESZ+1] = {0};
+    size_t len;
+
+    if(val) {
+        len = strlen(val);
+        len = len > ASCIILINESZ ? ASCIILINESZ : len;
+        memcpy(tmp_val, val, len) ;
+        val = tmp_val;
+    }
+    return dictionary_set(ini, strlwc(entry, tmp_key, sizeof(tmp_key)), val);
 }
 
 /*-------------------------------------------------------------------------*/
