@@ -123,6 +123,8 @@ From the build directory run the examples with:
 
 ## Documentation
 
+The library is completely documented in its header file.
+
 To build the documentation [doxygen](https://www.doxygen.org/index.html) has be
 installed. Documentation can build and be found in build directory under
 `html`:
@@ -161,3 +163,176 @@ See [FAQ-en.md](FAQ-en.md) in this directory for answers to Frequently Asked
 Questions.
 
 还有简化中国翻译在[FAQ-zhcn.md](FAQ-zhcn.md).
+
+
+## Details
+
+### Introduction
+
+iniParser is a simple C library offering ini file parsing services.
+The library is pretty small (less than 1500 lines of C) and robust, and does
+not depend on any other external library to compile. It is written in C and
+should compile on most platforms without difficulty.
+
+
+### What is an ini file?
+
+An ini file is an ASCII file describing simple parameters (character strings,
+integers, floating-point values or booleans) in an explicit format, easy to use
+and modify for users.
+
+An ini file is segmented into Sections, declared by the following syntax:
+
+```ini
+[Section Name]
+```
+
+i.e. the section name enclosed in square brackets, alone on a line. Sections
+names are allowed to contain any character but square brackets or linefeeds.
+
+In any section are zero or more variables, declared with the following syntax:
+
+```ini
+Key = value ; comment
+```
+
+The key is any string (possibly containing blanks). The value is any character
+on the right side of the equal sign. Values can be given enclosed with quotes.
+If no quotes are present, the value is understood as containing all characters
+between the first and the last non-blank characters before the comment. The
+following declarations are identical:
+
+```ini
+Hello = "this is a long string value" ; comment
+Hello = this is a long string value ; comment
+```
+
+The semicolon and comment at the end of the line are optional. If there is a
+comment, it starts from the first character after the semicolon up to the end
+of the line.
+
+Multi-line values can be provided by ending the line with a backslash (`\`).
+
+```ini
+Multiple = Line 1 \
+Line 2 \
+Line 3 \
+Line 4 ; comment
+```
+
+This would yield: "multiple" <- "Line1 Line2 Line3 Line4"
+
+Comments in an ini file are:
+
+- Lines starting with a hash sign
+- Blank lines (only blanks or tabs)
+- Comments given on value lines after the semicolon (if present)
+
+
+### Using the library
+
+To use the library in your programs, add the following line on top of your
+module:
+
+```c
+#include "iniparser.h"
+```
+
+And link your program with the iniParser library by adding `-liniparser` to the
+compile line.
+
+See the file example/example.c for an example.
+
+iniParser is an C library. If you want to compile it with a C++ compiler have
+to include the extern "C" hack to include the header:
+
+```c
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include "iniparser.h"
+#ifdef __cplusplus
+}
+#endif
+```
+Comments are discarded by the parser. Then sections are identified, and in each
+section a new entry is created for every keyword found. The keywords are stored
+with the following syntax:
+
+```c
+[Section]
+Keyword = value ; comment
+```
+
+is converted to the following key pair:
+
+```c
+("section:keyword", "value")
+```
+
+This means that if you want to retrieve the value that was stored in the
+section called `Pizza`, in the keyword `Cheese`, you would make a request to
+the dictionary for `"pizza:cheese"`. All section and keyword names are
+converted to lowercase before storage in the structure. The value side is
+conserved as it has been parsed, though.
+
+Section names are also stored in the structure. They are stored using as key
+the section name, and a NULL associated value. They can be queried through
+`iniparser_find_entry()`.
+
+To launch the parser, use the function called `iniparser_load()`, which takes
+an input file name and returns a newly allocated @e dictionary structure. This
+latter object should remain opaque to the user and only accessed through the
+following accessor functions:
+
+- `iniparser_getstring()`
+- `iniparser_getint()`
+- `iniparser_getdouble()`
+- `iniparser_getboolean()`
+
+Finally, discard this structure using `iniparser_freedict()`.
+
+All values parsed from the ini file are stored as strings. The accessors are
+just converting these strings to the requested type on the fly, but you could
+basically perform this conversion by yourself after having called the string
+accessor.
+
+Notice that `iniparser_getboolean()` will return an integer (0 or 1), trying to
+make sense of what was found in the file. Strings starting with "y", "Y", "t",
+"T" or "1" are considered true values (return 1), strings starting with "n",
+"N", "f", "F", "0" are considered false (return 0). This allows some
+flexibility in handling of boolean answers.
+
+If you want to add extra information into the structure that was not present in
+the ini file, you can use `iniparser_set()` to insert a string.
+
+If you want to add a section to the structure, add a key with a NULL value.
+Example:
+
+```c
+iniparser_set(ini, "section", NULL);
+iniparser_set(ini, "section:key1", NULL);
+iniparser_set(ini, "section:key2", NULL);
+```
+
+
+### A word about the implementation
+
+The dictionary structure is a pretty simple dictionary implementation which
+might find some uses in other applications. If you are curious, look into the
+source.
+
+
+### Known defects
+
+The dictionary structure is extremely unefficient for searching as keys are
+sorted in the same order as they are read from the ini file, which is
+convenient when dumping back to a file. The simplistic first-approach linear
+search implemented there can become a bottleneck if you have a very large
+number of keys.
+
+People who need to load large amounts of data from an ini file should
+definitely turn to more appropriate solutions: sqlite3 or similar. There are
+otherwise many other dictionary implementations available on the net to replace
+this one.

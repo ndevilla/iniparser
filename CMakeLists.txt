@@ -203,9 +203,10 @@ option(BUILD_DOCS "Build and install docs")
 if(BUILD_DOCS)
   find_package(Doxygen REQUIRED)
   set(DOXYGEN_STRIP_FROM_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
   doxygen_add_docs(
     docs
-    ${CMAKE_CURRENT_SOURCE_DIR}/doc/iniparser.txt
+    ${CMAKE_CURRENT_SOURCE_DIR}/README.md
     ${CMAKE_CURRENT_SOURCE_DIR}/src/iniparser.h
     ALL
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc)
