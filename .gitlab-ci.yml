@@ -107,7 +107,6 @@ win-build:
         - ctest -C Debug --verbose
     artifacts:
         paths:
-            - install/
             - build/
     dependencies: []
 
