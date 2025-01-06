@@ -122,8 +122,16 @@ From the build directory run the examples with:
 
 ## Documentation
 
-Documentation is build by default and can be found in build directory under
-`html`.
+To build the documentation [doxygen](https://www.doxygen.org/index.html) has be
+installed. Documentation can build and be found in build directory under
+`html`:
+
+```
+mkdir build
+cd build
+cmake -DBUILD_DOCS ..
+make all
+```
 
 Open the file `html/index.html` with any HTML-capable browser.
 
