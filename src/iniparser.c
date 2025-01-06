@@ -283,7 +283,7 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
     size_t       i ;
     size_t       nsec ;
     const char * secname ;
-    char escaped[ASCIILINESZ+1] = "";
+    char escaped[(ASCIILINESZ * 2) + 2] = "";
 
     if (d==NULL || f==NULL) return ;
 
@@ -323,7 +323,7 @@ void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f)
     size_t  j ;
     char    keym[ASCIILINESZ+1];
     int     seclen ;
-    char escaped[ASCIILINESZ+1] = "";
+    char escaped[(ASCIILINESZ * 2) + 2] = "";
 
     if (d==NULL || f==NULL) return ;
     if (! iniparser_find_entry(d, s)) return ;
