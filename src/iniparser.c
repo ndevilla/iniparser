@@ -99,9 +99,9 @@ static unsigned strstrip(char * s)
     if (s==NULL) return 0;
 
     last = s + strlen(s);
-    while (isspace((int)*s) && *s) s++;
+    while (isspace((unsigned char)*s) && *s) s++;
     while (last > s) {
-        if (!isspace((int)*(last-1)))
+        if (!isspace((unsigned char)*(last-1)))
             break ;
         last -- ;
     }
@@ -283,7 +283,7 @@ void iniparser_dump_ini(const dictionary * d, FILE * f)
     size_t       i ;
     size_t       nsec ;
     const char * secname ;
-    char escaped[ASCIILINESZ+1] = "";
+    char escaped[(ASCIILINESZ * 2) + 2] = "";
 
     if (d==NULL || f==NULL) return ;
 
@@ -323,7 +323,7 @@ void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f)
     size_t  j ;
     char    keym[ASCIILINESZ+1];
     int     seclen ;
-    char escaped[ASCIILINESZ+1] = "";
+    char escaped[(ASCIILINESZ * 2) + 2] = "";
 
     if (d==NULL || f==NULL) return ;
     if (! iniparser_find_entry(d, s)) return ;
@@ -643,8 +643,17 @@ int iniparser_find_entry(const dictionary * ini, const char * entry)
 /*--------------------------------------------------------------------------*/
 int iniparser_set(dictionary * ini, const char * entry, const char * val)
 {
-    char tmp_str[ASCIILINESZ+1];
-    return dictionary_set(ini, strlwc(entry, tmp_str, sizeof(tmp_str)), val) ;
+    char tmp_key[ASCIILINESZ+1] = {0};
+    char tmp_val[ASCIILINESZ+1] = {0};
+    size_t len;
+
+    if(val) {
+        len = strlen(val);
+        len = len > ASCIILINESZ ? ASCIILINESZ : len;
+        memcpy(tmp_val, val, len) ;
+        val = tmp_val;
+    }
+    return dictionary_set(ini, strlwc(entry, tmp_key, sizeof(tmp_key)), val);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -846,7 +855,7 @@ dictionary * iniparser_load_file(FILE * in, const char * ininame)
         }
         /* Get rid of \n and spaces at end of line */
         while ((len>=0) &&
-                ((line[len]=='\n') || (isspace(line[len])))) {
+                ((line[len]=='\n') || (isspace((unsigned char)line[len])))) {
             line[len]=0 ;
             len-- ;
         }

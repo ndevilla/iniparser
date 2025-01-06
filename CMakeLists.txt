@@ -1,22 +1,30 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(iniparser VERSION 4.2.4)
+project(
+  iniparser
+  DESCRIPTION "C library for parsing INI-style files"
+  HOMEPAGE_URL https://gitlab.com/iniparser/iniparser/
+  LANGUAGES C
+  VERSION 4.2.5)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(CMakeDependentOption)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(
   BUILD_SHARED_LIBS
   "Build using shared libraries"
   ON)
-# For packaging by tools like bitbake, shared and static libs should be build
-# at once
-CMAKE_DEPENDENT_OPTION(BUILD_STATIC_LIBS "Build static libs" ON
-                      "BUILD_SHARED_LIBS" OFF)
+# For packaging by tools like bitbake, shared and static libs should be build at
+# once
+cmake_dependent_option(
+  BUILD_STATIC_LIBS
+  "Build static libs"
+  ON
+  "BUILD_SHARED_LIBS"
+  OFF)
 if(BUILD_SHARED_LIBS)
   list(
     APPEND
@@ -46,12 +54,47 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
   set(PUBLIC_HEADERS "src/iniparser.h" "src/dictionary.h")
   set_target_properties(${TARGET_NAME} PROPERTIES PUBLIC_HEADER
                                                   "${PUBLIC_HEADERS}")
-
   target_include_directories(
     ${TARGET_NAME}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
-  set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+  # If both shared and static libs are build at once with MSVC it generates a
+  # shared library consisting of
+  #
+  # * a DLL (that contains the actual code) with filename suffix `.dll`,
+  # * a correspoding import library (against which users should link) with
+  #   filename suffix `.lib`.
+  #
+  # and a static library with filename suffix `.lib`
+  #
+  # As both, the shared import library and the static library share the same
+  # basename and suffix one would overwrite the other.
+  #
+  # To solve this issue we set the PREFIX for *static* libs explicitely so MSVC
+  # will build:
+  #
+  # * shared: iniparser.dll
+  # * import: iniparser.lib
+  # * static: libiniparser.lib
+  #
+  # As all other platforms already set `PREFIX` for all lib types they remain
+  # unchanged. Therefore no `if(MSVC)` check is needed here.
+  #
+  if(TARGET_TYPE
+     MATCHES
+     "static")
+    set_target_properties(${TARGET_NAME}
+                          PROPERTIES OUTPUT_NAME "${PROJECT_NAME}" PREFIX "lib")
+  else()
+    set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+    # automatically create a module definition (.def) file for MSVC so it will
+    # build an import library (.lib)
+    set_property(TARGET ${TARGET_NAME} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS 1)
+    if(WIN32)
+      # Let MinGW as MSVC not prefix the DLL
+      set_property(TARGET ${TARGET_NAME} PROPERTY PREFIX "")
+    endif()
+  endif()
   set_target_properties(${TARGET_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
   set_target_properties(${TARGET_NAME} PROPERTIES SOVERSION
                                                   ${PROJECT_VERSION_MAJOR})
@@ -71,6 +114,7 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
     EXPORT ${TARGETS_EXPORT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # install DLLs on Windows
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
   # build directory package config
@@ -112,8 +156,15 @@ file(COPY ${FIND_MODULES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 export(PACKAGE ${PROJECT_NAME})
 # generate pc-file
 include(JoinPaths)
-join_paths(libdir_for_pc_file "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
-join_paths(includedir_for_pc_file "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}" "${PROJECT_NAME}")
+join_paths(
+  libdir_for_pc_file
+  "\${exec_prefix}"
+  "${CMAKE_INSTALL_LIBDIR}")
+join_paths(
+  includedir_for_pc_file
+  "\${prefix}"
+  "${CMAKE_INSTALL_INCLUDEDIR}"
+  "${PROJECT_NAME}")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
@@ -148,19 +199,16 @@ if(BUILD_EXAMPLES)
           DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)
 endif()
 
-option(
-  BUILD_DOCS
-  "Build and install docs"
-  ON)
+option(BUILD_DOCS "Build and install docs")
 if(BUILD_DOCS)
   find_package(Doxygen REQUIRED)
   set(DOXYGEN_STRIP_FROM_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
   doxygen_add_docs(
     docs
-    ${CMAKE_CURRENT_SOURCE_DIR}/doc/iniparser.txt
+    ${CMAKE_CURRENT_SOURCE_DIR}/README.md
     ${CMAKE_CURRENT_SOURCE_DIR}/src/iniparser.h
-    ALL
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+    ALL)
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
           DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
