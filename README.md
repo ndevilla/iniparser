@@ -35,6 +35,12 @@ Key features:
  - Fully re-entrant : easy to make it thread-safe (just surround
    library calls by mutex)
 
+## MinGW
+
+In the instructions below, replace `make all` by `ninja` if you are using
+MinGW as build system. Of course you will need to install
+[ninja](https://ninja-build.org/) to use it.
+
 ## Building project
 
 This project uses CMake as build system. Use these command at the root or the
