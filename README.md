@@ -1,7 +1,7 @@
 [![pipeline status](https://gitlab.com/iniparser/iniparser/badges/main/pipeline.svg)](https://gitlab.com/iniparser/iniparser/-/commits/main)
 [![latest release](https://gitlab.com/iniparser/iniparser/-/badges/release.svg)](https://gitlab.com/iniparser/iniparser/-/releases)
 
-# Iniparser 4 #
+# iniParser 4 #
 
 Changes in May 2024:
 We moved to [iniparser/iniparser](https://gitlab.com/iniparser/iniparser)!
