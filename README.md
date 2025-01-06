@@ -120,6 +120,7 @@ From the build directory run the examples with:
  - `./iniwrite`
  - `./parse ../example/twisted.ini`
 
+
 ## Documentation
 
 To build the documentation [doxygen](https://www.doxygen.org/index.html) has be
@@ -138,10 +139,12 @@ Open the file `html/index.html` with any HTML-capable browser.
 Or see the [complete documentation](https://iniparser.gitlab.io/iniparser/)
 in online.
 
+
 ## License
 
 This software is released under MIT License.
 See [LICENSE](LICENSE) for more details
+
 
 ## Versions
 
@@ -150,6 +153,7 @@ See [LICENSE](LICENSE) for more details
 - Since v4.2.x [Semantic Versioning](https://semver.org/) is applied.
 - Version 4.0 introduced breaking changes in the api.
 - Older versions 3.1 and 3.2 with the legacy api are available as tags.
+
 
 ## FAQ
 
