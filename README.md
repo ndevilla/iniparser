@@ -58,8 +58,15 @@ There are some CMake option which are `OFF` by default:
 
 - `BUILD_TESTING`
 - `BUILD_EXAMPLES`
+- `BUILD_DOCS`
+
+These CMake options are `ON` by default:
+
+- `BUILD_SHARED_LIBS`
+- `BUILD_STATIC_LIBS`
 
 From within build directory execute `ccmake ..` to see all.
+
 
 ## Tests
 
