@@ -282,7 +282,7 @@ the section name, and a NULL associated value. They can be queried through
 `iniparser_find_entry()`.
 
 To launch the parser, use the function called `iniparser_load()`, which takes
-an input file name and returns a newly allocated @e dictionary structure. This
+an input file name and returns a newly allocated `dictionary` structure. This
 latter object should remain opaque to the user and only accessed through the
 following accessor functions:
 
