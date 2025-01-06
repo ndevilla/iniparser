@@ -24,7 +24,7 @@ library alive!
 Many thanks to @touilleman for his exceptional contributions and efforts for
 maintaining this project for a decade. Manu, you rock!
 
-## I - Overview
+## Overview
 
 This modules offers parsing of ini files from C.
 
@@ -35,7 +35,7 @@ Key features:
  - Fully re-entrant : easy to make it thread-safe (just surround
    library calls by mutex)
 
-## II - Building project
+## Building project
 
 This project uses CMake as build system. Use these command at the root or the
 project to get the static (i.e. `libiniparser.a`) and shared (i.e.
@@ -55,7 +55,7 @@ There are some CMake option which are `OFF` by default:
 
 From within build directory execute `ccmake ..` to see all.
 
-## III - Tests
+## Tests
 
 ```
 mkdir build
@@ -90,7 +90,7 @@ Now CMake will try to use the sources in this directory and fall back to
 cloning if it cannot find them there.
 
 
-## IV - Examples
+## Examples
 
 To build the examples:
 
@@ -107,7 +107,7 @@ From the build directory run the examples with:
  - `./iniwrite`
  - `./parse ../example/twisted.ini`
 
-## V - Documentation
+## Documentation
 
 Documentation is build by default and can be found in build directory under
 `html`.
@@ -117,12 +117,12 @@ Open the file `html/index.html` with any HTML-capable browser.
 Or see the [complete documentation](https://iniparser.gitlab.io/iniparser/)
 in online.
 
-## VI - License
+## License
 
 This software is released under MIT License.
 See [LICENSE](LICENSE) for more details
 
-## VII - Versions
+## Versions
 
 [![latest release](https://gitlab.com/iniparser/iniparser/-/badges/release.svg)](https://gitlab.com/iniparser/iniparser/-/releases)
 
@@ -130,7 +130,7 @@ See [LICENSE](LICENSE) for more details
 - Version 4.0 introduced breaking changes in the api.
 - Older versions 3.1 and 3.2 with the legacy api are available as tags.
 
-## VIII - FAQ
+## FAQ
 
 See [FAQ-en.md](FAQ-en.md) in this directory for answers to Frequently Asked
 Questions.
