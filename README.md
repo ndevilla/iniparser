@@ -35,6 +35,12 @@ Key features:
  - Fully re-entrant : easy to make it thread-safe (just surround
    library calls by mutex)
 
+## Installation
+
+is available on a number of package repositories:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/iniparser.svg)](https://repology.org/project/iniparser/versions)
+
 ## MinGW
 
 In the instructions below, replace `make all` by `ninja` if you are using
