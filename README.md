@@ -37,7 +37,7 @@ Key features:
 
 ## Installation
 
-is available on a number of package repositories:
+iniParser is available in a number of package repositories:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/iniparser.svg)](https://repology.org/project/iniparser/versions)
 
