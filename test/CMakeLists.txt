@@ -34,7 +34,8 @@ FetchContent_Declare(
                 ${CMAKE_CURRENT_LIST_DIR}/unity_config.h ./src/)
 
 FetchContent_MakeAvailable(unity)
-target_compile_definitions(unity PUBLIC UNITY_INCLUDE_CONFIG_H)
+target_compile_definitions(unity PUBLIC UNITY_INCLUDE_CONFIG_H
+                                        UNITY_USE_COMMAND_LINE_ARGS)
 
 function(create_test_runner)
   set(options)
@@ -53,7 +54,7 @@ function(create_test_runner)
     COMMAND
       ${RUBY_EXECUTABLE} ${unity_SOURCE_DIR}/auto/generate_test_runner.rb
       ${CMAKE_CURRENT_SOURCE_DIR}/test_${TEST_RUNNER_NAME}.c
-      test_${TEST_RUNNER_NAME}_runner.c
+      test_${TEST_RUNNER_NAME}_runner.c ${CMAKE_CURRENT_LIST_DIR}/unity-config.yml
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test_${TEST_RUNNER_NAME}.c
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
