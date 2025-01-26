@@ -327,6 +327,7 @@ void iniparser_dumpsection_ini(const dictionary * d, const char * s, FILE * f)
 
     if (d==NULL || f==NULL) return;
     if (! iniparser_find_entry(d, s)) return;
+    if (strlen(s) > sizeof(keym)) return;
 
     seclen  = (int)strlen(s);
     fprintf(f, "\n[%s]\n", s);
