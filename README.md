@@ -11,7 +11,7 @@ Go there for:
 - [Merge Requests](https://gitlab.com/iniparser/iniparser/-/merge_requests/new)
 
 Changes in March 2024:
-@lmoellendorf took over maintenance for this project.
+\@lmoellendorf took over maintenance for this project.
 
 - [X] The objective was to get all known issues fixed and released as v4.2.
 - [X] After that, this project has been frozen on Github as v4.2.1 and
@@ -21,7 +21,7 @@ Changes in March 2024:
 Thanks a million times to Lars for his tremendous work and help in keeping this
 library alive!
 
-Many thanks to @touilleman for his exceptional contributions and efforts for
+Many thanks to \@touilleman for his exceptional contributions and efforts for
 maintaining this project for a decade. Manu, you rock!
 
 ## Overview
