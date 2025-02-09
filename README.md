@@ -145,7 +145,7 @@ make all
 Open the file `html/index.html` with any HTML-capable browser.
 
 Or see the [complete documentation](https://iniparser.gitlab.io/iniparser/)
-in online.
+online.
 
 
 ## License
