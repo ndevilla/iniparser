@@ -5,7 +5,7 @@ project(
   DESCRIPTION "C library for parsing INI-style files"
   HOMEPAGE_URL https://gitlab.com/iniparser/iniparser/
   LANGUAGES C
-  VERSION 4.2.5)
+  VERSION 4.2.6)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
