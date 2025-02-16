@@ -11,7 +11,7 @@ Go there for:
 - [Merge Requests](https://gitlab.com/iniparser/iniparser/-/merge_requests/new)
 
 Changes in March 2024:
-@lmoellendorf took over maintenance for this project.
+\@lmoellendorf took over maintenance for this project.
 
 - [X] The objective was to get all known issues fixed and released as v4.2.
 - [X] After that, this project has been frozen on Github as v4.2.1 and
@@ -21,7 +21,7 @@ Changes in March 2024:
 Thanks a million times to Lars for his tremendous work and help in keeping this
 library alive!
 
-Many thanks to @touilleman for his exceptional contributions and efforts for
+Many thanks to \@touilleman for his exceptional contributions and efforts for
 maintaining this project for a decade. Manu, you rock!
 
 ## Overview
@@ -34,6 +34,12 @@ Key features:
  - Portable : no dependancies, written in `-pedantic` C
  - Fully re-entrant : easy to make it thread-safe (just surround
    library calls by mutex)
+
+## Installation
+
+iniParser is available in a number of package repositories:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/iniparser.svg)](https://repology.org/project/iniparser/versions)
 
 ## MinGW
 
@@ -139,7 +145,7 @@ make all
 Open the file `html/index.html` with any HTML-capable browser.
 
 Or see the [complete documentation](https://iniparser.gitlab.io/iniparser/)
-in online.
+online.
 
 
 ## License
@@ -282,7 +288,7 @@ the section name, and a NULL associated value. They can be queried through
 `iniparser_find_entry()`.
 
 To launch the parser, use the function called `iniparser_load()`, which takes
-an input file name and returns a newly allocated @e dictionary structure. This
+an input file name and returns a newly allocated `dictionary` structure. This
 latter object should remain opaque to the user and only accessed through the
 following accessor functions:
 

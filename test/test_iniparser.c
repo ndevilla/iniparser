@@ -1042,6 +1042,8 @@ void test_iniparser_dump_ini(void)
 void test_iniparser_dumpsection_ini(void)
 {
     const char *str;
+    char key[4096] = {};
+    int ret;
 
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
@@ -1068,6 +1070,20 @@ void test_iniparser_dumpsection_ini(void)
     TEST_ASSERT_EQUAL_STRING("hello world", str);
     str = iniparser_getstring(dic,"section:key1",NULL);
     TEST_ASSERT_EQUAL_STRING("321abc", str);
+    iniparser_freedict(dic);
+    dic = NULL;
+    /*test extra large keys*/
+    dic = dictionary_new(0);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(key, 'a', sizeof(key)-1);
+    ret = iniparser_set(dic, key, "dummy");
+    TEST_ASSERT_GREATER_OR_EQUAL(0, ret);
+    ini = fopen(TMP_INI_PATH, "wt");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
+    /*dump the data of old.ini to test.ini*/
+    iniparser_dumpsection_ini(dic,key,ini);
+    fclose(ini);
+    ini = NULL;
     iniparser_freedict(dic);
     dic = NULL;
 }

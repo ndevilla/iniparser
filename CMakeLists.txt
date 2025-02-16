@@ -5,7 +5,7 @@ project(
   DESCRIPTION "C library for parsing INI-style files"
   HOMEPAGE_URL https://gitlab.com/iniparser/iniparser/
   LANGUAGES C
-  VERSION 4.2.5)
+  VERSION 4.2.6)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -207,6 +207,8 @@ if(BUILD_DOCS)
   doxygen_add_docs(
     docs
     ${CMAKE_CURRENT_SOURCE_DIR}/README.md
+    ${CMAKE_CURRENT_SOURCE_DIR}/FAQ-en.md
+    ${CMAKE_CURRENT_SOURCE_DIR}/FAQ-zhcn.md
     ${CMAKE_CURRENT_SOURCE_DIR}/src/iniparser.h
     ALL)
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
