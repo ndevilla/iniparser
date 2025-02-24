@@ -79,7 +79,7 @@ From within build directory execute `ccmake ..` to see all.
 ```
 mkdir build
 cd build
-cmake -DBUILD_TESTING ..
+cmake -DBUILD_TESTING=ON ..
 make all
 ```
 
@@ -102,7 +102,7 @@ to `cmake` (adjust the path to unity to your local setup):
 ```
 mkdir build
 cd build
-cmake -DBUILD_TESTING -DFETCHCONTENT_SOURCE_DIR_UNITY=../../3rparty/unity ..
+cmake -DBUILD_TESTING=ON -DFETCHCONTENT_SOURCE_DIR_UNITY=../../3rparty/unity ..
 make all
 ```
 Now CMake will try to use the sources in this directory and fall back to
@@ -116,7 +116,7 @@ To build the examples:
 ```
 mkdir build
 cd build
-cmake -DBUILD_EXAMPLES ..
+cmake -DBUILD_EXAMPLES=ON ..
 make all
 ```
 
@@ -138,7 +138,7 @@ installed. Documentation can build and be found in build directory under
 ```
 mkdir build
 cd build
-cmake -DBUILD_DOCS ..
+cmake -DBUILD_DOCS=ON ..
 make all
 ```
 
