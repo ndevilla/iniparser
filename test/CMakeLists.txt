@@ -29,11 +29,12 @@ set(FETCHCONTENT_QUIET OFF)
 FetchContent_Declare(
   unity
   GIT_REPOSITORY "https://github.com/throwtheswitch/unity.git"
-  GIT_PROGRESS TRUE
-  PATCH_COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_CURRENT_LIST_DIR}/unity_config.h ./src/)
+  GIT_PROGRESS TRUE)
 
 FetchContent_MakeAvailable(unity)
+
+file(COPY "${CMAKE_CURRENT_LIST_DIR}/unity_config.h" DESTINATION "${unity_SOURCE_DIR}/src/")
+
 target_compile_definitions(unity PUBLIC UNITY_INCLUDE_CONFIG_H
                                         UNITY_USE_COMMAND_LINE_ARGS)
 
