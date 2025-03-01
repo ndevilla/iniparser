@@ -4,12 +4,12 @@
 
 #include "iniparser.h"
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
-    dictionary * ini ;
-    char       * ini_name ;
+    dictionary *ini ;
+    char        *ini_name ;
 
-    if (argc<2) {
+    if (argc < 2) {
         ini_name = "twisted.ini";
     } else {
         ini_name = argv[1] ;

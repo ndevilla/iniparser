@@ -42,9 +42,9 @@ extern "C" {
 typedef struct _dictionary_ {
     unsigned        n ;     /** Number of entries in dictionary */
     size_t          size ;  /** Storage size */
-    char        **  val ;   /** List of string values */
-    char        **  key ;   /** List of string keys */
-    unsigned     *  hash ;  /** List of hash values for keys */
+    char          **val ;   /** List of string values */
+    char          **key ;   /** List of string keys */
+    unsigned       *hash ;  /** List of hash values for keys */
 } dictionary ;
 
 
@@ -64,7 +64,7 @@ typedef struct _dictionary_ {
   by comparing the key itself in last resort.
  */
 /*--------------------------------------------------------------------------*/
-unsigned dictionary_hash(const char * key);
+unsigned dictionary_hash(const char *key);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -77,7 +77,7 @@ unsigned dictionary_hash(const char * key);
   dictionary, give size=0.
  */
 /*--------------------------------------------------------------------------*/
-dictionary * dictionary_new(size_t size);
+dictionary *dictionary_new(size_t size);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -88,7 +88,7 @@ dictionary * dictionary_new(size_t size);
   Deallocate a dictionary object and all memory associated to it.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_del(dictionary * vd);
+void dictionary_del(dictionary *vd);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -104,7 +104,8 @@ void dictionary_del(dictionary * vd);
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-const char * dictionary_get(const dictionary * d, const char * key, const char * def);
+const char *dictionary_get(const dictionary *d, const char *key,
+                           const char *def);
 
 
 /*-------------------------------------------------------------------------*/
@@ -133,7 +134,7 @@ const char * dictionary_get(const dictionary * d, const char * key, const char *
   This function returns non-zero in case of failure.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_set(dictionary * vd, const char * key, const char * val);
+int dictionary_set(dictionary *vd, const char *key, const char *val);
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -146,7 +147,7 @@ int dictionary_set(dictionary * vd, const char * key, const char * val);
   key cannot be found.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_unset(dictionary * d, const char * key);
+void dictionary_unset(dictionary *d, const char *key);
 
 
 /*-------------------------------------------------------------------------*/
@@ -161,7 +162,7 @@ void dictionary_unset(dictionary * d, const char * key);
   output file pointers.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_dump(const dictionary * d, FILE * out);
+void dictionary_dump(const dictionary *d, FILE *out);
 
 #ifdef __cplusplus
 }

@@ -5,69 +5,72 @@
 #include "iniparser.h"
 
 void create_example_ini_file(void);
-int  parse_ini_file(char * ini_name);
+int  parse_ini_file(char *ini_name);
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
     int     status ;
 
-    if (argc<2) {
+    if (argc < 2) {
         create_example_ini_file();
         status = parse_ini_file("example.ini");
     } else {
         status = parse_ini_file(argv[1]);
     }
+
     return status ;
 }
 
 void create_example_ini_file(void)
 {
-    FILE    *   ini ;
+    FILE       *ini ;
 
-    if ((ini=fopen("example.ini", "w"))==NULL) {
+    if ((ini = fopen("example.ini", "w")) == NULL) {
         fprintf(stderr, "iniparser: cannot create example.ini\n");
         return ;
     }
 
     fprintf(ini,
-    "#\n"
-    "# This is an example of ini file\n"
-    "#\n"
-    "\n"
-    "[Pizza]\n"
-    "\n"
-    "Ham       = yes ;\n"
-    "Mushrooms = TRUE ;\n"
-    "Capres    = 0 ;\n"
-    "Cheese    = Non ;\n"
-    "\n"
-    "\n"
-    "[Wine]\n"
-    "\n"
-    "Grape     = Cabernet Sauvignon ;\n"
-    "Year      = 1989 ;\n"
-    "Country   = Spain ;\n"
-    "Alcohol   = 12.5  ;\n"
-    "\n");
+            "#\n"
+            "# This is an example of ini file\n"
+            "#\n"
+            "\n"
+            "[Pizza]\n"
+            "\n"
+            "Ham       = yes ;\n"
+            "Mushrooms = TRUE ;\n"
+            "Capres    = 0 ;\n"
+            "Cheese    = Non ;\n"
+            "\n"
+            "\n"
+            "[Wine]\n"
+            "\n"
+            "Grape     = Cabernet Sauvignon ;\n"
+            "Year      = 1989 ;\n"
+            "Country   = Spain ;\n"
+            "Alcohol   = 12.5  ;\n"
+            "\n");
     fclose(ini);
 }
 
 
-int parse_ini_file(char * ini_name)
+int parse_ini_file(char *ini_name)
 {
-    dictionary  *   ini ;
+    dictionary     *ini ;
 
     /* Some temporary variables to hold query results */
     int             b ;
     int             i ;
     double          d ;
-    const char  *   s ;
+    const char     *s ;
 
     ini = iniparser_load(ini_name);
-    if (ini==NULL) {
+
+    if (ini == NULL) {
         fprintf(stderr, "cannot parse file: %s\n", ini_name);
         return -1 ;
     }
+
     iniparser_dump(ini, stderr);
 
     /* Get pizza attributes */
