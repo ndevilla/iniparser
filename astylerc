@@ -1,0 +1,36 @@
+# Linux style formatting/indenting.
+# Linux braces, minimum conditional indent is one-half indent.
+--style=linux
+# Linux Kernel coding style:
+# Tabs are 8 characters, and thus indentations are also 8 characters
+#--indent=tab=8
+# Force tabs to be used in areas AStyle would prefer to use spaces.
+# To make ./scripts/checkpatch.pl happy
+#--indent=force-tab=8
+# When declaring pointer data or a function that returns a pointer type, the
+# preferred use of * is adjacent to the data name or function name and not
+# adjacent to the type name.
+--align-pointer=name
+# Use one space around (on each side of) most binary and ternary operators
+--pad-oper
+--pad-comma
+# but no space after unary operators
+--align-reference=name
+# Do not add spaces around (inside) parenthesized expressions
+--unpad-paren
+# Use a space after (most) keywords
+--pad-header
+# In source files, separate functions with one blank line
+--break-blocks
+# would love to delete empty lines, however astyle does also delete blank line
+# after declarations
+#--delete-empty-lines
+# The limit on the length of lines is 80 columns and this is a strongly
+# preferred limit.
+--max-code-length=80
+--exclude=build
+--ignore-exclude-errors
+--suffix=none
+# Remove braces from a braced one line conditional statements.
+# I do not like this, but kernel styling affords this
+#--remove-braces

@@ -214,3 +214,14 @@ if(BUILD_DOCS)
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
           DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
+
+find_program(ASTYLE astyle)
+if(ASTYLE)
+  add_custom_target(
+    format
+    ${ASTYLE} --suffix=none --options=astylerc --recursive *.h *.c
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMENT "Format sources with astyle"
+    VERBATIM
+  )
+endif()
