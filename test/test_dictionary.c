@@ -26,7 +26,7 @@ void test_xstrdup(void)
     /* NULL test */
     TEST_ASSERT_NULL(xstrdup(NULL));
 
-    for (i = 0 ; i < sizeof(strings) / sizeof(char *) ; ++i) {
+    for (i = 0; i < sizeof(strings) / sizeof(char *); ++i) {
         dup_str = xstrdup(strings[i]);
         TEST_ASSERT_EQUAL_STRING(strings[i], dup_str);
         free(dup_str);
@@ -53,7 +53,7 @@ void test_dictionary_grow(void)
     TEST_ASSERT_EQUAL(0, dic->n);
     TEST_ASSERT_EQUAL(DICTMINSZ, dic->size);
 
-    for (i = 1 ; i < 10 ; ++i) {
+    for (i = 1; i < 10; ++i) {
         TEST_ASSERT_EQUAL(0, dictionary_grow(dic));
         TEST_ASSERT_EQUAL(0, dic->n);
         TEST_ASSERT_EQUAL((1 << i) * DICTMINSZ, dic->size);
@@ -80,11 +80,11 @@ void test_dictionary_growing(void)
     TEST_ASSERT_EQUAL(0, dic->n);
 
     /* Makes the dictionary grow */
-    for (i = 1 ; i < 101; ++i) {
+    for (i = 1; i < 101; ++i) {
         sprintf(sec_name, "sec%d", i);
         TEST_ASSERT_EQUAL(0, dictionary_set(dic, sec_name, ""));
 
-        for (j = 1 ; j < 11; ++j) {
+        for (j = 1; j < 11; ++j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
             TEST_ASSERT_EQUAL(0, dictionary_set(dic, key_name, "dummy_value"));
             TEST_ASSERT_EQUAL(i + (i - 1) * 10 + j, dic->n);
@@ -92,10 +92,10 @@ void test_dictionary_growing(void)
     }
 
     /* Shrink the dictionary */
-    for (i = 100 ; i > 0; --i) {
+    for (i = 100; i > 0; --i) {
         sprintf(sec_name, "sec%d", i);
 
-        for (j = 10 ; j > 0; --j) {
+        for (j = 10; j > 0; --j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
             dictionary_unset(dic, key_name);
         }
@@ -165,11 +165,11 @@ void test_dictionary_unset(void)
     dic1 = dictionary_new(DICTMINSZ);
     TEST_ASSERT_NOT_NULL(dic1);
 
-    for (i = 1 ; i < 10; ++i) {
+    for (i = 1; i < 10; ++i) {
         sprintf(sec_name, "sec%d", i);
         dictionary_set(dic1, sec_name, "");
 
-        for (j = 1 ; j < 10; ++j) {
+        for (j = 1; j < 10; ++j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
             dictionary_set(dic1, key_name, "dummy_value");
         }
@@ -178,11 +178,11 @@ void test_dictionary_unset(void)
     dic2 = dictionary_new(DICTMINSZ);
     TEST_ASSERT_NOT_NULL(dic2);
 
-    for (i = 1 ; i < 10; ++i) {
+    for (i = 1; i < 10; ++i) {
         sprintf(sec_name, "sec%d", i);
         dictionary_set(dic2, sec_name, "");
 
-        for (j = 1 ; j < 10; ++j) {
+        for (j = 1; j < 10; ++j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
             dictionary_set(dic2, key_name, "dummy_value");
         }
@@ -243,11 +243,11 @@ void test_dictionary_dump(void)
     free(dump_buff);
 
     /* Populate the dictionary */
-    for (i = 1 ; i < 3; ++i) {
+    for (i = 1; i < 3; ++i) {
         sprintf(sec_name, "sec%d", i);
         dictionary_set(dic, sec_name, "");
 
-        for (j = 1 ; j < 5; ++j) {
+        for (j = 1; j < 5; ++j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
             dictionary_set(dic, key_name, "dummy_value");
         }

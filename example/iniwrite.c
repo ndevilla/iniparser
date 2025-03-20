@@ -73,5 +73,5 @@ int main(int argc, char *argv[])
     } else
         ret = write_to_ini(argv[1]);
 
-    return ret ;
+    return ret;
 }

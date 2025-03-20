@@ -66,7 +66,7 @@ void tearDown(void)
 static dictionary *generate_dictionary(unsigned sections,
                                        unsigned entries_per_section)
 {
-    unsigned i, j ;
+    unsigned i, j;
     dictionary *dic;
     char sec_name[32];
     char key_name[64];
@@ -158,7 +158,7 @@ void test_iniparser_strstrip(void)
     strstrip(NULL);
 
     /* empty string */
-    for (i = 0 ; i < sizeof(strings_empty) / sizeof(char *) ; ++i) {
+    for (i = 0; i < sizeof(strings_empty) / sizeof(char *); ++i) {
         strcpy(stripped, strings_empty[i]);
         strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
@@ -167,7 +167,7 @@ void test_iniparser_strstrip(void)
     }
 
     /* test string */
-    for (i = 0 ; i < sizeof(strings_test) / sizeof(char *) ; ++i) {
+    for (i = 0; i < sizeof(strings_test) / sizeof(char *); ++i) {
         strcpy(stripped, strings_test[i]);
         strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
@@ -793,9 +793,9 @@ void test_iniparser_getboolean(void)
 
 void test_iniparser_line(void)
 {
-    char section [ASCIILINESZ + 1] ;
-    char key     [ASCIILINESZ + 1] ;
-    char val     [ASCIILINESZ + 1] ;
+    char section [ASCIILINESZ + 1];
+    char key     [ASCIILINESZ + 1];
+    char val     [ASCIILINESZ + 1];
 
     /* Test empty line */
     TEST_ASSERT_EQUAL(LINE_EMPTY, iniparser_line("", section, key, val));
@@ -1455,7 +1455,7 @@ void test_iniparser_quotes(void)
 
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, QUOTES_INI_VAL1);
-    /* iniparser_set() supports ; in values */
+    /* iniparser_set() supports; in values */
     str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL);
     TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, str);
     ini = fopen(TMP_INI_PATH, "w+");

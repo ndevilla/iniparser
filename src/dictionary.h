@@ -40,12 +40,12 @@ extern "C" {
  */
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
-    unsigned        n ;     /** Number of entries in dictionary */
-    size_t          size ;  /** Storage size */
-    char          **val ;   /** List of string values */
-    char          **key ;   /** List of string keys */
-    unsigned       *hash ;  /** List of hash values for keys */
-} dictionary ;
+    unsigned        n;     /** Number of entries in dictionary */
+    size_t          size;  /** Storage size */
+    char          **val;   /** List of string values */
+    char          **key;   /** List of string keys */
+    unsigned       *hash;  /** List of hash values for keys */
+} dictionary;
 
 
 /*---------------------------------------------------------------------------

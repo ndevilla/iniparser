@@ -377,7 +377,7 @@ void iniparser_unset(dictionary *ini, const char *entry);
   of querying for the presence of sections in a dictionary.
  */
 /*--------------------------------------------------------------------------*/
-int iniparser_find_entry(const dictionary *ini, const char *entry) ;
+int iniparser_find_entry(const dictionary *ini, const char *entry);
 
 /*-------------------------------------------------------------------------*/
 /**
