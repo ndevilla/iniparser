@@ -323,7 +323,7 @@ int dictionary_set(dictionary *d, const char *key, const char *val)
     d->key[i]  = xstrdup(key);
     d->val[i]  = (val ? xstrdup(val) : NULL);
     d->hash[i] = hash;
-    d->n ++;
+    d->n++;
     return 0;
 }
 
@@ -376,7 +376,7 @@ void dictionary_unset(dictionary *d, const char *key)
     }
 
     d->hash[i] = 0;
-    d->n --;
+    d->n--;
     return;
 }
 

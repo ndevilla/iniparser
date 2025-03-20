@@ -112,7 +112,7 @@ static unsigned strstrip(char *s)
         if (!isspace((unsigned char) * (last - 1)))
             break;
 
-        last --;
+        last--;
     }
 
     *last = (char)0;
@@ -189,7 +189,7 @@ int iniparser_getnsec(const dictionary *d)
             continue;
 
         if (strchr(d->key[i], ':') == NULL) {
-            nsec ++;
+            nsec++;
         }
     }
 
