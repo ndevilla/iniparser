@@ -6,12 +6,21 @@ variables:
 
 
 stages:
+    - prebuild
     - build
     - doc
     - test
     - win
     - prepare
     - release
+
+format:
+    stage: prebuild
+    script:
+        - mkdir build
+        - cd build
+        - cmake ..
+        - ! make format | grep Formatted
 
 build:
     stage: build
