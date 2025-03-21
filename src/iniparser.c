@@ -25,7 +25,7 @@
  * This enum stores the status for each parsed line (internal use only).
  */
 typedef enum _line_status_ {
-    LINE_UNPROCESSED,
+  LINE_UNPROCESSED,
     LINE_ERROR,
     LINE_EMPTY,
     LINE_COMMENT,
