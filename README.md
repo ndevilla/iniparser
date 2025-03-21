@@ -147,6 +147,18 @@ Open the file `html/index.html` with any HTML-capable browser.
 Or see the [complete documentation](https://iniparser.gitlab.io/iniparser/)
 online.
 
+## Code Formatting
+
+Code is formatted using Artistic Style Version 3.1:
+```
+astyle --options=astylerc --recursive '*.h' '*.c'
+```
+There is also a make target:
+```
+cd build/
+make format
+```
+Code formatting is enforced by the CI.
 
 ## License
 
