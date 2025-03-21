@@ -20,7 +20,8 @@ format:
         - mkdir build
         - cd build
         - cmake ..
-        - ! make format | grep Formatted
+        - |
+          ! make format | grep Formatted
 
 build:
     stage: build
