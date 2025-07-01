@@ -131,8 +131,8 @@ From the build directory run the examples with:
 
 The library is completely documented in its header file.
 
-To build the documentation [doxygen](https://www.doxygen.org/index.html) has be
-installed. Documentation can build and be found in build directory under
+To build the documentation [doxygen](https://www.doxygen.org/index.html) has to
+be installed. Documentation can be build and found in build directory under
 `html`:
 
 ```
