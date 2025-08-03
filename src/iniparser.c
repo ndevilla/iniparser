@@ -64,34 +64,6 @@ static const char *strlwc(const char *in, char *out, unsigned len)
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Duplicate a string
-  @param    s String to duplicate
-  @return   Pointer to a newly allocated string, to be freed with free()
-
-  This is a replacement for strdup(). This implementation is provided
-  for systems that do not have it.
- */
-/*--------------------------------------------------------------------------*/
-static char *xstrdup(const char *s)
-{
-    char *t;
-    size_t len;
-
-    if (!s)
-        return NULL;
-
-    len = strlen(s) + 1;
-    t = (char *) malloc(len);
-
-    if (t) {
-        memcpy(t, s, len);
-    }
-
-    return t;
-}
-
-/*-------------------------------------------------------------------------*/
-/**
   @brief    Remove blanks at the beginning and the end of a string.
   @param    str  String to parse and alter.
   @return   unsigned New size of the string.
@@ -745,7 +717,7 @@ static void parse_quoted_value(char *value, char quote)
     if (!value)
         return;
 
-    quoted = xstrdup(value);
+    quoted = strdup(value);
 
     if (!quoted) {
         iniparser_error_callback("iniparser: memory allocation failure\n");
@@ -797,7 +769,7 @@ static line_status iniparser_line(
     size_t      len;
     int d_quote;
 
-    line = xstrdup(input_line);
+    line = strdup(input_line);
     len = strstrip(line);
 
     sta = LINE_UNPROCESSED;

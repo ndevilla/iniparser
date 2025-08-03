@@ -12,37 +12,6 @@ void tearDown(void)
 {
 }
 
-void test_xstrdup(void)
-{
-    size_t i;
-    char *dup_str;
-    const char *strings[] = {
-        "",
-        "test",
-        " "
-    };
-    char *string_very_long;
-
-    /* NULL test */
-    TEST_ASSERT_NULL(xstrdup(NULL));
-
-    for (i = 0; i < sizeof(strings) / sizeof(char *); ++i) {
-        dup_str = xstrdup(strings[i]);
-        TEST_ASSERT_EQUAL_STRING(strings[i], dup_str);
-        free(dup_str);
-    }
-
-    /* test a overflowing string */
-    string_very_long = (char *) malloc(10 * 1024);
-    memset(string_very_long, '#', 10 * 1024);
-    string_very_long[10 * 1024 - 1] = '\0';
-    dup_str = xstrdup(string_very_long);
-    TEST_ASSERT_EQUAL_STRING(string_very_long, dup_str);
-
-    free(string_very_long);
-    free(dup_str);
-}
-
 void test_dictionary_grow(void)
 {
     unsigned i;
