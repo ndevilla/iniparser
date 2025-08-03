@@ -29,7 +29,8 @@ set(FETCHCONTENT_QUIET OFF)
 FetchContent_Declare(
   unity
   GIT_REPOSITORY "https://github.com/throwtheswitch/unity.git"
-  GIT_PROGRESS TRUE)
+  GIT_PROGRESS TRUE
+  GIT_TAG v2.6.1)
 
 FetchContent_MakeAvailable(unity)
 
