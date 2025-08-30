@@ -1,3 +1,4 @@
+![Gears engraving. A pinion and spur gear meshed together. Used as IniParser logo](/logo/302949_55x55.png)
 [![pipeline status](https://gitlab.com/iniparser/iniparser/badges/main/pipeline.svg)](https://gitlab.com/iniparser/iniparser/-/commits/main)
 [![latest release](https://gitlab.com/iniparser/iniparser/-/badges/release.svg)](https://gitlab.com/iniparser/iniparser/-/releases)
 

@@ -204,6 +204,8 @@ if(BUILD_DOCS)
   find_package(Doxygen REQUIRED)
   set(DOXYGEN_STRIP_FROM_PATH ${CMAKE_CURRENT_SOURCE_DIR})
   set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
+  set(DOXYGEN_PROJECT_BRIEF "iniParser is a simple C library offering ini file parsing services.")
+  set(DOXYGEN_PROJECT_LOGO "logo/302949_55x55.png")
   doxygen_add_docs(
     docs
     ${CMAKE_CURRENT_SOURCE_DIR}/README.md
