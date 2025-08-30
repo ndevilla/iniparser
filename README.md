@@ -24,16 +24,13 @@ library alive!
 Many thanks to \@touilleman for his exceptional contributions and efforts for
 maintaining this project for a decade. Manu, you rock!
 
-## Overview
+## Introduction
 
-This modules offers parsing of ini files from C.
+iniParser is a simple C library offering ini file parsing services.
+The library is pretty small (less than 1500 lines of C) and robust, and does
+not depend on any other external library to compile. It is written in C and
+should compile on most platforms without difficulty.
 
-Key features:
-
- - Small : around 1500 sloc inside 4 files (2 .c and 2 .h)
- - Portable : no dependancies, written in `-pedantic` C
- - Fully re-entrant : easy to make it thread-safe (just surround
-   library calls by mutex)
 
 ## Installation
 
@@ -184,14 +181,6 @@ Questions.
 
 
 ## Details
-
-### Introduction
-
-iniParser is a simple C library offering ini file parsing services.
-The library is pretty small (less than 1500 lines of C) and robust, and does
-not depend on any other external library to compile. It is written in C and
-should compile on most platforms without difficulty.
-
 
 ### What is an ini file?
 
