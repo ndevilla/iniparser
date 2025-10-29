@@ -1,4 +1,3 @@
-
 /*-------------------------------------------------------------------------*/
 /**
    @file    iniparser.h
@@ -30,7 +29,6 @@ extern "C" {
   as errback the error callback will be switched back to default.
  */
 /*--------------------------------------------------------------------------*/
-
 void iniparser_set_error_callback(int (*errback)(const char *, ...));
 
 /*-------------------------------------------------------------------------*/
@@ -51,9 +49,7 @@ void iniparser_set_error_callback(int (*errback)(const char *, ...));
   This function returns -1 in case of error.
  */
 /*--------------------------------------------------------------------------*/
-
 int iniparser_getnsec(const dictionary *d);
-
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -69,9 +65,7 @@ int iniparser_getnsec(const dictionary *d);
   This function returns NULL in case of error.
  */
 /*--------------------------------------------------------------------------*/
-
 const char *iniparser_getsecname(const dictionary *d, int n);
-
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -89,7 +83,6 @@ const char *iniparser_getsecname(const dictionary *d, int n);
 
  */
 /*--------------------------------------------------------------------------*/
-
 void iniparser_dump_ini(const dictionary *d, FILE *f);
 
 /*-------------------------------------------------------------------------*/
@@ -103,7 +96,6 @@ void iniparser_dump_ini(const dictionary *d, FILE *f);
   file.  It is Ok to specify @c stderr or @c stdout as output files.
  */
 /*--------------------------------------------------------------------------*/
-
 void iniparser_dumpsection_ini(const dictionary *d, const char *s, FILE *f);
 
 /*-------------------------------------------------------------------------*/
@@ -148,7 +140,6 @@ int iniparser_getsecnkeys(const dictionary *d, const char *s);
 /*--------------------------------------------------------------------------*/
 const char **iniparser_getseckeys(const dictionary *d, const char *s,
                                   const char **keys);
-
 
 /*-------------------------------------------------------------------------*/
 /**
@@ -337,7 +328,6 @@ double iniparser_getdouble(const dictionary *d, const char *key,
 /*--------------------------------------------------------------------------*/
 int iniparser_getboolean(const dictionary *d, const char *key, int notfound);
 
-
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Set an entry in a dictionary.
@@ -352,7 +342,6 @@ int iniparser_getboolean(const dictionary *d, const char *key, int notfound);
  */
 /*--------------------------------------------------------------------------*/
 int iniparser_set(dictionary *ini, const char *entry, const char *val);
-
 
 /*-------------------------------------------------------------------------*/
 /**

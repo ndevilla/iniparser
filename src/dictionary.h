@@ -1,4 +1,3 @@
-
 /*-------------------------------------------------------------------------*/
 /**
    @file    dictionary.h
@@ -107,7 +106,6 @@ void dictionary_del(dictionary *vd);
 const char *dictionary_get(const dictionary *d, const char *key,
                            const char *def);
 
-
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Set a value in a dictionary.
@@ -148,7 +146,6 @@ int dictionary_set(dictionary *vd, const char *key, const char *val);
  */
 /*--------------------------------------------------------------------------*/
 void dictionary_unset(dictionary *d, const char *key);
-
 
 /*-------------------------------------------------------------------------*/
 /**
