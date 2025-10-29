@@ -65,11 +65,14 @@ function(create_test_runner)
   add_executable(test_${TEST_RUNNER_NAME} test_${TEST_RUNNER_NAME}.c
                                           test_${TEST_RUNNER_NAME}_runner.c)
   foreach(TARGET_TYPE ${TARGET_TYPES})
-    target_compile_options(test_${TEST_RUNNER_NAME} PRIVATE -fsanitize=address)
-    target_link_options(
-      test_${TEST_RUNNER_NAME}
-      PRIVATE
-      -fsanitize=address)
+    if(UNIX)
+      target_compile_options(test_${TEST_RUNNER_NAME}
+                             PRIVATE -fsanitize=address)
+      target_link_options(
+        test_${TEST_RUNNER_NAME}
+        PRIVATE
+        -fsanitize=address)
+    endif(UNIX)
     # if BUILD_STATIC_LIBS=ON shared takes precedence
     target_link_libraries(
       test_${TEST_RUNNER_NAME}
