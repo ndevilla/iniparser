@@ -89,7 +89,7 @@ void iniparser_dump_ini(const dictionary *d, FILE *f);
 /**
   @brief    Save a dictionary section to a loadable ini file
   @param    d   Dictionary to dump
-  @param    s   Section name of dictionary to dump
+  @param    s   Section name of dictionary to dump, must be null-terminated.
   @param    f   Opened file pointer to dump to
 
   This function dumps a given section of a given dictionary into a loadable ini
@@ -116,7 +116,7 @@ void iniparser_dump(const dictionary *d, FILE *f);
 /**
   @brief    Get the number of keys in a section of a dictionary.
   @param    d   Dictionary to examine
-  @param    s   Section name of dictionary to examine
+  @param    s   Section name of dictionary to examine, must be null-terminated.
   @return   Number of keys in section
  */
 /*--------------------------------------------------------------------------*/
@@ -126,7 +126,7 @@ int iniparser_getsecnkeys(const dictionary *d, const char *s);
 /**
   @brief    Get the number of keys in a section of a dictionary.
   @param    d    Dictionary to examine
-  @param    s    Section name of dictionary to examine
+  @param    s    Section name of dictionary to examine, must be null-terminated.
   @param    keys Already allocated array to store the keys in
   @return   The pointer passed as `keys` argument or NULL in case of error
 
@@ -145,8 +145,9 @@ const char **iniparser_getseckeys(const dictionary *d, const char *s,
 /**
   @brief    Get the string associated to a key
   @param    d       Dictionary to search
-  @param    key     Key string to look for
-  @param    def     Default value to return if key not found.
+  @param    key     Key string to look for, must be null-terminated.
+  @param    def     Default value to return if key not found, must be
+                    null-terminated.
   @return   pointer to statically allocated character string
 
   This function queries a dictionary for a key. A key as read from an
@@ -163,7 +164,7 @@ const char *iniparser_getstring(const dictionary *d, const char *key,
 /**
   @brief    Get the string associated to a key, convert to an int
   @param    d Dictionary to search
-  @param    key Key string to look for
+  @param    key Key string to look for, must be null-terminated.
   @param    notfound Value to return in case of error
   @return   integer
 
@@ -192,7 +193,7 @@ int iniparser_getint(const dictionary *d, const char *key, int notfound);
 /**
   @brief    Get the string associated to a key, convert to an long int
   @param    d Dictionary to search
-  @param    key Key string to look for
+  @param    key Key string to look for, must be null-terminated.
   @param    notfound Value to return in case of error
   @return   integer
 
@@ -220,7 +221,7 @@ long int iniparser_getlongint(const dictionary *d, const char *key,
 /**
   @brief    Get the string associated to a key, convert to an int64_t
   @param    d Dictionary to search
-  @param    key Key string to look for
+  @param    key Key string to look for, must be null-terminated.
   @param    notfound Value to return in case of error
   @return   integer
 
@@ -251,7 +252,7 @@ int64_t iniparser_getint64(const dictionary *d, const char *key,
 /**
   @brief    Get the string associated to a key, convert to an uint64_t
   @param    d Dictionary to search
-  @param    key Key string to look for
+  @param    key Key string to look for, must be null-terminated.
   @param    notfound Value to return in case of error
   @return   integer
 
@@ -282,7 +283,7 @@ uint64_t iniparser_getuint64(const dictionary *d, const char *key,
 /**
   @brief    Get the string associated to a key, convert to a double
   @param    d Dictionary to search
-  @param    key Key string to look for
+  @param    key Key string to look for, must be null-terminated.
   @param    notfound Value to return in case of error
   @return   double
 
@@ -298,7 +299,7 @@ double iniparser_getdouble(const dictionary *d, const char *key,
 /**
   @brief    Get the string associated to a key, convert to a boolean
   @param    d Dictionary to search
-  @param    key Key string to look for
+  @param    key Key string to look for, must be null-terminated.
   @param    notfound Value to return in case of error
   @return   integer
 
@@ -332,8 +333,8 @@ int iniparser_getboolean(const dictionary *d, const char *key, int notfound);
 /**
   @brief    Set an entry in a dictionary.
   @param    ini     Dictionary to modify.
-  @param    entry   Entry to modify (entry name)
-  @param    val     New value to associate to the entry.
+  @param    entry   Entry to modify (entry name), must be null-terminated.
+  @param    val     New value to associate to the entry, must be null-terminated.
   @return   int     0 if Ok, -1 otherwise.
 
   If the given entry can be found in the dictionary, it is modified to
@@ -347,7 +348,7 @@ int iniparser_set(dictionary *ini, const char *entry, const char *val);
 /**
   @brief    Delete an entry in a dictionary
   @param    ini     Dictionary to modify
-  @param    entry   Entry to delete (entry name)
+  @param    entry   Entry to delete (entry name), must be null-terminated.
 
   If the given entry can be found, it is deleted from the dictionary.
  */
@@ -358,7 +359,7 @@ void iniparser_unset(dictionary *ini, const char *entry);
 /**
   @brief    Finds out if a given entry exists in a dictionary
   @param    ini     Dictionary to search
-  @param    entry   Name of the entry to look for
+  @param    entry   Name of the entry to look for, must be null-terminated.
   @return   integer 1 if entry exists, 0 otherwise
 
   Finds out if a given entry exists in the dictionary. Since sections
@@ -371,7 +372,7 @@ int iniparser_find_entry(const dictionary *ini, const char *entry);
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Parse an ini file and return an allocated dictionary object
-  @param    ininame Name of the ini file to read.
+  @param    ininame Name of the ini file to read, must be null-terminated..
   @return   Pointer to newly allocated dictionary
 
   This is the parser for ini files. This function is called, providing
@@ -399,7 +400,8 @@ dictionary *iniparser_load(const char *ininame);
 /**
   @brief    Parse an ini file and return an allocated dictionary object
   @param    in File to read.
-  @param    ininame Name of the ini file to read (only used for nicer error messages)
+  @param    ininame Name of the ini file to read (only used for nicer error
+            messages), must be null-terminated.
   @return   Pointer to newly allocated dictionary
 
   This is the parser for ini files. This function is called, providing
