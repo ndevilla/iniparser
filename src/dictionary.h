@@ -54,7 +54,7 @@ typedef struct _dictionary_ {
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Compute the hash key for a string.
-  @param    key     Character string to use for key, must be null-terminated.
+  @param    key   Character string to use for key, must be null-terminated.
   @return   1 unsigned int on at least 32 bits.
 
   This hash function has been taken from an Article in Dr Dobbs Journal.
@@ -68,7 +68,7 @@ unsigned dictionary_hash(const char *key);
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Create a new dictionary object.
-  @param    size    Optional initial size of the dictionary.
+  @param    size   Optional initial size of the dictionary.
   @return   1 newly allocated dictionary object.
 
   This function allocates a new dictionary object of given size and returns
@@ -80,7 +80,7 @@ dictionary *dictionary_new(size_t size);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Delete a dictionary object
+  @brief    Delete a dictionary object.
   @param    d   dictionary object to deallocate.
   @return   void
 
@@ -92,10 +92,10 @@ void dictionary_del(dictionary *vd);
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get a value from a dictionary.
-  @param    d       dictionary object to search.
-  @param    key     Key to look for in the dictionary, must be null-terminated.
-  @param    def     Default value to return if key not found, must be
-                    null-terminated.
+  @param    d     dictionary object to search.
+  @param    key   Key to look for in the dictionary, must be null-terminated.
+  @param    def   Default value to return if key not found, must be
+                  null-terminated.
   @return   1 pointer to internally allocated character string.
 
   This function locates a key in a dictionary and returns a pointer to its
@@ -110,10 +110,10 @@ const char *dictionary_get(const dictionary *d, const char *key,
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Set a value in a dictionary.
-  @param    d       dictionary object to modify.
-  @param    key     Key to modify or add, must be null-terminated.
-  @param    val     Value to add, must be null-terminated.
-  @return   int     0 if Ok, anything else otherwise
+  @param    d     dictionary object to modify.
+  @param    key   Key to modify or add, must be null-terminated.
+  @param    val   Value to add, must be null-terminated.
+  @return   int   0 if Ok, anything else otherwise.
 
   If the given key is found in the dictionary, the associated value is
   replaced by the provided one. If the key cannot be found in the
@@ -137,9 +137,9 @@ int dictionary_set(dictionary *vd, const char *key, const char *val);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Delete a key in a dictionary
-  @param    d       dictionary object to modify.
-  @param    key     Key to remove, must be null-terminated.
+  @brief    Delete a key in a dictionary.
+  @param    d     dictionary object to modify.
+  @param    key   Key to remove, must be null-terminated.
   @return   void
 
   This function deletes a key in a dictionary. Nothing is done if the
@@ -151,7 +151,7 @@ void dictionary_unset(dictionary *d, const char *key);
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Dump a dictionary to an opened file pointer.
-  @param    d   Dictionary to dump
+  @param    d   Dictionary to dump.
   @param    f   Opened file pointer.
   @return   void
 
