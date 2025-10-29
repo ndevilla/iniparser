@@ -36,6 +36,10 @@ with section("format"):
   # Format keywords consistently as 'lower' or 'upper' case
   keyword_case = 'upper'
 
+  # If a statement is wrapped to more than one line, than dangle the closing
+  # parenthesis on its own line.
+  dangle_parens = False
+
 # ------------------------------------------------
 # Options affecting comment reflow and formatting.
 # ------------------------------------------------
