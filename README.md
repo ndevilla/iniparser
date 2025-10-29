@@ -37,7 +37,8 @@ should compile on most platforms without difficulty.
 
 iniParser is available in a number of package repositories:
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/iniparser.svg)](https://repology.org/project/iniparser/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/iniparser.svg?columns=3&minversion=4.2)](https://repology.org/project/iniparser/versions)
+
 
 ## MinGW
 
