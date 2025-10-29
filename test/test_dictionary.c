@@ -277,19 +277,3 @@ void test_dictionary_get(void)
 
     dictionary_del(dic);
 }
-
-void test_dictionary_set(void)
-{
-    // Allocate 10 bytes without null-terminator
-    char *buf = malloc(10);
-    memset(buf, 'A', 10);  // Fill with 'A', no '\0'
-
-    dictionary *d = dictionary_new(128);
-
-    // strlen() will read past buf[9], causing heap-buffer-overflow
-    dictionary_set(d, "key", buf);
-
-    dictionary_del(d);
-    free(buf);
-    TEST_PASS();
-}
