@@ -1510,3 +1510,41 @@ void test_iniparser_quotes(void)
     ret = remove(TMP_INI_PATH);
     TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 }
+
+void test_iniparser_load_buffer(void)
+{
+#ifdef INIPARSER_HAVE_LOAD_BUFFER
+    const char *good_ini =
+        "[section]\n"
+        "key_01 = hello world\n"
+        "key1   = 321abc\n";
+    const char *bad_ini = "1111\n";
+
+    /* NULL buffer returns NULL */
+    dic = iniparser_load_buffer(NULL);
+    TEST_ASSERT_NULL(dic);
+
+    /* Empty buffer returns a valid empty dictionary */
+    dic = iniparser_load_buffer("");
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(0, iniparser_getnsec(dic));
+    dictionary_del(dic);
+    dic = NULL;
+
+    /* Well-formed buffer is parsed correctly */
+    dic = iniparser_load_buffer(good_ini);
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL_STRING("hello world",
+                             iniparser_getstring(dic, "section:key_01", NULL));
+    TEST_ASSERT_EQUAL_STRING("321abc",
+                             iniparser_getstring(dic, "section:key1", NULL));
+    dictionary_del(dic);
+    dic = NULL;
+
+    /* Syntax error in buffer returns NULL */
+    dic = iniparser_load_buffer(bad_ini);
+    TEST_ASSERT_NULL(dic);
+#else
+    TEST_IGNORE_MESSAGE("iniparser_load_buffer not available (no fmemopen)");
+#endif
+}

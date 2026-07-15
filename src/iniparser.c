@@ -714,6 +714,50 @@ dictionary *iniparser_load(const char *ininame)
     return dict;
 }
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Parse an ini file held in a memory buffer
+  @param    buffer  Null-terminated string holding the ini data to read.
+  @return   Pointer to newly allocated dictionary
+
+  This is the parser for ini data already loaded in memory. It behaves
+  exactly like iniparser_load() but reads from the provided null-terminated
+  buffer instead of a file on disk. The buffer is only read, never modified.
+
+  A NULL buffer triggers the error callback and returns NULL. An empty
+  buffer returns a valid, empty dictionary.
+
+  Note: this function relies on fmemopen() and is therefore only available
+  when the platform's feature test macros make fmemopen() visible (see
+  INIPARSER_HAVE_LOAD_BUFFER in iniparser.h).
+
+  The returned dictionary must be freed using iniparser_freedict().
+ */
+/*--------------------------------------------------------------------------*/
+#ifdef INIPARSER_HAVE_LOAD_BUFFER
+dictionary * iniparser_load_buffer(const char * buffer)
+{
+    FILE * in ;
+    dictionary * dict ;
+
+    if (buffer == NULL) {
+        iniparser_error_callback("iniparser: NULL buffer\n");
+        return NULL ;
+    }
+
+    if ((in=fmemopen((void *)buffer, strlen(buffer), "r"))==NULL) {
+        iniparser_error_callback("iniparser: cannot open memory buffer\n");
+        return NULL ;
+    }
+
+    dict = iniparser_load_file(in, "(memory buffer)");
+    fclose(in);
+
+    return dict ;
+}
+#endif /* INIPARSER_HAVE_LOAD_BUFFER */
+
+
 void iniparser_freedict(dictionary *d)
 {
     dictionary_del(d);

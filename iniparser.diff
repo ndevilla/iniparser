@@ -1,0 +1,248 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4f7fdba..940ab2c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -183,17 +183,20 @@ if(BUILD_EXAMPLES)
+   add_executable(iniexample ${CMAKE_CURRENT_SOURCE_DIR}/example/iniexample.c)
+   add_executable(iniwrite ${CMAKE_CURRENT_SOURCE_DIR}/example/iniwrite.c)
+   add_executable(parse ${CMAKE_CURRENT_SOURCE_DIR}/example/parse.c)
++  add_executable(loadbuffer ${CMAKE_CURRENT_SOURCE_DIR}/example/loadbuffer.c)
+ 
+   foreach(TARGET_TYPE ${TARGET_TYPES})
+     # if BUILD_STATIC_LIBS=ON shared takes precedence
+     target_link_libraries(iniexample ${PROJECT_NAME}-${TARGET_TYPE})
+     target_link_libraries(iniwrite ${PROJECT_NAME}-${TARGET_TYPE})
+     target_link_libraries(parse ${PROJECT_NAME}-${TARGET_TYPE})
++    target_link_libraries(loadbuffer ${PROJECT_NAME}-${TARGET_TYPE})
+   endforeach()
+   install(
+     TARGETS iniexample
+             iniwrite
+             parse
++            loadbuffer
+     DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)
+   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/example/twisted.ini
+           DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)
+diff --git a/example/loadbuffer.c b/example/loadbuffer.c
+new file mode 100644
+index 0000000..4077c91
+--- /dev/null
++++ b/example/loadbuffer.c
+@@ -0,0 +1,60 @@
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "iniparser.h"
++
++/*
++ * This example demonstrates parsing ini data that is already held in a
++ * memory buffer (a null-terminated string) using iniparser_load_buffer().
++ */
++
++static const char ini_buffer[] =
++    "#\n"
++    "# This ini data lives in a memory buffer\n"
++    "#\n"
++    "\n"
++    "[Pizza]\n"
++    "Ham       = yes ;\n"
++    "Mushrooms = TRUE ;\n"
++    "Capres    = 0 ;\n"
++    "Cheese    = Non ;\n"
++    "\n"
++    "[Wine]\n"
++    "Grape     = Cabernet Sauvignon ;\n"
++    "Year      = 1989 ;\n"
++    "Country   = Spain ;\n"
++    "Alcohol   = 12.5 ;\n";
++
++int main(void)
++{
++#ifdef INIPARSER_HAVE_LOAD_BUFFER
++    dictionary * ini ;
++
++    ini = iniparser_load_buffer(ini_buffer);
++    if (ini == NULL) {
++        fprintf(stderr, "cannot parse ini buffer\n");
++        return EXIT_FAILURE ;
++    }
++
++    printf("Parsed ini buffer:\n\n");
++    iniparser_dump(ini, stdout);
++
++    printf("\nPizza has ham    : %d\n",
++           iniparser_getboolean(ini, "pizza:ham", 0));
++    printf("Wine year        : %d\n",
++           iniparser_getint(ini, "wine:year", -1));
++    printf("Wine alcohol     : %g\n",
++           iniparser_getdouble(ini, "wine:alcohol", -1.0));
++
++    iniparser_freedict(ini);
++    return EXIT_SUCCESS ;
++#else
++    (void)ini_buffer;
++    fprintf(stderr,
++        "iniparser_load_buffer() is not available on this platform "
++        "(fmemopen() not exposed).\n"
++        "Define an appropriate feature test macro "
++        "(e.g. _POSIX_C_SOURCE=200809L) to enable it.\n");
++    return EXIT_FAILURE ;
++#endif
++}
+diff --git a/src/iniparser.c b/src/iniparser.c
+index 1086b46..4e4ed33 100644
+--- a/src/iniparser.c
++++ b/src/iniparser.c
+@@ -941,6 +941,49 @@ dictionary * iniparser_load(const char * ininame)
+     return dict ;
+ }
+ 
++/*-------------------------------------------------------------------------*/
++/**
++  @brief    Parse an ini file held in a memory buffer
++  @param    buffer  Null-terminated string holding the ini data to read.
++  @return   Pointer to newly allocated dictionary
++
++  This is the parser for ini data already loaded in memory. It behaves
++  exactly like iniparser_load() but reads from the provided null-terminated
++  buffer instead of a file on disk. The buffer is only read, never modified.
++
++  A NULL buffer triggers the error callback and returns NULL. An empty
++  buffer returns a valid, empty dictionary.
++
++  Note: this function relies on fmemopen() and is therefore only available
++  when the platform's feature test macros make fmemopen() visible (see
++  INIPARSER_HAVE_LOAD_BUFFER in iniparser.h).
++
++  The returned dictionary must be freed using iniparser_freedict().
++ */
++/*--------------------------------------------------------------------------*/
++#ifdef INIPARSER_HAVE_LOAD_BUFFER
++dictionary * iniparser_load_buffer(const char * buffer)
++{
++    FILE * in ;
++    dictionary * dict ;
++
++    if (buffer == NULL) {
++        iniparser_error_callback("iniparser: NULL buffer\n");
++        return NULL ;
++    }
++
++    if ((in=fmemopen((void *)buffer, strlen(buffer), "r"))==NULL) {
++        iniparser_error_callback("iniparser: cannot open memory buffer\n");
++        return NULL ;
++    }
++
++    dict = iniparser_load_file(in, "(memory buffer)");
++    fclose(in);
++
++    return dict ;
++}
++#endif /* INIPARSER_HAVE_LOAD_BUFFER */
++
+ 
+ /*-------------------------------------------------------------------------*/
+ /**
+diff --git a/src/iniparser.h b/src/iniparser.h
+index d8026a8..74ad552 100644
+--- a/src/iniparser.h
++++ b/src/iniparser.h
+@@ -17,6 +17,18 @@
+ #include "dictionary.h"
+ #include <stdint.h>
+ 
++/*
++ * iniparser_load_buffer() relies on fmemopen(). Expose it only when the
++ * platform's feature test macros make fmemopen() available (POSIX.1-2008).
++ * Callers that want this function must request the appropriate feature test
++ * macros (e.g. _POSIX_C_SOURCE >= 200809L or _GNU_SOURCE) before including
++ * any system header.
++ */
++#if defined(_GNU_SOURCE) \
++    || (defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE - 0) >= 200809L)
++#define INIPARSER_HAVE_LOAD_BUFFER 1
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -427,6 +439,30 @@ dictionary * iniparser_load(const char * ininame);
+ /*--------------------------------------------------------------------------*/
+ dictionary * iniparser_load_file(FILE * in, const char * ininame);
+ 
++/*-------------------------------------------------------------------------*/
++/**
++  @brief    Parse an ini file held in a memory buffer
++  @param    buffer Null-terminated string holding the ini data to read.
++  @return   Pointer to newly allocated dictionary
++
++  This is the parser for ini data already loaded in memory. It behaves
++  exactly like iniparser_load() but reads from the provided null-terminated
++  buffer instead of a file on disk. The buffer is only read, never modified.
++
++  A NULL buffer triggers the error callback and returns NULL. An empty
++  buffer returns a valid, empty dictionary.
++
++  Note: this function relies on fmemopen() and is therefore only declared
++  when INIPARSER_HAVE_LOAD_BUFFER is defined, i.e. when the platform's
++  feature test macros make fmemopen() available (POSIX.1-2008 or later).
++
++  The returned dictionary must be freed using iniparser_freedict().
++ */
++/*--------------------------------------------------------------------------*/
++#ifdef INIPARSER_HAVE_LOAD_BUFFER
++dictionary * iniparser_load_buffer(const char * buffer);
++#endif
++
+ /*-------------------------------------------------------------------------*/
+ /**
+   @brief    Free all memory associated to an ini dictionary
+diff --git a/test/test_iniparser.c b/test/test_iniparser.c
+index ed88f9e..2ed6de0 100644
+--- a/test/test_iniparser.c
++++ b/test/test_iniparser.c
+@@ -873,6 +873,44 @@ void test_iniparser_load(void)
+     dir = NULL;
+ }
+ 
++void test_iniparser_load_buffer(void)
++{
++#ifdef INIPARSER_HAVE_LOAD_BUFFER
++    const char *good_ini =
++        "[section]\n"
++        "key_01 = hello world\n"
++        "key1   = 321abc\n";
++    const char *bad_ini = "1111\n";
++
++    /* NULL buffer returns NULL */
++    dic = iniparser_load_buffer(NULL);
++    TEST_ASSERT_NULL(dic);
++
++    /* Empty buffer returns a valid empty dictionary */
++    dic = iniparser_load_buffer("");
++    TEST_ASSERT_NOT_NULL(dic);
++    TEST_ASSERT_EQUAL(0, iniparser_getnsec(dic));
++    dictionary_del(dic);
++    dic = NULL;
++
++    /* Well-formed buffer is parsed correctly */
++    dic = iniparser_load_buffer(good_ini);
++    TEST_ASSERT_NOT_NULL(dic);
++    TEST_ASSERT_EQUAL_STRING("hello world",
++                             iniparser_getstring(dic, "section:key_01", NULL));
++    TEST_ASSERT_EQUAL_STRING("321abc",
++                             iniparser_getstring(dic, "section:key1", NULL));
++    dictionary_del(dic);
++    dic = NULL;
++
++    /* Syntax error in buffer returns NULL */
++    dic = iniparser_load_buffer(bad_ini);
++    TEST_ASSERT_NULL(dic);
++#else
++    TEST_IGNORE_MESSAGE("iniparser_load_buffer not available (no fmemopen)");
++#endif
++}
++
+ void test_dictionary_wrapper(void)
+ {
+     dic = dictionary_new(10);

@@ -16,6 +16,18 @@
 #include "dictionary.h"
 #include <stdint.h>
 
+/*
+ * iniparser_load_buffer() relies on fmemopen(). Expose it only when the
+ * platform's feature test macros make fmemopen() available (POSIX.1-2008).
+ * Callers that want this function must request the appropriate feature test
+ * macros (e.g. _POSIX_C_SOURCE >= 200809L or _GNU_SOURCE) before including
+ * any system header.
+ */
+#if defined(_GNU_SOURCE) \
+    || (defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE - 0) >= 200809L)
+#define INIPARSER_HAVE_LOAD_BUFFER 1
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -425,7 +437,30 @@ extern "C"
   /*--------------------------------------------------------------------------*/
   dictionary *iniparser_load_file(FILE *in, const char *ininame);
 
-  dictionary *iniparser_load_buffer(const char *buffer, size_t buffer_size);
+  /*-------------------------------------------------------------------------*/
+  /**
+    @brief    Parse an ini file held in a memory buffer
+    @param    buffer Null-terminated string holding the ini data to read.
+    @return   Pointer to newly allocated dictionary
+
+    This is the parser for ini data already loaded in memory. It behaves
+    exactly like iniparser_load() but reads from the provided null-terminated
+    buffer instead of a file on disk. The buffer is only read, never modified.
+
+    A NULL buffer triggers the error callback and returns NULL. An empty
+    buffer returns a valid, empty dictionary.
+
+    Note: this function relies on fmemopen() and is therefore only declared
+    when INIPARSER_HAVE_LOAD_BUFFER is defined, i.e. when the platform's
+    feature test macros make fmemopen() available (POSIX.1-2008 or later).
+
+    The returned dictionary must be freed using iniparser_freedict().
+  */
+  /*--------------------------------------------------------------------------*/
+  #ifdef INIPARSER_HAVE_LOAD_BUFFER
+  dictionary * iniparser_load_buffer(const char * buffer);
+  #endif
+
 
   /*-------------------------------------------------------------------------*/
   /**
