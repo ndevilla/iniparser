@@ -735,17 +735,17 @@ dictionary *iniparser_load(const char *ininame)
  */
 /*--------------------------------------------------------------------------*/
 #ifdef INIPARSER_HAVE_LOAD_BUFFER
-dictionary * iniparser_load_buffer(const char * buffer)
+dictionary *iniparser_load_buffer(const char *buffer)
 {
-    FILE * in ;
-    dictionary * dict ;
+    FILE *in ;
+    dictionary *dict ;
 
     if (buffer == NULL) {
         iniparser_error_callback("iniparser: NULL buffer\n");
         return NULL ;
     }
 
-    if ((in=fmemopen((void *)buffer, strlen(buffer), "r"))==NULL) {
+    if ((in = fmemopen((void *)buffer, strlen(buffer), "r")) == NULL) {
         iniparser_error_callback("iniparser: cannot open memory buffer\n");
         return NULL ;
     }

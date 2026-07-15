@@ -31,8 +31,8 @@ int main(void)
     dictionary *ini;
 
     ini = iniparser_load_buffer(ini_buffer);
-    if (ini == NULL)
-    {
+
+    if (ini == NULL) {
         fprintf(stderr, "cannot parse ini buffer\n");
         return EXIT_FAILURE;
     }
