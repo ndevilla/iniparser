@@ -183,17 +183,20 @@ if(BUILD_EXAMPLES)
   add_executable(iniexample ${CMAKE_CURRENT_SOURCE_DIR}/example/iniexample.c)
   add_executable(iniwrite ${CMAKE_CURRENT_SOURCE_DIR}/example/iniwrite.c)
   add_executable(parse ${CMAKE_CURRENT_SOURCE_DIR}/example/parse.c)
+  add_executable(loadbuffer ${CMAKE_CURRENT_SOURCE_DIR}/example/loadbuffer.c)
 
   foreach(TARGET_TYPE ${TARGET_TYPES})
     # if BUILD_STATIC_LIBS=ON shared takes precedence
     target_link_libraries(iniexample ${PROJECT_NAME}-${TARGET_TYPE})
     target_link_libraries(iniwrite ${PROJECT_NAME}-${TARGET_TYPE})
     target_link_libraries(parse ${PROJECT_NAME}-${TARGET_TYPE})
+    target_link_libraries(loadbuffer ${PROJECT_NAME}-${TARGET_TYPE})
   endforeach()
   install(
     TARGETS iniexample
             iniwrite
             parse
+            loadbuffer
     DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/example/twisted.ini
           DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)

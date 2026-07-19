@@ -78,6 +78,16 @@ iniexample-memcheck:
     dependencies:
         - build
 
+loadbuffer-memcheck:
+    stage: test
+    script:
+        - pwd
+        - tree
+        - cd install/share/doc/iniparser/examples/
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./loadbuffer
+    dependencies:
+        - build
+
 iniwrite-memcheck:
     stage: test
     script:
