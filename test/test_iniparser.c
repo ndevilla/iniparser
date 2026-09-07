@@ -1060,6 +1060,8 @@ void test_iniparser_dump(void)
 
 void test_iniparser_dump_ini(void)
 {
+    FILE *in;
+    char section[1025];
     const char *str;
     char val[4096] = {};
     int ret;
@@ -1103,6 +1105,18 @@ void test_iniparser_dump_ini(void)
     iniparser_dump_ini(dic, ini);
     fclose(ini);
     ini = NULL;
+    iniparser_freedict(dic);
+    dic = NULL;
+
+    in = fmemopen((void *)"[s1]\na", 7, "r");
+    TEST_ASSERT_NOT_NULL(in);
+    dic = iniparser_load_file(in, "t");
+    fclose(in);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(section, 'a', 1024);
+    section[1024] = '\0';
+    iniparser_set(dic, section, "value");
+    iniparser_dump_ini(dic, fopen("/dev/null", "w"));
     iniparser_freedict(dic);
     dic = NULL;
 }
@@ -1150,6 +1164,20 @@ void test_iniparser_dumpsection_ini(void)
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
     /*dump the data of old.ini to test.ini*/
     iniparser_dumpsection_ini(dic, key, ini);
+    fclose(ini);
+    ini = NULL;
+    iniparser_freedict(dic);
+    dic = NULL;
+    /*test keys at the boundary of the guard*/
+    dic = dictionary_new(0);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(key, 'a', 1024);          /* strlen(key) = 1024 */
+    key[1024] = '\0';
+    ret = iniparser_set(dic, key, "dummy");
+    TEST_ASSERT_GREATER_OR_EQUAL(0, ret);
+    ini = fopen(TMP_INI_PATH, "wt");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
+    iniparser_dumpsection_ini(dic, key, ini);   /* overflows keym[1025] */
     fclose(ini);
     ini = NULL;
     iniparser_freedict(dic);
