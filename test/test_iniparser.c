@@ -264,6 +264,8 @@ void test_iniparser_getsecname(void)
 
 void test_iniparser_getseckeys(void)
 {
+    FILE *in;
+    char name[1026];
     unsigned i;
     char key_name[64];
     int nkeys;
@@ -323,6 +325,17 @@ void test_iniparser_getseckeys(void)
         TEST_ASSERT_EQUAL_STRING(key_name, keys[i]);
     }
 
+    dictionary_del(dic);
+    dic = NULL;
+
+    in = fmemopen((void *)"[s1]\na", 7, "r");
+    dic = iniparser_load_file(in, "t");
+    fclose(in);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(name, 'a', 1025);
+    name[1025] = '\0';
+    iniparser_set(dic, name, "value");
+    iniparser_getsecnkeys(dic, name);
     dictionary_del(dic);
     dic = NULL;
 }
