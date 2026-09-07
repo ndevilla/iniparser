@@ -264,7 +264,6 @@ void test_iniparser_getsecname(void)
 
 void test_iniparser_getseckeys(void)
 {
-    FILE *in;
     char name[1026];
     unsigned i;
     char key_name[64];
@@ -328,9 +327,7 @@ void test_iniparser_getseckeys(void)
     dictionary_del(dic);
     dic = NULL;
 
-    in = fmemopen((void *)"[s1]\na", 7, "r");
-    dic = iniparser_load_file(in, "t");
-    fclose(in);
+    dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL(dic);
     memset(name, 'a', 1025);
     name[1025] = '\0';
@@ -339,10 +336,7 @@ void test_iniparser_getseckeys(void)
     dictionary_del(dic);
     dic = NULL;
 
-    in = fmemopen((void *)"[s1]\na", 7, "r");
-    TEST_ASSERT_NOT_NULL(in);
-    dic = iniparser_load_file(in, "t");
-    fclose(in);
+    dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL(dic);
     memset(name, 'a', 1025);
     name[1025] = '\0';
@@ -1133,10 +1127,7 @@ void test_iniparser_dump_ini(void)
     iniparser_freedict(dic);
     dic = NULL;
 
-    in = fmemopen((void *)"[s1]\na", 7, "r");
-    TEST_ASSERT_NOT_NULL(in);
-    dic = iniparser_load_file(in, "t");
-    fclose(in);
+    dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL(dic);
     memset(section, 'a', 1024);
     section[1024] = '\0';
