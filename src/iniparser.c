@@ -314,6 +314,8 @@ const char **iniparser_getseckeys(const dictionary *d, const char *s,
 
     if (! iniparser_find_entry(d, s)) return NULL;
 
+    if (strlen(s) + 2 > sizeof(keym)) return NULL;
+
     seclen  = strlen(s);
     strlwc(s, keym, sizeof(keym));
     keym[seclen] = ':';
