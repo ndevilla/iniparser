@@ -437,6 +437,7 @@ dictionary *iniparser_load(const char *ininame);
 /*--------------------------------------------------------------------------*/
 dictionary *iniparser_load_file(FILE *in, const char *ininame);
 
+#ifdef INIPARSER_HAVE_LOAD_BUFFER
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Parse an ini file held in a memory buffer
@@ -457,7 +458,6 @@ dictionary *iniparser_load_file(FILE *in, const char *ininame);
   The returned dictionary must be freed using iniparser_freedict().
 */
 /*--------------------------------------------------------------------------*/
-#ifdef INIPARSER_HAVE_LOAD_BUFFER
 dictionary *iniparser_load_buffer(const char *buffer);
 #endif
 
