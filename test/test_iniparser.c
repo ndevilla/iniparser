@@ -163,7 +163,7 @@ void test_iniparser_strstrip(void)
         strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
                 strings_empty[i], stripped);
-        TEST_ASSERT_EQUAL_STRING_MESSAGE(stripped, strings_empty[0], error_msg);
+        TEST_ASSERT_EQUAL_STRING_MESSAGE(strings_empty[0], stripped, error_msg);
     }
 
     /* test string */
@@ -290,7 +290,7 @@ void test_iniparser_getseckeys(void)
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "dummy", keys));
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "sec0", NULL));
     nkeys = iniparser_getsecnkeys(dic, "sec42");
-    TEST_ASSERT_EQUAL(nkeys, 10);
+    TEST_ASSERT_EQUAL(10, nkeys);
     TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "sec42", keys));
 
     for (i = 0; i < 10; ++i) {
@@ -307,7 +307,7 @@ void test_iniparser_getseckeys(void)
 
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "sec42", keys));
     nkeys = iniparser_getsecnkeys(dic, "Sec99");
-    TEST_ASSERT_EQUAL(nkeys, 9);
+    TEST_ASSERT_EQUAL(9, nkeys);
     TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "Sec99", keys));
 
     for (i = 0; i < 9; ++i) {
@@ -316,7 +316,7 @@ void test_iniparser_getseckeys(void)
     }
 
     nkeys = iniparser_getsecnkeys(dic, "sec0");
-    TEST_ASSERT_EQUAL(nkeys, 7);
+    TEST_ASSERT_EQUAL(7, nkeys);
     TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "sec0", keys));
 
     for (i = 0; i < 7; ++i) {
