@@ -443,8 +443,7 @@ void test_iniparser_getint(void)
 
     for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "int:bad%d", i);
-        TEST_ASSERT_EQUAL(0,
-                          iniparser_getint(dic, key_name, 0));
+        TEST_ASSERT_EQUAL(0, iniparser_getint(dic, key_name, 0));
     }
 
     dictionary_del(dic);
@@ -520,8 +519,7 @@ void test_iniparser_getlongint(void)
 
     for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        TEST_ASSERT_EQUAL(0,
-                          iniparser_getlongint(dic, key_name, 0));
+        TEST_ASSERT_EQUAL(0, iniparser_getlongint(dic, key_name, 0));
     }
 
     dictionary_del(dic);
@@ -600,8 +598,7 @@ void test_iniparser_getint64(void)
 
     for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        TEST_ASSERT_EQUAL_INT64(0,
-                                iniparser_getint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_INT64(0, iniparser_getint64(dic, key_name, 0));
     }
 
     dictionary_del(dic);
@@ -680,8 +677,7 @@ void test_iniparser_getuint64(void)
 
     for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        TEST_ASSERT_EQUAL_UINT64(0,
-                                 iniparser_getuint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_UINT64(0, iniparser_getuint64(dic, key_name, 0));
     }
 
     dictionary_del(dic);
