@@ -283,6 +283,8 @@ int iniparser_getsecnkeys(const dictionary *d, const char *s)
 
     nkeys = 0;
 
+    if (s == NULL) return -1;
+
     if (d == NULL) return nkeys;
 
     if (strlen(s) + 2 > sizeof(keym)) return nkeys;
