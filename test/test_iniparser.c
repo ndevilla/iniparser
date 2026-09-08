@@ -271,14 +271,22 @@ void test_iniparser_getseckeys(void)
     const char *keys[10];  /* At most 10 elements per section */
     /* NULL test */
     TEST_ASSERT_NULL(iniparser_getseckeys(NULL, NULL, NULL));
+    nkeys = iniparser_getsecnkeys(NULL, NULL);
+    TEST_ASSERT_EQUAL(-1, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(NULL, "dummy", NULL));
+    nkeys = iniparser_getsecnkeys(NULL, "dummy");
+    TEST_ASSERT_EQUAL(0, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(NULL, "dummy", keys));
 
     /* Empty dictionary */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, NULL, keys));
+    nkeys = iniparser_getsecnkeys(dic, NULL);
+    TEST_ASSERT_EQUAL(-1, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "dummy", keys));
+    nkeys = iniparser_getsecnkeys(dic, "dummy");
+    TEST_ASSERT_EQUAL(0, nkeys);
     dictionary_del(dic);
     dic = NULL;
 
@@ -287,6 +295,8 @@ void test_iniparser_getseckeys(void)
     dic = generate_dictionary(100, 10);
     TEST_ASSERT_NOT_NULL(dic);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, NULL, keys));
+    nkeys = iniparser_getsecnkeys(dic, NULL);
+    TEST_ASSERT_EQUAL(-1, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "dummy", keys));
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "sec0", NULL));
     nkeys = iniparser_getsecnkeys(dic, "sec42");
