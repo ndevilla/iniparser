@@ -1089,6 +1089,7 @@ void test_iniparser_dump_ini(void)
     char section[1025];
     const char *str;
     char val[4096] = {};
+    char val2[1026];
     int ret;
 
     /*loading old.ini*/
@@ -1140,6 +1141,16 @@ void test_iniparser_dump_ini(void)
     iniparser_set(dic, section, "value");
     iniparser_dump_ini(dic, fopen("/dev/null", "w"));
     iniparser_freedict(dic);
+    dic = NULL;
+
+    dic = iniparser_load(OLD_INI_PATH);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(val, '\\', 1025);
+    val[1025] = '\0';
+    dictionary_set(dic, "sec", NULL);
+    dictionary_set(dic, "sec:key", val);
+    iniparser_dump_ini(dic, fopen("/dev/null", "w"));
+    dictionary_del(dic);
     dic = NULL;
 }
 
