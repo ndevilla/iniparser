@@ -207,7 +207,8 @@ if(BUILD_DOCS)
   find_package(Doxygen REQUIRED)
   set(DOXYGEN_STRIP_FROM_PATH ${CMAKE_CURRENT_SOURCE_DIR})
   set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
-  set(DOXYGEN_PROJECT_BRIEF "iniParser is a simple C library offering ini file parsing services.")
+  set(DOXYGEN_PROJECT_BRIEF
+      "iniParser is a simple C library offering ini file parsing services.")
   set(DOXYGEN_PROJECT_LOGO "logo/302949_55x55.png")
   doxygen_add_docs(
     docs
@@ -224,9 +225,13 @@ find_program(ASTYLE astyle)
 if(ASTYLE)
   add_custom_target(
     format
-    ${ASTYLE} --suffix=none --options=astylerc --recursive *.h *.c
+    ${ASTYLE}
+    --suffix=none
+    --options=astylerc
+    --recursive
+    *.h
+    *.c
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Format sources with astyle"
-    VERBATIM
-  )
+    VERBATIM)
 endif()
