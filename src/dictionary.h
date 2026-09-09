@@ -17,6 +17,7 @@
                                 Includes
  ---------------------------------------------------------------------------*/
 
+#include "version.h"
 #include <stdio.h>
 
 #ifdef __cplusplus

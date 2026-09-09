@@ -39,6 +39,12 @@ if(BUILD_STATIC_LIBS OR NOT BUILD_SHARED_LIBS)
 endif()
 set(CONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
+# Generate version number constants
+configure_file(
+  cmake/version.h.in
+  ${CMAKE_BINARY_DIR}/version.h
+  @ONLY)
+
 foreach(TARGET_TYPE ${TARGET_TYPES})
   set(TARGET_NAME "${PROJECT_NAME}-${TARGET_TYPE}")
   set(TARGETS_EXPORT_NAME "${TARGET_NAME}Targets")
@@ -51,12 +57,16 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
     ${UPPER_TARGET_TYPE}
     "src/iniparser.c"
     "src/dictionary.c")
-  set(PUBLIC_HEADERS "src/iniparser.h" "src/dictionary.h")
+  set(PUBLIC_HEADERS
+      "src/iniparser.h"
+      "src/dictionary.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/version.h")
   set_target_properties(${TARGET_NAME} PROPERTIES PUBLIC_HEADER
                                                   "${PUBLIC_HEADERS}")
   target_include_directories(
     ${TARGET_NAME}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
   # If both shared and static libs are build at once with MSVC it generates a
   # shared library consisting of
@@ -216,6 +226,7 @@ if(BUILD_DOCS)
     ${CMAKE_CURRENT_SOURCE_DIR}/FAQ-en.md
     ${CMAKE_CURRENT_SOURCE_DIR}/FAQ-zhcn.md
     ${CMAKE_CURRENT_SOURCE_DIR}/src/iniparser.h
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
     ALL)
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
           DESTINATION ${CMAKE_INSTALL_DOCDIR})

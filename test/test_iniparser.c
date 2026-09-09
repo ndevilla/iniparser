@@ -93,6 +93,13 @@ static dictionary *generate_dictionary(unsigned sections,
     return dic;
 }
 
+void test_iniparser_version(void)
+{
+    TEST_ASSERT_EQUAL(4, INIPARSER_VERSION_MAJOR);
+    TEST_ASSERT_EQUAL(2, INIPARSER_VERSION_MINOR);
+    TEST_ASSERT_EQUAL(6, INIPARSER_VERSION_PATCH);
+}
+
 void test_iniparser_strlwc(void)
 {
     char out_buffer[128];
