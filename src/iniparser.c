@@ -197,7 +197,7 @@ static void escape_value(char *escaped, char *value)
     if (!escaped || !value)
         return;
 
-    while ((c = value[v]) != '\0') {
+    while ((c = value[v]) != '\0' && e < (ASCIILINESZ * 2)) {
         if (c == '\\' || c == '"') {
             escaped[e] = '\\';
             e++;
@@ -255,7 +255,7 @@ void iniparser_dumpsection_ini(const dictionary *d, const char *s, FILE *f)
 
     if (! iniparser_find_entry(d, s)) return;
 
-    if (strlen(s) > sizeof(keym)) return;
+    if (strlen(s) + 2 > sizeof(keym)) return;
 
     seclen  = (int)strlen(s);
     fprintf(f, "\n[%s]\n", s);
@@ -283,7 +283,11 @@ int iniparser_getsecnkeys(const dictionary *d, const char *s)
 
     nkeys = 0;
 
+    if (s == NULL) return -1;
+
     if (d == NULL) return nkeys;
+
+    if (strlen(s) + 2 > sizeof(keym)) return nkeys;
 
     if (! iniparser_find_entry(d, s)) return nkeys;
 
@@ -312,6 +316,8 @@ const char **iniparser_getseckeys(const dictionary *d, const char *s,
     if (d == NULL || keys == NULL) return NULL;
 
     if (! iniparser_find_entry(d, s)) return NULL;
+
+    if (strlen(s) + 2 > sizeof(keym)) return NULL;
 
     seclen  = strlen(s);
     strlwc(s, keym, sizeof(keym));

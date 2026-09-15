@@ -17,6 +17,7 @@ stages:
 format:
     stage: prebuild
     script:
+        - astyle --version
         - mkdir build
         - cd build
         - cmake ..
