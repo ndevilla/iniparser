@@ -5,7 +5,7 @@ project(
   DESCRIPTION "C library for parsing INI-style files"
   HOMEPAGE_URL https://gitlab.com/iniparser/iniparser/
   LANGUAGES C
-  VERSION 4.2.6)
+  VERSION 4.3.0)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -39,6 +39,12 @@ if(BUILD_STATIC_LIBS OR NOT BUILD_SHARED_LIBS)
 endif()
 set(CONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
+# Generate version number constants
+configure_file(
+  cmake/version.h.in
+  ${CMAKE_BINARY_DIR}/version.h
+  @ONLY)
+
 foreach(TARGET_TYPE ${TARGET_TYPES})
   set(TARGET_NAME "${PROJECT_NAME}-${TARGET_TYPE}")
   set(TARGETS_EXPORT_NAME "${TARGET_NAME}Targets")
@@ -51,12 +57,16 @@ foreach(TARGET_TYPE ${TARGET_TYPES})
     ${UPPER_TARGET_TYPE}
     "src/iniparser.c"
     "src/dictionary.c")
-  set(PUBLIC_HEADERS "src/iniparser.h" "src/dictionary.h")
+  set(PUBLIC_HEADERS
+      "src/iniparser.h"
+      "src/dictionary.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/version.h")
   set_target_properties(${TARGET_NAME} PROPERTIES PUBLIC_HEADER
                                                   "${PUBLIC_HEADERS}")
   target_include_directories(
     ${TARGET_NAME}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>)
   # If both shared and static libs are build at once with MSVC it generates a
   # shared library consisting of
@@ -183,17 +193,20 @@ if(BUILD_EXAMPLES)
   add_executable(iniexample ${CMAKE_CURRENT_SOURCE_DIR}/example/iniexample.c)
   add_executable(iniwrite ${CMAKE_CURRENT_SOURCE_DIR}/example/iniwrite.c)
   add_executable(parse ${CMAKE_CURRENT_SOURCE_DIR}/example/parse.c)
+  add_executable(loadbuffer ${CMAKE_CURRENT_SOURCE_DIR}/example/loadbuffer.c)
 
   foreach(TARGET_TYPE ${TARGET_TYPES})
     # if BUILD_STATIC_LIBS=ON shared takes precedence
     target_link_libraries(iniexample ${PROJECT_NAME}-${TARGET_TYPE})
     target_link_libraries(iniwrite ${PROJECT_NAME}-${TARGET_TYPE})
     target_link_libraries(parse ${PROJECT_NAME}-${TARGET_TYPE})
+    target_link_libraries(loadbuffer ${PROJECT_NAME}-${TARGET_TYPE})
   endforeach()
   install(
     TARGETS iniexample
             iniwrite
             parse
+            loadbuffer
     DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/example/twisted.ini
           DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples/)
@@ -204,13 +217,32 @@ if(BUILD_DOCS)
   find_package(Doxygen REQUIRED)
   set(DOXYGEN_STRIP_FROM_PATH ${CMAKE_CURRENT_SOURCE_DIR})
   set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
+  set(DOXYGEN_PROJECT_BRIEF
+      "iniParser is a simple C library offering ini file parsing services.")
+  set(DOXYGEN_PROJECT_LOGO "logo/302949_55x55.png")
   doxygen_add_docs(
     docs
     ${CMAKE_CURRENT_SOURCE_DIR}/README.md
     ${CMAKE_CURRENT_SOURCE_DIR}/FAQ-en.md
     ${CMAKE_CURRENT_SOURCE_DIR}/FAQ-zhcn.md
     ${CMAKE_CURRENT_SOURCE_DIR}/src/iniparser.h
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
     ALL)
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
           DESTINATION ${CMAKE_INSTALL_DOCDIR})
+endif()
+
+find_program(ASTYLE astyle)
+if(ASTYLE)
+  add_custom_target(
+    format
+    ${ASTYLE}
+    --suffix=none
+    --options=astylerc
+    --recursive
+    *.h
+    *.c
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMENT "Format sources with astyle"
+    VERBATIM)
 endif()

@@ -1,3 +1,4 @@
+![Gears engraving. A pinion and spur gear meshed together. Used as IniParser logo](/logo/302949_55x55.png)
 [![pipeline status](https://gitlab.com/iniparser/iniparser/badges/main/pipeline.svg)](https://gitlab.com/iniparser/iniparser/-/commits/main)
 [![latest release](https://gitlab.com/iniparser/iniparser/-/badges/release.svg)](https://gitlab.com/iniparser/iniparser/-/releases)
 
@@ -24,22 +25,20 @@ library alive!
 Many thanks to \@touilleman for his exceptional contributions and efforts for
 maintaining this project for a decade. Manu, you rock!
 
-## Overview
+## Introduction
 
-This modules offers parsing of ini files from C.
+iniParser is a simple C library offering ini file parsing services.
+The library is pretty small (less than 1500 lines of C) and robust, and does
+not depend on any other external library to compile. It is written in C and
+should compile on most platforms without difficulty.
 
-Key features:
-
- - Small : around 1500 sloc inside 4 files (2 .c and 2 .h)
- - Portable : no dependancies, written in `-pedantic` C
- - Fully re-entrant : easy to make it thread-safe (just surround
-   library calls by mutex)
 
 ## Installation
 
 iniParser is available in a number of package repositories:
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/iniparser.svg)](https://repology.org/project/iniparser/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/iniparser.svg?columns=3&minversion=4.2)](https://repology.org/project/iniparser/versions)
+
 
 ## MinGW
 
@@ -79,7 +78,7 @@ From within build directory execute `ccmake ..` to see all.
 ```
 mkdir build
 cd build
-cmake -DBUILD_TESTING ..
+cmake -DBUILD_TESTING=ON ..
 make all
 ```
 
@@ -102,7 +101,7 @@ to `cmake` (adjust the path to unity to your local setup):
 ```
 mkdir build
 cd build
-cmake -DBUILD_TESTING -DFETCHCONTENT_SOURCE_DIR_UNITY=../../3rparty/unity ..
+cmake -DBUILD_TESTING=ON -DFETCHCONTENT_SOURCE_DIR_UNITY=../../3rparty/unity ..
 make all
 ```
 Now CMake will try to use the sources in this directory and fall back to
@@ -116,7 +115,7 @@ To build the examples:
 ```
 mkdir build
 cd build
-cmake -DBUILD_EXAMPLES ..
+cmake -DBUILD_EXAMPLES=ON ..
 make all
 ```
 
@@ -131,14 +130,14 @@ From the build directory run the examples with:
 
 The library is completely documented in its header file.
 
-To build the documentation [doxygen](https://www.doxygen.org/index.html) has be
-installed. Documentation can build and be found in build directory under
+To build the documentation [doxygen](https://www.doxygen.org/index.html) has to
+be installed. Documentation can be build and found in build directory under
 `html`:
 
 ```
 mkdir build
 cd build
-cmake -DBUILD_DOCS ..
+cmake -DBUILD_DOCS=ON ..
 make all
 ```
 
@@ -147,6 +146,18 @@ Open the file `html/index.html` with any HTML-capable browser.
 Or see the [complete documentation](https://iniparser.gitlab.io/iniparser/)
 online.
 
+## Code Formatting
+
+Code is formatted using Artistic Style Version 3.1:
+```
+astyle --options=astylerc --recursive '*.h' '*.c'
+```
+There is also a make target:
+```
+cd build/
+make format
+```
+Code formatting is enforced by the CI.
 
 ## License
 
@@ -172,14 +183,6 @@ Questions.
 
 
 ## Details
-
-### Introduction
-
-iniParser is a simple C library offering ini file parsing services.
-The library is pretty small (less than 1500 lines of C) and robust, and does
-not depend on any other external library to compile. It is written in C and
-should compile on most platforms without difficulty.
-
 
 ### What is an ini file?
 

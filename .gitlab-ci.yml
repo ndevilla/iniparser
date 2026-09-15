@@ -6,12 +6,23 @@ variables:
 
 
 stages:
+    - prebuild
     - build
     - doc
     - test
     - win
     - prepare
     - release
+
+format:
+    stage: prebuild
+    script:
+        - astyle --version
+        - mkdir build
+        - cd build
+        - cmake ..
+        - |
+          ! make format | grep Formatted
 
 build:
     stage: build
@@ -65,6 +76,16 @@ iniexample-memcheck:
         - tree
         - cd install/share/doc/iniparser/examples/
         - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./iniexample
+    dependencies:
+        - build
+
+loadbuffer-memcheck:
+    stage: test
+    script:
+        - pwd
+        - tree
+        - cd install/share/doc/iniparser/examples/
+        - valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=255 ./loadbuffer
     dependencies:
         - build
 

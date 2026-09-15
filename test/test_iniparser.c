@@ -46,27 +46,34 @@ void setUp(void)
 
 void tearDown(void)
 {
-    if(dic)
+    if (dic)
         dictionary_del(dic);
+
     dic = NULL;
-    if(ini)
+
+    if (ini)
         fclose(ini);
+
     ini = NULL;
-    if(dir)
+
+    if (dir)
         closedir(dir);
+
     dir = NULL;
 }
 
 /* Tool function to create and populate a generic non-empty dictionary */
-static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_section)
+static dictionary *generate_dictionary(unsigned sections,
+                                       unsigned entries_per_section)
 {
-    unsigned i, j ;
-    dictionary * dic;
+    unsigned i, j;
+    dictionary *dic;
     char sec_name[32];
     char key_name[64];
     char key_value[32];
 
     dic = dictionary_new(sections + sections * entries_per_section);
+
     if (dic == NULL)
         return NULL;
 
@@ -74,6 +81,7 @@ static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_
     for (i = 0; i < sections; ++i) {
         sprintf(sec_name, "sec%d", i);
         dictionary_set(dic, sec_name, "");
+
         for (j = 0; j < entries_per_section; ++j) {
             /* Populate the section with the entries */
             sprintf(key_name, "%s:key%d", sec_name, j);
@@ -85,33 +93,40 @@ static dictionary * generate_dictionary(unsigned sections, unsigned entries_per_
     return dic;
 }
 
+void test_iniparser_version(void)
+{
+    TEST_ASSERT_EQUAL(4, INIPARSER_VERSION_MAJOR);
+    TEST_ASSERT_EQUAL(3, INIPARSER_VERSION_MINOR);
+    TEST_ASSERT_EQUAL(0, INIPARSER_VERSION_PATCH);
+}
+
 void test_iniparser_strlwc(void)
 {
     char out_buffer[128];
 
     /* NULL ptr as input */
     TEST_ASSERT_NULL(strlwc(NULL, NULL, 0));
-    TEST_ASSERT_NULL(strlwc(NULL, out_buffer, sizeof (out_buffer)));
-    TEST_ASSERT_NULL(strlwc("", NULL, sizeof (out_buffer)));
+    TEST_ASSERT_NULL(strlwc(NULL, out_buffer, sizeof(out_buffer)));
+    TEST_ASSERT_NULL(strlwc("", NULL, sizeof(out_buffer)));
     TEST_ASSERT_NULL(strlwc("", out_buffer, 0));
     TEST_ASSERT_NULL(strlwc(NULL, NULL, 0));
 
     /* empty string */
-    TEST_ASSERT_EQUAL_STRING("", strlwc("", out_buffer, sizeof (out_buffer)));
+    TEST_ASSERT_EQUAL_STRING("", strlwc("", out_buffer, sizeof(out_buffer)));
     TEST_ASSERT_EQUAL_STRING("  ",
-                             strlwc("  ", out_buffer, sizeof (out_buffer)));
+                             strlwc("  ", out_buffer, sizeof(out_buffer)));
     TEST_ASSERT_EQUAL_STRING("test",
-                             strlwc("test", out_buffer, sizeof (out_buffer)));
+                             strlwc("test", out_buffer, sizeof(out_buffer)));
     TEST_ASSERT_EQUAL_STRING("test",
-                             strlwc("TEST", out_buffer, sizeof (out_buffer)));
+                             strlwc("TEST", out_buffer, sizeof(out_buffer)));
     TEST_ASSERT_EQUAL_STRING("test",
-                             strlwc("TeSt", out_buffer, sizeof (out_buffer)));
+                             strlwc("TeSt", out_buffer, sizeof(out_buffer)));
     TEST_ASSERT_EQUAL_STRING("test test",
                              strlwc("TEST TEST", out_buffer,
-                                    sizeof (out_buffer)));
+                                    sizeof(out_buffer)));
     TEST_ASSERT_EQUAL_STRING("very long string !!!!!!!",
                              strlwc("very long string !!!!!!!", out_buffer,
-                                    sizeof (out_buffer)));
+                                    sizeof(out_buffer)));
     TEST_ASSERT_EQUAL_STRING("cutted string",
                              strlwc("cutted string<---here", out_buffer, 14));
 
@@ -142,7 +157,7 @@ void test_iniparser_strstrip(void)
 
     };
     const char *test_with_spaces = "I am a test with\tspaces.";
-    char stripped[ASCIILINESZ+1];
+    char stripped[ASCIILINESZ + 1];
     char error_msg[1060];
     unsigned i;
 
@@ -150,22 +165,23 @@ void test_iniparser_strstrip(void)
     strstrip(NULL);
 
     /* empty string */
-    for (i = 0 ; i < sizeof (strings_empty) / sizeof (char *) ; ++i) {
+    for (i = 0; i < sizeof(strings_empty) / sizeof(char *); ++i) {
         strcpy(stripped, strings_empty[i]);
         strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
                 strings_empty[i], stripped);
-        TEST_ASSERT_EQUAL_STRING_MESSAGE(stripped, strings_empty[0], error_msg);
+        TEST_ASSERT_EQUAL_STRING_MESSAGE(strings_empty[0], stripped, error_msg);
     }
 
     /* test string */
-    for (i = 0 ; i < sizeof (strings_test) / sizeof (char *) ; ++i) {
+    for (i = 0; i < sizeof(strings_test) / sizeof(char *); ++i) {
         strcpy(stripped, strings_test[i]);
         strstrip(stripped);
         sprintf(error_msg, "Bad stripping : strstrip(\"%s\") ==> \"%s\"",
                 strings_test[i], stripped);
         TEST_ASSERT_EQUAL_STRING_MESSAGE(strings_test[0], stripped, error_msg);
     }
+
     strcpy(stripped, ".");
     strstrip(stripped);
     TEST_ASSERT_EQUAL_STRING(".", stripped);
@@ -202,6 +218,7 @@ void test_iniparser_getnsec(void)
         dictionary_unset(dic, sec_name);
         TEST_ASSERT_EQUAL(512 - i, iniparser_getnsec(dic));
     }
+
     dictionary_del(dic);
     dic = NULL;
 
@@ -230,40 +247,53 @@ void test_iniparser_getsecname(void)
     /* Sections without entries dictionary */
     dic = generate_dictionary(100, 0);
     TEST_ASSERT_NOT_NULL(dic);
+
     for (i = 0; i < 100; ++i) {
         sprintf(sec_name, "sec%d", i);
         TEST_ASSERT_EQUAL_STRING(sec_name, iniparser_getsecname(dic, i));
     }
+
     dictionary_del(dic);
     dic = NULL;
 
     /* Generic dictionary */
     dic = generate_dictionary(10, 100);
     TEST_ASSERT_NOT_NULL(dic);
+
     for (i = 0; i < 10; ++i) {
         sprintf(sec_name, "sec%d", i);
         TEST_ASSERT_EQUAL_STRING(sec_name, iniparser_getsecname(dic, i));
     }
+
     dictionary_del(dic);
     dic = NULL;
 }
 
 void test_iniparser_getseckeys(void)
 {
+    char name[1026];
     unsigned i;
     char key_name[64];
     int nkeys;
-    const char * keys[10]; /* At most 10 elements per section */
+    const char *keys[10];  /* At most 10 elements per section */
     /* NULL test */
     TEST_ASSERT_NULL(iniparser_getseckeys(NULL, NULL, NULL));
+    nkeys = iniparser_getsecnkeys(NULL, NULL);
+    TEST_ASSERT_EQUAL(-1, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(NULL, "dummy", NULL));
+    nkeys = iniparser_getsecnkeys(NULL, "dummy");
+    TEST_ASSERT_EQUAL(0, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(NULL, "dummy", keys));
 
     /* Empty dictionary */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, NULL, keys));
+    nkeys = iniparser_getsecnkeys(dic, NULL);
+    TEST_ASSERT_EQUAL(-1, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "dummy", keys));
+    nkeys = iniparser_getsecnkeys(dic, "dummy");
+    TEST_ASSERT_EQUAL(0, nkeys);
     dictionary_del(dic);
     dic = NULL;
 
@@ -272,11 +302,14 @@ void test_iniparser_getseckeys(void)
     dic = generate_dictionary(100, 10);
     TEST_ASSERT_NOT_NULL(dic);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, NULL, keys));
+    nkeys = iniparser_getsecnkeys(dic, NULL);
+    TEST_ASSERT_EQUAL(-1, nkeys);
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "dummy", keys));
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "sec0", NULL));
     nkeys = iniparser_getsecnkeys(dic, "sec42");
-    TEST_ASSERT_EQUAL(nkeys, 10);
+    TEST_ASSERT_EQUAL(10, nkeys);
     TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "sec42", keys));
+
     for (i = 0; i < 10; ++i) {
         sprintf(key_name, "sec42:key%d", i);
         TEST_ASSERT_EQUAL_STRING(key_name, keys[i]);
@@ -291,21 +324,41 @@ void test_iniparser_getseckeys(void)
 
     TEST_ASSERT_NULL(iniparser_getseckeys(dic, "sec42", keys));
     nkeys = iniparser_getsecnkeys(dic, "Sec99");
-    TEST_ASSERT_EQUAL(nkeys, 9);
+    TEST_ASSERT_EQUAL(9, nkeys);
     TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "Sec99", keys));
+
     for (i = 0; i < 9; ++i) {
         sprintf(key_name, "sec99:key%d", i);
         TEST_ASSERT_EQUAL_STRING(key_name, keys[i]);
     }
 
     nkeys = iniparser_getsecnkeys(dic, "sec0");
-    TEST_ASSERT_EQUAL(nkeys, 7);
+    TEST_ASSERT_EQUAL(7, nkeys);
     TEST_ASSERT_EQUAL_STRING(keys, iniparser_getseckeys(dic, "sec0", keys));
+
     for (i = 0; i < 7; ++i) {
         sprintf(key_name, "sec0:key%d", i + 3);
         TEST_ASSERT_EQUAL_STRING(key_name, keys[i]);
     }
 
+    dictionary_del(dic);
+    dic = NULL;
+
+    dic = iniparser_load(OLD_INI_PATH);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(name, 'a', 1025);
+    name[1025] = '\0';
+    iniparser_set(dic, name, "value");
+    iniparser_getsecnkeys(dic, name);
+    dictionary_del(dic);
+    dic = NULL;
+
+    dic = iniparser_load(OLD_INI_PATH);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(name, 'a', 1025);
+    name[1025] = '\0';
+    iniparser_set(dic, name, "value");
+    iniparser_getseckeys(dic, name, keys);
     dictionary_del(dic);
     dic = NULL;
 }
@@ -381,30 +434,35 @@ void test_iniparser_getint(void)
     /* Generic dictionary */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "int:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "int:value%d", i);
         TEST_ASSERT_EQUAL(good_val[i].num,
                           iniparser_getint(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "int:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "int:bad%d", i);
-        TEST_ASSERT_EQUAL(0,
-                          iniparser_getint(dic, key_name, 0));
+        TEST_ASSERT_EQUAL(0, iniparser_getint(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 }
@@ -452,30 +510,35 @@ void test_iniparser_getlongint(void)
     /* Generic dictionary */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         TEST_ASSERT_EQUAL(good_val[i].num,
                           iniparser_getlongint(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        TEST_ASSERT_EQUAL(0,
-                          iniparser_getlongint(dic, key_name, 0));
+        TEST_ASSERT_EQUAL(0, iniparser_getlongint(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 }
@@ -519,37 +582,42 @@ void test_iniparser_getint64(void)
                             iniparser_getint64(dic, NULL, 0x7FFFFFFFFFFFFFFF));
     TEST_ASSERT_EQUAL_HEX64(-0x7FFFFFFFFFFFFFFF,
                             iniparser_getint64(dic, "dummy",
-                                -0x7FFFFFFFFFFFFFFF));
+                                    -0x7FFFFFFFFFFFFFFF));
     dictionary_del(dic);
     dic = NULL;
 
     /* Generic dictionary */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         TEST_ASSERT_EQUAL_INT64(good_val[i].num,
                                 iniparser_getint64(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        TEST_ASSERT_EQUAL_INT64(0,
-                                iniparser_getint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_INT64(0, iniparser_getint64(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 }
@@ -593,37 +661,42 @@ void test_iniparser_getuint64(void)
                             iniparser_getuint64(dic, NULL, 0xFFFFFFFFFFFFFFFF));
     TEST_ASSERT_EQUAL_HEX64(-0xFFFFFFFFFFFFFFFF,
                             iniparser_getuint64(dic, "dummy",
-                                -0xFFFFFFFFFFFFFFFF));
+                                    -0xFFFFFFFFFFFFFFFF));
     dictionary_del(dic);
     dic = NULL;
 
     /* Generic dictionary */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         dictionary_set(dic, key_name, good_val[i].value);
     }
+
     for (i = 0; good_val[i].value != NULL; ++i) {
         sprintf(key_name, "longint:value%d", i);
         TEST_ASSERT_EQUAL_UINT64(good_val[i].num,
                                  iniparser_getuint64(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 
     /* Test bad names */
     dic = dictionary_new(10);
     TEST_ASSERT_NOT_NULL(dic);
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
         dictionary_set(dic, key_name, bad_val[i]);
     }
-    for (i = 0; i < sizeof (bad_val) / sizeof (char *); ++i) {
+
+    for (i = 0; i < sizeof(bad_val) / sizeof(char *); ++i) {
         sprintf(key_name, "longint:bad%d", i);
-        TEST_ASSERT_EQUAL_UINT64(0,
-                                 iniparser_getuint64(dic, key_name, 0));
+        TEST_ASSERT_EQUAL_UINT64(0, iniparser_getuint64(dic, key_name, 0));
     }
+
     dictionary_del(dic);
     dic = NULL;
 }
@@ -720,6 +793,7 @@ void test_iniparser_getboolean(void)
         sprintf(key_name, "bool:true%d", i);
         iniparser_set(dic, key_name, token_true[i]);
     }
+
     for (i = 0; token_false[i] != NULL; ++i) {
         sprintf(key_name, "bool:false%d", i);
         iniparser_set(dic, key_name, token_false[i]);
@@ -729,6 +803,7 @@ void test_iniparser_getboolean(void)
         sprintf(key_name, "bool:true%d", i);
         TEST_ASSERT_EQUAL(1, iniparser_getboolean(dic, key_name, 0));
     }
+
     for (i = 0; token_false[i] != NULL; ++i) {
         sprintf(key_name, "bool:false%d", i);
         TEST_ASSERT_EQUAL(0, iniparser_getboolean(dic, key_name, 1));
@@ -750,9 +825,9 @@ void test_iniparser_getboolean(void)
 
 void test_iniparser_line(void)
 {
-    char section [ASCIILINESZ+1] ;
-    char key     [ASCIILINESZ+1] ;
-    char val     [ASCIILINESZ+1] ;
+    char section [ASCIILINESZ + 1];
+    char key     [ASCIILINESZ + 1];
+    char val     [ASCIILINESZ + 1];
 
     /* Test empty line */
     TEST_ASSERT_EQUAL(LINE_EMPTY, iniparser_line("", section, key, val));
@@ -763,13 +838,16 @@ void test_iniparser_line(void)
     TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[s]", section, key, val));
     TEST_ASSERT_EQUAL_STRING("s", section);
 
-    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[section 0]", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[section 0]", section, key,
+                      val));
     TEST_ASSERT_EQUAL_STRING("section 0", section);
 
-    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[ section 0 ]", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[ section 0 ]", section, key,
+                      val));
     TEST_ASSERT_EQUAL_STRING("section 0", section);
 
-    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[ section ]", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_SECTION, iniparser_line("[ section ]", section, key,
+                      val));
     TEST_ASSERT_EQUAL_STRING("section", section);
 
     TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("k=1", section, key, val));
@@ -780,7 +858,8 @@ void test_iniparser_line(void)
     TEST_ASSERT_EQUAL_STRING("key", key);
     TEST_ASSERT_EQUAL_STRING("0x42", val);
 
-    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key= value with spaces", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key= value with spaces", section,
+                      key, val));
     TEST_ASSERT_EQUAL_STRING("key", key);
     TEST_ASSERT_EQUAL_STRING("value with spaces", val);
 
@@ -788,30 +867,37 @@ void test_iniparser_line(void)
     TEST_ASSERT_EQUAL_STRING("k", key);
     TEST_ASSERT_EQUAL_STRING("_!<>''", val);
 
-    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("empty_value =", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("empty_value =", section, key,
+                      val));
     TEST_ASSERT_EQUAL_STRING("empty_value", key);
     TEST_ASSERT_EQUAL_STRING("", val);
 
-    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("empty_value =        \t\n", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("empty_value =        \t\n",
+                      section, key, val));
     TEST_ASSERT_EQUAL_STRING("empty_value", key);
     TEST_ASSERT_EQUAL_STRING("", val);
 
-    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key =\tval # comment", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key =\tval # comment", section,
+                      key, val));
     TEST_ASSERT_EQUAL_STRING("key", key);
     TEST_ASSERT_EQUAL_STRING("val", val);
 
-    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key \n\n = \n val", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key \n\n = \n val", section, key,
+                      val));
     TEST_ASSERT_EQUAL_STRING("key", key);
     TEST_ASSERT_EQUAL_STRING("val", val);
 
     TEST_ASSERT_EQUAL(LINE_COMMENT, iniparser_line(";comment", section, key, val));
-    TEST_ASSERT_EQUAL(LINE_COMMENT, iniparser_line(" # comment", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_COMMENT, iniparser_line(" # comment", section, key,
+                      val));
 
-    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = \"  do_not_strip  \"", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = \"  do_not_strip  \"",
+                      section, key, val));
     TEST_ASSERT_EQUAL_STRING("key", key);
     TEST_ASSERT_EQUAL_STRING("  do_not_strip  ", val);
 
-    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = '    '", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_VALUE, iniparser_line("key = '    '", section, key,
+                      val));
     TEST_ASSERT_EQUAL_STRING("key", key);
     TEST_ASSERT_EQUAL_STRING("    ", val);
 
@@ -825,8 +911,10 @@ void test_iniparser_line(void)
 
     /* Test syntax error */
     TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("empty_value", section, key, val));
-    TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("not finished\\", section, key, val));
-    TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("0x42 / 0b101010", section, key, val));
+    TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("not finished\\", section, key,
+                      val));
+    TEST_ASSERT_EQUAL(LINE_ERROR, iniparser_line("0x42 / 0b101010", section, key,
+                      val));
 
 }
 
@@ -843,9 +931,11 @@ void test_iniparser_load(void)
     /* Test all the good .ini files */
     dir = opendir(GOOD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dir, "cannot open " GOOD_INI_PATH);
+
     for (curr = readdir(dir); curr != NULL; curr = readdir(dir)) {
         sprintf(ini_path, "%s/%s", GOOD_INI_PATH, curr->d_name);
         stat(ini_path, &curr_stat);
+
         if (S_ISREG(curr_stat.st_mode)) {
             dic = iniparser_load(ini_path);
             TEST_ASSERT_NOT_NULL_MESSAGE(dic, ini_path);
@@ -853,15 +943,18 @@ void test_iniparser_load(void)
             dic = NULL;
         }
     }
+
     closedir(dir);
     dir = NULL;
 
     /* Test all the bad .ini files */
     dir = opendir(BAD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dir, "cannot open " BAD_INI_PATH);
+
     for (curr = readdir(dir); curr != NULL; curr = readdir(dir)) {
         sprintf(ini_path, "%s/%s", BAD_INI_PATH, curr->d_name);
         stat(ini_path, &curr_stat);
+
         if (S_ISREG(curr_stat.st_mode)) {
             dic = iniparser_load(ini_path);
             TEST_ASSERT_EQUAL_PTR_MESSAGE(NULL, dic, ini_path);
@@ -869,6 +962,7 @@ void test_iniparser_load(void)
             dic = NULL;
         }
     }
+
     closedir(dir);
     dir = NULL;
 }
@@ -884,15 +978,18 @@ void test_dictionary_wrapper(void)
     TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section", NULL));
     TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", "value"));
 
-    TEST_ASSERT_EQUAL_STRING("value", iniparser_getstring(dic, "section:key", NULL));
+    TEST_ASSERT_EQUAL_STRING("value", iniparser_getstring(dic, "section:key",
+                             NULL));
     /* reset the key's value*/
     TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", NULL));
     TEST_ASSERT_NULL(iniparser_getstring(dic, "section:key", "dummy"));
     TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", "value"));
-    TEST_ASSERT_EQUAL_STRING("value", iniparser_getstring(dic, "section:key", NULL));
+    TEST_ASSERT_EQUAL_STRING("value", iniparser_getstring(dic, "section:key",
+                             NULL));
 
     iniparser_unset(dic, "section:key");
-    TEST_ASSERT_EQUAL_STRING("dummy", iniparser_getstring(dic, "section:key", "dummy"));
+    TEST_ASSERT_EQUAL_STRING("dummy", iniparser_getstring(dic, "section:key",
+                             "dummy"));
     TEST_ASSERT_NULL(iniparser_getstring(dic, "section", "dummy"));
 
     TEST_ASSERT_EQUAL(0, iniparser_set(dic, "section:key", NULL));
@@ -948,67 +1045,73 @@ void test_iniparser_dump(void)
     dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    str = iniparser_getstring(dic,"section:key_01",NULL);
+    str = iniparser_getstring(dic, "section:key_01", NULL);
     TEST_ASSERT_EQUAL_STRING("hello world", str);
-    str = iniparser_getstring(dic,"section:key1",NULL);
+    str = iniparser_getstring(dic, "section:key1", NULL);
     TEST_ASSERT_EQUAL_STRING("321abc", str);
     /*open test.txt*/
-    ini = fopen(TEST_TXT_PATH,"w");
+    ini = fopen(TEST_TXT_PATH, "w");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_TXT_PATH);
     /*dump the data of old.ini to new.ini*/
-    iniparser_dump(dic,ini);
+    iniparser_dump(dic, ini);
     fclose(ini);
     ini = NULL;
     iniparser_freedict(dic);
     dic = NULL;
     /*read the data of test.txt*/
-    ini = fopen(TEST_TXT_PATH,"r");
+    ini = fopen(TEST_TXT_PATH, "r");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_TXT_PATH);
-    str = fgets(buff,100,ini);
+    str = fgets(buff, 100, ini);
     (void)str;
+
     /*remove '\n'*/
-    if(buff[strlen(buff)-1] == '\n')
-    {
-        buff[strlen(buff)-1] = '\0';
+    if (buff[strlen(buff) - 1] == '\n') {
+        buff[strlen(buff) - 1] = '\0';
     }
-    TEST_ASSERT_EQUAL_STRING("[section]=UNDEF",buff);
-    str = fgets(buff,100,ini);
+
+    TEST_ASSERT_EQUAL_STRING("[section]=UNDEF", buff);
+    str = fgets(buff, 100, ini);
     (void)str;
-    if(buff[strlen(buff)-1] == '\n')
-    {
-        buff[strlen(buff)-1] = '\0';
+
+    if (buff[strlen(buff) - 1] == '\n') {
+        buff[strlen(buff) - 1] = '\0';
     }
-    TEST_ASSERT_EQUAL_STRING("[section:key_01]=[hello world]",buff);
-    str = fgets(buff,100,ini);
+
+    TEST_ASSERT_EQUAL_STRING("[section:key_01]=[hello world]", buff);
+    str = fgets(buff, 100, ini);
     (void)str;
-    if(buff[strlen(buff)-1] == '\n')
-    {
-        buff[strlen(buff)-1] = '\0';
+
+    if (buff[strlen(buff) - 1] == '\n') {
+        buff[strlen(buff) - 1] = '\0';
     }
-    TEST_ASSERT_EQUAL_STRING("[section:key1]=[321abc]",buff);
+
+    TEST_ASSERT_EQUAL_STRING("[section:key1]=[321abc]", buff);
     fclose(ini);
     ini = NULL;
 }
 
 void test_iniparser_dump_ini(void)
 {
+    FILE *in;
+    char section[1025];
     const char *str;
     char val[4096] = {};
+    char val2[1026];
     int ret;
 
     /*loading old.ini*/
     dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    str = iniparser_getstring(dic,"section:key_01",NULL);
+    str = iniparser_getstring(dic, "section:key_01", NULL);
     TEST_ASSERT_EQUAL_STRING("hello world", str);
-    str = iniparser_getstring(dic,"section:key1",NULL);
+    str = iniparser_getstring(dic, "section:key1", NULL);
     TEST_ASSERT_EQUAL_STRING("321abc", str);
     /*open new.ini*/
-    ini = fopen(NEW_INI_PATH,"w");
+    ini = fopen(NEW_INI_PATH, "w");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " NEW_INI_PATH);
     /*dump the data of old.ini to new.ini*/
-    iniparser_dump_ini(dic,ini);
+    iniparser_dump_ini(dic, ini);
     fclose(ini);
     ini = NULL;
     iniparser_freedict(dic);
@@ -1017,16 +1120,16 @@ void test_iniparser_dump_ini(void)
     dic = iniparser_load(NEW_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " NEW_INI_PATH);
     /*check the data of new.ini*/
-    str = iniparser_getstring(dic,"section:key_01",NULL);
+    str = iniparser_getstring(dic, "section:key_01", NULL);
     TEST_ASSERT_EQUAL_STRING("hello world", str);
-    str = iniparser_getstring(dic,"section:key1",NULL);
+    str = iniparser_getstring(dic, "section:key1", NULL);
     TEST_ASSERT_EQUAL_STRING("321abc", str);
     iniparser_freedict(dic);
     dic = NULL;
     /*test extra large values*/
     dic = dictionary_new(0);
     TEST_ASSERT_NOT_NULL(dic);
-    memset(val, '\\', sizeof(val)-1);
+    memset(val, '\\', sizeof(val) - 1);
     ret = iniparser_set(dic, ":key1", val);
     TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot set :key1"
                                          " in: " TMP_INI_PATH);
@@ -1036,6 +1139,25 @@ void test_iniparser_dump_ini(void)
     fclose(ini);
     ini = NULL;
     iniparser_freedict(dic);
+    dic = NULL;
+
+    dic = iniparser_load(OLD_INI_PATH);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(section, 'a', 1024);
+    section[1024] = '\0';
+    iniparser_set(dic, section, "value");
+    iniparser_dump_ini(dic, fopen("/dev/null", "w"));
+    iniparser_freedict(dic);
+    dic = NULL;
+
+    dic = iniparser_load(OLD_INI_PATH);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(val, '\\', 1025);
+    val[1025] = '\0';
+    dictionary_set(dic, "sec", NULL);
+    dictionary_set(dic, "sec:key", val);
+    iniparser_dump_ini(dic, fopen("/dev/null", "w"));
+    dictionary_del(dic);
     dic = NULL;
 }
 
@@ -1049,15 +1171,15 @@ void test_iniparser_dumpsection_ini(void)
     dic = iniparser_load(OLD_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " OLD_INI_PATH);
     /*check the data of old.ini*/
-    str = iniparser_getstring(dic,"section:key_01",NULL);
+    str = iniparser_getstring(dic, "section:key_01", NULL);
     TEST_ASSERT_EQUAL_STRING("hello world", str);
-    str = iniparser_getstring(dic,"section:key1",NULL);
+    str = iniparser_getstring(dic, "section:key1", NULL);
     TEST_ASSERT_EQUAL_STRING("321abc", str);
     /*open test.ini*/
-    ini = fopen(TEST_INI_PATH,"w");
+    ini = fopen(TEST_INI_PATH, "w");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TEST_INI_PATH);
     /*dump the data of old.ini to test.ini*/
-    iniparser_dumpsection_ini(dic,"section",ini);
+    iniparser_dumpsection_ini(dic, "section", ini);
     fclose(ini);
     ini = NULL;
     iniparser_freedict(dic);
@@ -1066,22 +1188,36 @@ void test_iniparser_dumpsection_ini(void)
     dic = iniparser_load(TEST_INI_PATH);
     TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TEST_INI_PATH);
     /*check the data of test.ini*/
-    str = iniparser_getstring(dic,"section:key_01",NULL);
+    str = iniparser_getstring(dic, "section:key_01", NULL);
     TEST_ASSERT_EQUAL_STRING("hello world", str);
-    str = iniparser_getstring(dic,"section:key1",NULL);
+    str = iniparser_getstring(dic, "section:key1", NULL);
     TEST_ASSERT_EQUAL_STRING("321abc", str);
     iniparser_freedict(dic);
     dic = NULL;
     /*test extra large keys*/
     dic = dictionary_new(0);
     TEST_ASSERT_NOT_NULL(dic);
-    memset(key, 'a', sizeof(key)-1);
+    memset(key, 'a', sizeof(key) - 1);
     ret = iniparser_set(dic, key, "dummy");
     TEST_ASSERT_GREATER_OR_EQUAL(0, ret);
     ini = fopen(TMP_INI_PATH, "wt");
     TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
     /*dump the data of old.ini to test.ini*/
-    iniparser_dumpsection_ini(dic,key,ini);
+    iniparser_dumpsection_ini(dic, key, ini);
+    fclose(ini);
+    ini = NULL;
+    iniparser_freedict(dic);
+    dic = NULL;
+    /*test keys at the boundary of the guard*/
+    dic = dictionary_new(0);
+    TEST_ASSERT_NOT_NULL(dic);
+    memset(key, 'a', 1024);          /* strlen(key) = 1024 */
+    key[1024] = '\0';
+    ret = iniparser_set(dic, key, "dummy");
+    TEST_ASSERT_GREATER_OR_EQUAL(0, ret);
+    ini = fopen(TMP_INI_PATH, "wt");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
+    iniparser_dumpsection_ini(dic, key, ini);   /* overflows keym[1025] */
     fclose(ini);
     ini = NULL;
     iniparser_freedict(dic);
@@ -1111,11 +1247,12 @@ void test_iniparser_find_entry(void)
     /*Regular dictionary */
     dic = generate_dictionary(1, 8);
     TEST_ASSERT_NOT_NULL(dic);
-    for (i = 1; i < 8; i++)
-    {
+
+    for (i = 1; i < 8; i++) {
         ret = iniparser_find_entry(dic, dic->key[i]);
         TEST_ASSERT_EQUAL(1, ret);
     }
+
     ret = iniparser_find_entry(dic, "dummy");
     TEST_ASSERT_EQUAL(0, ret);
 
@@ -1386,7 +1523,7 @@ void test_iniparser_quotes(void)
 
     /* test dictionary */
     iniparser_set(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, QUOTES_INI_VAL1);
-    /* iniparser_set() supports ; in values */
+    /* iniparser_set() supports; in values */
     str = iniparser_getstring(dic, QUOTES_INI_SEC ":" QUOTES_INI_ATTR1, NULL);
     TEST_ASSERT_EQUAL_STRING(QUOTES_INI_VAL1, str);
     ini = fopen(TMP_INI_PATH, "w+");
@@ -1440,4 +1577,42 @@ void test_iniparser_quotes(void)
     dic = NULL;
     ret = remove(TMP_INI_PATH);
     TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
+}
+
+void test_iniparser_load_buffer(void)
+{
+#ifdef INIPARSER_HAVE_LOAD_BUFFER
+    const char *good_ini =
+        "[section]\n"
+        "key_01 = hello world\n"
+        "key1   = 321abc\n";
+    const char *bad_ini = "1111\n";
+
+    /* NULL buffer returns NULL */
+    dic = iniparser_load_buffer(NULL);
+    TEST_ASSERT_NULL(dic);
+
+    /* Empty buffer returns a valid empty dictionary */
+    dic = iniparser_load_buffer("");
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL(0, iniparser_getnsec(dic));
+    dictionary_del(dic);
+    dic = NULL;
+
+    /* Well-formed buffer is parsed correctly */
+    dic = iniparser_load_buffer(good_ini);
+    TEST_ASSERT_NOT_NULL(dic);
+    TEST_ASSERT_EQUAL_STRING("hello world",
+                             iniparser_getstring(dic, "section:key_01", NULL));
+    TEST_ASSERT_EQUAL_STRING("321abc",
+                             iniparser_getstring(dic, "section:key1", NULL));
+    dictionary_del(dic);
+    dic = NULL;
+
+    /* Syntax error in buffer returns NULL */
+    dic = iniparser_load_buffer(bad_ini);
+    TEST_ASSERT_NULL(dic);
+#else
+    TEST_IGNORE_MESSAGE("iniparser_load_buffer not available (no fmemopen)");
+#endif
 }

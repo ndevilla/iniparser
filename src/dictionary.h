@@ -1,4 +1,3 @@
-
 /*-------------------------------------------------------------------------*/
 /**
    @file    dictionary.h
@@ -18,6 +17,7 @@
                                 Includes
  ---------------------------------------------------------------------------*/
 
+#include "version.h"
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -40,12 +40,12 @@ extern "C" {
  */
 /*-------------------------------------------------------------------------*/
 typedef struct _dictionary_ {
-    unsigned        n ;     /** Number of entries in dictionary */
-    size_t          size ;  /** Storage size */
-    char        **  val ;   /** List of string values */
-    char        **  key ;   /** List of string keys */
-    unsigned     *  hash ;  /** List of hash values for keys */
-} dictionary ;
+    unsigned        n;     /** Number of entries in dictionary */
+    size_t          size;  /** Storage size */
+    char          **val;   /** List of string values */
+    char          **key;   /** List of string keys */
+    unsigned       *hash;  /** List of hash values for keys */
+} dictionary;
 
 
 /*---------------------------------------------------------------------------
@@ -55,7 +55,7 @@ typedef struct _dictionary_ {
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Compute the hash key for a string.
-  @param    key     Character string to use for key.
+  @param    key   Character string to use for key, must be null-terminated.
   @return   1 unsigned int on at least 32 bits.
 
   This hash function has been taken from an Article in Dr Dobbs Journal.
@@ -64,12 +64,12 @@ typedef struct _dictionary_ {
   by comparing the key itself in last resort.
  */
 /*--------------------------------------------------------------------------*/
-unsigned dictionary_hash(const char * key);
+unsigned dictionary_hash(const char *key);
 
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Create a new dictionary object.
-  @param    size    Optional initial size of the dictionary.
+  @param    size   Optional initial size of the dictionary.
   @return   1 newly allocated dictionary object.
 
   This function allocates a new dictionary object of given size and returns
@@ -77,25 +77,26 @@ unsigned dictionary_hash(const char * key);
   dictionary, give size=0.
  */
 /*--------------------------------------------------------------------------*/
-dictionary * dictionary_new(size_t size);
+dictionary *dictionary_new(size_t size);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Delete a dictionary object
+  @brief    Delete a dictionary object.
   @param    d   dictionary object to deallocate.
   @return   void
 
   Deallocate a dictionary object and all memory associated to it.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_del(dictionary * vd);
+void dictionary_del(dictionary *vd);
 
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Get a value from a dictionary.
-  @param    d       dictionary object to search.
-  @param    key     Key to look for in the dictionary.
-  @param    def     Default value to return if key not found.
+  @param    d     dictionary object to search.
+  @param    key   Key to look for in the dictionary, must be null-terminated.
+  @param    def   Default value to return if key not found, must be
+                  null-terminated.
   @return   1 pointer to internally allocated character string.
 
   This function locates a key in a dictionary and returns a pointer to its
@@ -104,16 +105,16 @@ void dictionary_del(dictionary * vd);
   dictionary object, you should not try to free it or modify it.
  */
 /*--------------------------------------------------------------------------*/
-const char * dictionary_get(const dictionary * d, const char * key, const char * def);
-
+const char *dictionary_get(const dictionary *d, const char *key,
+                           const char *def);
 
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Set a value in a dictionary.
-  @param    d       dictionary object to modify.
-  @param    key     Key to modify or add.
-  @param    val     Value to add.
-  @return   int     0 if Ok, anything else otherwise
+  @param    d     dictionary object to modify.
+  @param    key   Key to modify or add, must be null-terminated.
+  @param    val   Value to add, must be null-terminated.
+  @return   int   0 if Ok, anything else otherwise.
 
   If the given key is found in the dictionary, the associated value is
   replaced by the provided one. If the key cannot be found in the
@@ -133,26 +134,25 @@ const char * dictionary_get(const dictionary * d, const char * key, const char *
   This function returns non-zero in case of failure.
  */
 /*--------------------------------------------------------------------------*/
-int dictionary_set(dictionary * vd, const char * key, const char * val);
+int dictionary_set(dictionary *vd, const char *key, const char *val);
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Delete a key in a dictionary
-  @param    d       dictionary object to modify.
-  @param    key     Key to remove.
+  @brief    Delete a key in a dictionary.
+  @param    d     dictionary object to modify.
+  @param    key   Key to remove, must be null-terminated.
   @return   void
 
   This function deletes a key in a dictionary. Nothing is done if the
   key cannot be found.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_unset(dictionary * d, const char * key);
-
+void dictionary_unset(dictionary *d, const char *key);
 
 /*-------------------------------------------------------------------------*/
 /**
   @brief    Dump a dictionary to an opened file pointer.
-  @param    d   Dictionary to dump
+  @param    d   Dictionary to dump.
   @param    f   Opened file pointer.
   @return   void
 
@@ -161,7 +161,7 @@ void dictionary_unset(dictionary * d, const char * key);
   output file pointers.
  */
 /*--------------------------------------------------------------------------*/
-void dictionary_dump(const dictionary * d, FILE * out);
+void dictionary_dump(const dictionary *d, FILE *out);
 
 #ifdef __cplusplus
 }
