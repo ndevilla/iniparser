@@ -365,6 +365,8 @@ void test_iniparser_getseckeys(void)
 
 void test_iniparser_getstring(void)
 {
+    const char *ret;
+
     /* NULL test */
     TEST_ASSERT_NULL(iniparser_getstring(NULL, NULL, NULL));
     TEST_ASSERT_NULL(iniparser_getstring(NULL, "dummy", NULL));
@@ -387,6 +389,15 @@ void test_iniparser_getstring(void)
                              iniparser_getstring(dic, "sec42:key5", NULL));
     TEST_ASSERT_EQUAL_STRING("value-99/9",
                              iniparser_getstring(dic, "sec99:key9", NULL));
+    dictionary_del(dic);
+    dic = NULL;
+
+    dic = iniparser_load(OLD_INI_PATH);
+    TEST_ASSERT_NOT_NULL(dic);
+    iniparser_set(dic, ":keyword", "value");
+    ret = iniparser_getstring(dic, ":keyword", NULL);
+    TEST_ASSERT_NOT_NULL(ret);
+    TEST_ASSERT_EQUAL_STRING("value", ret);
     dictionary_del(dic);
     dic = NULL;
 }
