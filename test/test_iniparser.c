@@ -365,6 +365,8 @@ void test_iniparser_getseckeys(void)
 
 void test_iniparser_getstring(void)
 {
+    const char *ret;
+
     /* NULL test */
     TEST_ASSERT_NULL(iniparser_getstring(NULL, NULL, NULL));
     TEST_ASSERT_NULL(iniparser_getstring(NULL, "dummy", NULL));
@@ -387,6 +389,15 @@ void test_iniparser_getstring(void)
                              iniparser_getstring(dic, "sec42:key5", NULL));
     TEST_ASSERT_EQUAL_STRING("value-99/9",
                              iniparser_getstring(dic, "sec99:key9", NULL));
+    dictionary_del(dic);
+    dic = NULL;
+
+    dic = iniparser_load(OLD_INI_PATH);
+    TEST_ASSERT_NOT_NULL(dic);
+    iniparser_set(dic, ":keyword", "value");
+    ret = iniparser_getstring(dic, ":keyword", NULL);
+    TEST_ASSERT_NOT_NULL(ret);
+    TEST_ASSERT_EQUAL_STRING("value", ret);
     dictionary_del(dic);
     dic = NULL;
 }
@@ -1222,6 +1233,54 @@ void test_iniparser_dumpsection_ini(void)
     ini = NULL;
     iniparser_freedict(dic);
     dic = NULL;
+}
+
+void test_iniparser_dump_ini_null_value(void)
+{
+    char buff[255];
+    const char *str;
+    int ret;
+
+    /* a key with a NULL value must not repeat the previous key's value */
+    dic = dictionary_new(0);
+    TEST_ASSERT_NOT_NULL(dic);
+    iniparser_set(dic, "section", NULL);
+    iniparser_set(dic, "section:key", "value");
+    iniparser_set(dic, "section:empty", NULL);
+    ini = fopen(TMP_INI_PATH, "w");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
+    iniparser_dump_ini(dic, ini);
+    fclose(ini);
+    ini = NULL;
+    dictionary_del(dic);
+    dic = iniparser_load(TMP_INI_PATH);
+    TEST_ASSERT_NOT_NULL_MESSAGE(dic, "cannot load " TMP_INI_PATH);
+    str = iniparser_getstring(dic, "section:key", NULL);
+    TEST_ASSERT_EQUAL_STRING("value", str);
+    str = iniparser_getstring(dic, "section:empty", NULL);
+    TEST_ASSERT_EQUAL_STRING("", str);
+    dictionary_del(dic);
+    dic = NULL;
+
+    /* without a section entry iniparser_dump_ini() takes its no-section path */
+    dic = dictionary_new(0);
+    TEST_ASSERT_NOT_NULL(dic);
+    iniparser_set(dic, "section:key", "value");
+    iniparser_set(dic, "section:empty", NULL);
+    ini = fopen(TMP_INI_PATH, "w+");
+    TEST_ASSERT_NOT_NULL_MESSAGE(ini, "cannot open " TMP_INI_PATH);
+    iniparser_dump_ini(dic, ini);
+    dictionary_del(dic);
+    dic = NULL;
+    rewind(ini);
+    TEST_ASSERT_NOT_NULL(fgets(buff, sizeof(buff), ini));
+    TEST_ASSERT_EQUAL_STRING("section:key = \"value\"\n", buff);
+    TEST_ASSERT_NOT_NULL(fgets(buff, sizeof(buff), ini));
+    TEST_ASSERT_EQUAL_STRING("section:empty = \"\"\n", buff);
+    fclose(ini);
+    ini = NULL;
+    ret = remove(TMP_INI_PATH);
+    TEST_ASSERT_GREATER_OR_EQUAL_MESSAGE(0, ret, "cannot remove " TMP_INI_PATH);
 }
 
 void test_iniparser_find_entry(void)

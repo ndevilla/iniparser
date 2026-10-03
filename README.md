@@ -286,6 +286,13 @@ the dictionary for `"pizza:cheese"`. All section and keyword names are
 converted to lowercase before storage in the structure. The value side is
 conserved as it has been parsed, though.
 
+Values can be stored without section, just use an empty string for the
+section in key:
+
+```c
+(":keyword", "value")
+```
+
 Section names are also stored in the structure. They are stored using as key
 the section name, and a NULL associated value. They can be queried through
 `iniparser_find_entry()`.

@@ -114,9 +114,9 @@ dictionary *dictionary_new(size_t size)
         d->key  = (char **) calloc(size, sizeof * d->key);
         d->hash = (unsigned *) calloc(size, sizeof * d->hash);
 
-        if (!d->size || !d->val || !d->hash) {
-            free((void *) d->size);
+        if (!d->val || !d->key || !d->hash) {
             free((void *) d->val);
+            free((void *) d->key);
             free((void *) d->hash);
             free(d);
             d = NULL;

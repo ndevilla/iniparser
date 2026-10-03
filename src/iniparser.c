@@ -194,8 +194,13 @@ static void escape_value(char *escaped, char *value)
     int v = 0;
     int e = 0;
 
-    if (!escaped || !value)
+    if (!escaped)
         return;
+
+    if (!value) {
+        escaped[0] = '\0';
+        return;
+    }
 
     while ((c = value[v]) != '\0' && e < (ASCIILINESZ * 2)) {
         if (c == '\\' || c == '"') {
