@@ -113,6 +113,25 @@ parse-memcheck:
     tags:
         - saas-windows-medium-amd64
 
+asan:
+    stage: test
+    script:
+        - mkdir build-asan
+        - cd build-asan
+        - |
+          cmake -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
+                -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address" \
+                -DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=address" \
+                -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON ..
+        - make
+        - tree
+        - ./iniexample
+        - ./loadbuffer
+        - ./iniwrite
+        - ./parse test/ressources/good_ini/twisted.ini
+        - ctest --verbose
+    dependencies: []
+
 win-build:
     extends:
         - .shared_windows_runners
