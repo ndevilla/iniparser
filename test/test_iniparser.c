@@ -192,6 +192,33 @@ void test_iniparser_strstrip(void)
     TEST_ASSERT_EQUAL_STRING(test_with_spaces, stripped);
 }
 
+void test_iniparser_escape_value(void)
+{
+    char out_buffer[16];
+
+    /* zero sized output buffer is left untouched */
+    strcpy(out_buffer, "keep");
+    escape_value(out_buffer, 0, "value");
+    TEST_ASSERT_EQUAL_STRING("keep", out_buffer);
+
+    /* NULL value gives an empty string */
+    escape_value(out_buffer, sizeof(out_buffer), NULL);
+    TEST_ASSERT_EQUAL_STRING("", out_buffer);
+
+    escape_value(out_buffer, sizeof(out_buffer), "value");
+    TEST_ASSERT_EQUAL_STRING("value", out_buffer);
+    escape_value(out_buffer, sizeof(out_buffer), "a\"b\\c");
+    TEST_ASSERT_EQUAL_STRING("a\\\"b\\\\c", out_buffer);
+
+    /* output is cut to the buffer size, never inside an escape sequence */
+    escape_value(out_buffer, 4, "abcdef");
+    TEST_ASSERT_EQUAL_STRING("ab", out_buffer);
+    escape_value(out_buffer, 4, "a\"bc");
+    TEST_ASSERT_EQUAL_STRING("a\\\"", out_buffer);
+    escape_value(out_buffer, 1, "abc");
+    TEST_ASSERT_EQUAL_STRING("", out_buffer);
+}
+
 void test_iniparser_getnsec(void)
 {
     int i;

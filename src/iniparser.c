@@ -188,13 +188,24 @@ void iniparser_dump(const dictionary *d, FILE *f)
     return;
 }
 
-static void escape_value(char *escaped, char *value)
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Escape backslashes and double quotes in a value.
+  @param    escaped Output buffer.
+  @param    size    Size of the escaped buffer.
+  @param    value   Value to escape, NULL gives an empty string.
+
+  The output is always null-terminated. Escaping stops when the next
+  character might not fit, so at most size - 1 bytes are written.
+ */
+/*--------------------------------------------------------------------------*/
+static void escape_value(char *escaped, size_t size, const char *value)
 {
     char c;
-    int v = 0;
-    int e = 0;
+    size_t v = 0;
+    size_t e = 0;
 
-    if (!escaped)
+    if (!escaped || size == 0)
         return;
 
     if (!value) {
@@ -202,7 +213,7 @@ static void escape_value(char *escaped, char *value)
         return;
     }
 
-    while ((c = value[v]) != '\0' && e < (ASCIILINESZ * 2)) {
+    while ((c = value[v]) != '\0' && e + 2 < size) {
         if (c == '\\' || c == '"') {
             escaped[e] = '\\';
             e++;
@@ -233,7 +244,7 @@ void iniparser_dump_ini(const dictionary *d, FILE *f)
             if (d->key[i] == NULL)
                 continue;
 
-            escape_value(escaped, d->val[i]);
+            escape_value(escaped, sizeof(escaped), d->val[i]);
             fprintf(f, "%s = \"%s\"\n", d->key[i], escaped);
         }
 
@@ -264,14 +275,14 @@ void iniparser_dumpsection_ini(const dictionary *d, const char *s, FILE *f)
 
     seclen  = (int)strlen(s);
     fprintf(f, "\n[%s]\n", s);
-    sprintf(keym, "%s:", s);
+    snprintf(keym, sizeof(keym), "%s:", s);
 
     for (j = 0; j < d->size; j++) {
         if (d->key[j] == NULL)
             continue;
 
         if (!strncmp(d->key[j], keym, seclen + 1)) {
-            escape_value(escaped, d->val[j]);
+            escape_value(escaped, sizeof(escaped), d->val[j]);
             fprintf(f, "%-30s = \"%s\"\n", d->key[j] + seclen + 1, escaped);
         }
     }
@@ -675,7 +686,7 @@ dictionary *iniparser_load_file(FILE *in, const char *ininame)
             break;
 
         case LINE_VALUE:
-            sprintf(tmp, "%s:%s", section, key);
+            snprintf(tmp, sizeof(tmp), "%s:%s", section, key);
             mem_err = dictionary_set(dict, tmp, val);
             break;
 
